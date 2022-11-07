@@ -25,6 +25,8 @@ export function getDefaultPort(key: number){
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
+            opacity: 1,
+            transparency: false
         } as ComponentEntity,
         outputElement: {
             type: "CIRCLE",
@@ -45,6 +47,8 @@ export function getDefaultPort(key: number){
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
+            opacity: 1,
+            transparency: false
         } as ComponentEntity,
         isSelected: false,
         rlcParams: {} as RLCParams,
@@ -76,6 +80,8 @@ export function getDefaultLumped(key: number){
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
+            opacity: 1,
+            transparency: false
         } as ComponentEntity,
         outputElement: {
             type: "CIRCLE",
@@ -96,6 +102,8 @@ export function getDefaultLumped(key: number){
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
+            opacity: 1,
+            transparency: false
         } as ComponentEntity,
         isSelected: false,
         rlcParams: {} as RLCParams,
@@ -129,6 +137,8 @@ export function getDefaultProbe(key: number){
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1]
                 } as TransformationParams,
+                opacity: 1,
+                transparency: false
             } as ComponentEntity,
             {
                 type: "CIRCLE",
@@ -149,6 +159,8 @@ export function getDefaultProbe(key: number){
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1]
                 } as TransformationParams,
+                opacity: 1,
+                transparency: false
             } as ComponentEntity,
             {
                 type: "CIRCLE",
@@ -169,6 +181,8 @@ export function getDefaultProbe(key: number){
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1]
                 } as TransformationParams,
+                opacity: 1,
+                transparency: false
             } as ComponentEntity,
             {
                 type: "CIRCLE",
@@ -189,6 +203,8 @@ export function getDefaultProbe(key: number){
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1]
                 } as TransformationParams,
+                opacity: 1,
+                transparency: false
             } as ComponentEntity,
             {
                 type: "CIRCLE",
@@ -209,6 +225,8 @@ export function getDefaultProbe(key: number){
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1]
                 } as TransformationParams,
+                opacity: 1,
+                transparency: false
             } as ComponentEntity,
             {
                 type: "CIRCLE",
@@ -229,6 +247,8 @@ export function getDefaultProbe(key: number){
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1]
                 } as TransformationParams,
+                opacity: 1,
+                transparency: false
             } as ComponentEntity,
             {
                 type: "CIRCLE",
@@ -249,6 +269,8 @@ export function getDefaultProbe(key: number){
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1]
                 } as TransformationParams,
+                opacity: 1,
+                transparency: false
             } as ComponentEntity,
             {
                 type: "CIRCLE",
@@ -269,6 +291,8 @@ export function getDefaultProbe(key: number){
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1]
                 } as TransformationParams,
+                opacity: 1,
+                transparency: false
             } as ComponentEntity,
             {
                 type: "CIRCLE",
@@ -289,6 +313,8 @@ export function getDefaultProbe(key: number){
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1]
                 } as TransformationParams,
+                opacity: 1,
+                transparency: false
             } as ComponentEntity,
         ]
     }

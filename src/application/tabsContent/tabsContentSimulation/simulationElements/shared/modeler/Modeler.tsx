@@ -115,7 +115,7 @@ export const Modeler: React.FC<ModelerProps> = (
                                                 </mesh>
                                                 <Line
                                                     points={[port.inputElement.transformationParams.position, port.outputElement.transformationParams.position]}
-                                                    color={(port.category === 'port') ? 'red' : 'violet'}
+                                                    color={(port.category === 'port') ? new THREE.Color('red').getHex() : new THREE.Color('violet').getHex()}
                                                     lineWidth={1} alphaWrite={undefined}/>
                                             </group>
                                         )
