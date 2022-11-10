@@ -10,6 +10,7 @@ import {
     SelectedFolderSelector, selectFolder,
     selectProject
 } from '../../../../../../store/projectSlice';
+import {usersStateSelector} from "cad-library";
 
 interface ProjectsProps {
     setShowModal: Function,
@@ -17,17 +18,19 @@ interface ProjectsProps {
     projectsTab: Project[],
     setProjectsTab: Function,
     selectTab: Function,
+    setShowSearchUser: (v:boolean) => void
 }
 
 export const Projects: React.FC<ProjectsProps> = (
     {
-        setShowModal, setShowNewFolderModal, projectsTab, setProjectsTab, selectTab
+        setShowModal, setShowNewFolderModal, projectsTab, setProjectsTab, selectTab, setShowSearchUser
     }
 ) => {
 
     const dispatch = useDispatch()
     const mainFolder = useSelector(mainFolderSelector)
     const selectedFolder = useSelector(SelectedFolderSelector)
+    const user = useSelector(usersStateSelector)
     const [path, setPath] = useState([mainFolder]);
 
     const handleCardClick = (project: Project) => {
@@ -102,12 +105,26 @@ export const Projects: React.FC<ProjectsProps> = (
                             </div>
                             <div className={`flex flex-wrap mt-4`}>
                                 {projects.length > 0 && <h5 className="w-[100%]">Projects</h5>}
-                                {projects.map(project => {
+                                {projects.filter(p => p.owner.userName === user.userName).map(project => {
                                     return (
                                         <DraggableProjectCard project={project} projectsTab={projectsTab}
                                                               setProjectsTab={setProjectsTab}
                                                               handleCardClick={handleCardClick}
                                                               key={project.faunaDocumentId}
+                                                              setShowSearchUser={setShowSearchUser}
+                                        />
+                                    )
+                                })}
+                            </div>
+                            <div className={`flex flex-wrap mt-4`}>
+                                {projects.length > 0 && <h5 className="w-[100%]">Shared Projects</h5>}
+                                {projects.filter(p => p.owner.userName !== user.userName).map(project => {
+                                    return (
+                                        <DraggableProjectCard project={project} projectsTab={projectsTab}
+                                                              setProjectsTab={setProjectsTab}
+                                                              handleCardClick={handleCardClick}
+                                                              key={project.faunaDocumentId}
+                                                              setShowSearchUser={setShowSearchUser}
                                         />
                                     )
                                 })}

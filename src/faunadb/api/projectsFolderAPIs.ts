@@ -300,6 +300,26 @@ export const addIDInFolderProjectsList = async (faunaClient: faunadb.Client, fau
 
 }
 
+export const addIDInFolderProjectsListOfSharedUser = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, projectFaunaID: string, folderOfSharedUser: FaunaFolder) => {
+    console.log('folder', folderOfSharedUser)
+    const response = await faunaClient.query(
+        faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderOfSharedUser.id), {
+            data: {
+                ...folderOfSharedUser.folder,
+                projectList: [...folderOfSharedUser.folder.projectList, projectFaunaID]
+            }
+        })
+    )
+        .catch((err) => console.error(
+            'Error: [%s] %s: %s',
+            err.name,
+            err.message,
+            err.errors()[0].description,
+        ));
+    return response
+
+}
+
 const convertFolderInFaunaFolderDetails = (folder: Folder): FaunaFolderDetails => {
     let faunaFolder = {
         ...folder,
@@ -332,4 +352,44 @@ export const updateProjectInFauna = async (faunaClient: faunadb.Client, faunaQue
         ));
     return response
 
+}
+
+export const getSharedSimulationProjects = async (
+    faunaClient: faunadb.Client,
+    faunaQuery: typeof faunadb.query,
+    user: string
+) => {
+    const response = await faunaClient.query(
+        faunaQuery.Select("data",
+            faunaQuery.Map(
+                faunaQuery.Paginate(
+                    faunaQuery.Match(
+                        faunaQuery.Index("shared_simulationProjects"),
+                        user
+                    )
+                ),
+                faunaQuery.Lambda("project", {
+                    id: faunaQuery.Select(
+                        ["ref", "id"],
+                        faunaQuery.Get(
+                            faunaQuery.Var("project")
+                        )
+                    ),
+                    project: faunaQuery.Select(
+                        ["data"],
+                        faunaQuery.Get(
+                            faunaQuery.Var("project")
+                        )
+                    )
+                })
+            )
+        )
+    )
+        .catch((err) => console.error(
+            'Error: [%s] %s: %s',
+            err.name,
+            err.message,
+            err.errors()[0].description,
+        ));
+    return response as FaunaProject[]
 }

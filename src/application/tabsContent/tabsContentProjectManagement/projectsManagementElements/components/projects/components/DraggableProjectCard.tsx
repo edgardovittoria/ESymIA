@@ -15,20 +15,21 @@ import {
     allProjectFoldersSelector,
     moveObject,
     removeProject,
-    SelectedFolderSelector
+    SelectedFolderSelector, setProjectToShare, shareProject
 } from "../../../../../../../store/projectSlice";
-import {useFaunaQuery} from "cad-library";
+import {useFaunaQuery, usersStateSelector} from "cad-library";
 
 interface DraggableProjectCardProps {
     project: Project,
     projectsTab: Project[],
     setProjectsTab: Function,
     handleCardClick: Function,
+    setShowSearchUser: (v:boolean) => void
 }
 
 export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     {
-        project, setProjectsTab, projectsTab, handleCardClick
+        project, setProjectsTab, projectsTab, handleCardClick, setShowSearchUser
     }
 ) => {
 
@@ -36,6 +37,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     const {execQuery} = useFaunaQuery()
     const selectedFolder = useSelector(SelectedFolderSelector)
     const allProjectFolders = useSelector(allProjectFoldersSelector)
+    const user = useSelector(usersStateSelector)
 
     const [{isDragging}, drag, dragPreview] = useDrag(() => ({
         // "type" is required. It is used by the "accept" specification of drop targets.
@@ -120,7 +122,9 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     </Item>
                     <Item onClick={(p) => {
                         p.event.stopPropagation()
-                    }} disabled>
+                        dispatch(setProjectToShare(project))
+                        setShowSearchUser(true)
+                    }} disabled={user.userRole !== 'Base'}>
                         <BiShareAlt
                             className="mr-4 text-primaryColor w-[20px] h-[20px]"
                         />

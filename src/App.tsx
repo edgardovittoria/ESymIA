@@ -27,7 +27,13 @@ import {
 } from "cad-library";
 import {CreateNewFolderModal} from "./application/modals/createNewFolderModal/CreateNewFolderModal";
 import {selectFolder} from "./store/projectSlice";
-import {constructFolderStructure, getFoldersByOwner, getSimulationProjectsByOwner} from "./faunadb/api/projectsFolderAPIs";
+import {
+    constructFolderStructure,
+    getFoldersByOwner,
+    getSharedSimulationProjects,
+    getSimulationProjectsByOwner
+} from "./faunadb/api/projectsFolderAPIs";
+import {SearchUserAndShare} from "./application/modals/searchUserAndShare/searchUserAndShare";
 
 
 function App() {
@@ -44,6 +50,7 @@ function App() {
     const [showCreateNewProjectModal, setShowCreateNewProjectModal] = useState(false);
     const [showCreateNewFolderModal, setShowCreateNewFolderModal] = useState(false);
     const [showModalLoadFromDB, setShowModalLoadFromDB] = useState(false)
+    const [showSearchUser, setShowSearchUser] = useState(false);
     const menuItems = getMenuItemsArrayBasedOnTabType(tabSelected)
     const [menuItemSelected, setMenuItemSelected] = useState(menuItems[0]);
     const [selectedSimulation, setSelectedSimulation] = useState<Simulation | undefined>(undefined);
@@ -59,9 +66,14 @@ function App() {
             execQuery(getFoldersByOwner, user.userName)
                 .then(folders => {
                     execQuery(getSimulationProjectsByOwner, user.userName).then(projects => {
-                        let folder = constructFolderStructure(folders, projects)
-                        dispatch(setProjectsFolderToUser(folder))
-                        dispatch(selectFolder(folder.faunaDocumentId as string))
+                        execQuery(getSharedSimulationProjects, user.userName).then(sharedProjects => {
+                            let allProjects = [...projects, ...sharedProjects]
+                            console.log(allProjects)
+                            let folder = constructFolderStructure(folders, allProjects)
+                            dispatch(setProjectsFolderToUser(folder))
+                            dispatch(selectFolder(folder.faunaDocumentId as string))
+                        })
+
                     })
                 })
         }
@@ -103,6 +115,7 @@ function App() {
                     setSimulationCoreMenuItemSelected={setMenuItemSelected}
                     setSelectedSimulation={setSelectedSimulation}
                     setMenuItem={setMenuItemSelected}
+                    setShowSearchUser={setShowSearchUser}
                 />
                 :
                 <TabsContentSimulationFactory
@@ -135,6 +148,7 @@ function App() {
                     } as ImportActionParamsObject
                 }
             />}
+            {showSearchUser && <SearchUserAndShare setShowSearchUser={setShowSearchUser}/>}
         </>
 
 

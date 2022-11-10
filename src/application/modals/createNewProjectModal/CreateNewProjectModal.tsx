@@ -42,7 +42,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = (
                 simulations: [],
                 screenshot: undefined,
                 owner: user,
-                sharedWidth: [] as UsersState[]
+                sharedWith: [] as string[]
             }
             execQuery(createSimulationProjectInFauna, newProject).then((res: any) => {
                 newProject = {

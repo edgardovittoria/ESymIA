@@ -11,6 +11,6 @@ export type Project = {
     simulations: Simulation[],
     screenshot: string | undefined,
     owner: UsersState
-    sharedWidth?: UsersState[]
+    sharedWith?: string[]
     faunaDocumentId?: string
 }

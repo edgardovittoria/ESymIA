@@ -16,7 +16,7 @@ export type FaunaProjectDetails = {
     simulations: Simulation[],
     screenshot: string | undefined,
     owner: UsersState
-    sharedWidth?: UsersState[]
+    sharedWith?: string[]
 }
 
 export type FaunaFolder = {
