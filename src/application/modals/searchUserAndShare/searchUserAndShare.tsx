@@ -1,7 +1,8 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Combobox, Dialog, Transition} from "@headlessui/react";
 import {BiCheck} from "react-icons/bi";
 import {HiArrowsUpDown} from "react-icons/hi2";
+import {ImSpinner} from "react-icons/im";
 import {SearchUser} from "./components/SearchUser";
 import {useDispatch, useSelector} from "react-redux";
 import {projectToShareSelector, shareProject} from "../../../store/projectSlice";
@@ -12,15 +13,11 @@ import {
     getFoldersByOwner,
     updateProjectInFauna
 } from "../../../faunadb/api/projectsFolderAPIs";
+import axios from "axios";
 
 interface SearchUserAndShareProps {
     setShowSearchUser: (v: boolean) => void
 }
-
-const people: string[] = [
-    'Gianni Frittella',
-    'edgardo.vittoria@student.univaq.it',
-]
 
 export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
     {
@@ -28,6 +25,27 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
     }
 ) => {
 
+    const [users, setUsers] = useState<string[]>([]);
+    let usersList: string[] = []
+
+    useEffect(() => {
+        setSpinner(true)
+        axios.get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles`, {
+            headers: {authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`}
+        }).then(res => {
+            res.data.filter((r: { name: string; }) => r.name === "Base").forEach((role: { id: string; }) => {
+                axios.get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles/${role.id}/users`, {
+                    headers: {authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`}
+                }).then(res => {
+                    res.data.forEach((u: { name: string; }) => {
+                        usersList.push(u.name)
+                    })
+                    setUsers(usersList)
+                    setSpinner(false)
+                })
+            })
+        })
+    }, []);
 
     const dispatch = useDispatch()
     const projectToShare = useSelector(projectToShareSelector)
@@ -37,13 +55,14 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
 
     const handleClose = () => setShowSearchUser(false);
 
-    const [selected, setSelected] = useState(people[0])
+    const [selected, setSelected] = useState("")
     const [query, setQuery] = useState('')
+    const [spinner, setSpinner] = useState(true);
 
     const filteredPeople: string[] =
         query === ''
-            ? people.filter(p => p !== user.userName)
-            : people.filter(p => p !== user.userName).filter((person) =>
+            ? users.filter(p => p !== user.userName)
+            : users.filter(p => p !== user.userName).filter((person) =>
                 person.toLowerCase()
                     .replace(/\s+/g, '')
                     .includes(query.toLowerCase().replace(/\s+/g, ''))
@@ -79,35 +98,46 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
                                 <div className="w-1/5 bg-white rounded-lg p-5 shadow-2xl">
                                     <h5 >Share Project</h5>
                                     <hr className="mb-10"/>
-                                    <div className="flex items-center">
-                                        <span className="w-1/3">Share with:</span>
-                                        <SearchUser selected={selected} setSelected={setSelected}
-                                                    filteredPeople={filteredPeople} query={query} setQuery={setQuery}/>
-                                    </div>
-                                    <div className="mt-10 flex justify-between">
-                                        <button
-                                            type="button"
-                                            className="button bg-red-500 py-1 px-2 text-white text-sm"
-                                            onClick={handleClose}
-                                        >
-                                            CANCEL
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="button buttonPrimary py-1 px-2 text-sm"
-                                            onClick={() => {
-                                                dispatch(shareProject({projectToShare: projectToShare as Project, user: selected}))
-                                                execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...(projectToShare as Project).sharedWith as string[], selected]} as Project)
-                                                execQuery(getFoldersByOwner, selected).then(res => {
-                                                    console.log(res)
-                                                   execQuery(addIDInFolderProjectsListOfSharedUser, projectToShare?.faunaDocumentId, res[0])
-                                                })
-                                                handleClose()
-                                            }}
-                                        >
-                                            SHARE
-                                        </button>
-                                    </div>
+                                    {
+                                        spinner ? (
+                                            <div className="flex justify-center items-center">
+                                                <ImSpinner className={`animate-spin w-8 h-8`} />
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center">
+                                                    <span className="w-1/3">Share with:</span>
+                                                    <SearchUser selected={selected} setSelected={setSelected}
+                                                                filteredPeople={filteredPeople} query={query} setQuery={setQuery}/>
+                                                </div>
+                                                <div className="mt-10 flex justify-between">
+                                                    <button
+                                                        type="button"
+                                                        className="button bg-red-500 py-1 px-2 text-white text-sm"
+                                                        onClick={handleClose}
+                                                    >
+                                                        CANCEL
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="button buttonPrimary py-1 px-2 text-sm"
+                                                        onClick={() => {
+                                                            dispatch(shareProject({projectToShare: projectToShare as Project, user: selected}))
+                                                            execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...(projectToShare as Project).sharedWith as string[], selected]} as Project)
+                                                            execQuery(getFoldersByOwner, selected).then(res => {
+                                                                console.log(res)
+                                                                execQuery(addIDInFolderProjectsListOfSharedUser, projectToShare?.faunaDocumentId, res[0])
+                                                            })
+                                                            handleClose()
+                                                        }}
+                                                    >
+                                                        SHARE
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )
+
+                                    }
                                 </div>
                             </Transition.Child>
                         </div>
