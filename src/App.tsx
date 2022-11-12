@@ -55,7 +55,7 @@ function App() {
     const [menuItemSelected, setMenuItemSelected] = useState(menuItems[0]);
     const [selectedSimulation, setSelectedSimulation] = useState<Simulation | undefined>(undefined);
     const mainFolder = useSelector(mainFolderSelector)
-    const [chartVisualizationMode, setChartVisualizationMode] = useState<'grid' | 'full'>("grid");
+
     
 
     const {execQuery} = useFaunaQuery()
@@ -68,7 +68,6 @@ function App() {
                     execQuery(getSimulationProjectsByOwner, user.email).then(projects => {
                         execQuery(getSharedSimulationProjects, user.email).then(sharedProjects => {
                             let allProjects = [...projects, ...sharedProjects]
-                            console.log(allProjects)
                             let folder = constructFolderStructure(folders, allProjects)
                             dispatch(setProjectsFolderToUser(folder))
                             dispatch(selectFolder(folder.faunaDocumentId as string))

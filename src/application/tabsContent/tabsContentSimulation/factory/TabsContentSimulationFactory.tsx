@@ -211,8 +211,10 @@ export const TabsContentSimulationFactory: React.FC<TabsContentSimulationFactory
                             setSelectedPort={setSelectedPort}
                         />
                     </LeftPanel>
-                    {(selectedProject && chartVisualizationMode === 'full' && selectedProject.simulations.length > 0) ?
-                        <>
+                    {(selectedProject && selectedProject.simulations.length > 0)
+                    ?
+                    (chartVisualizationMode === 'full') ?
+                    <>
                             {selectedTabLeftPanel === "Results" && <ChartVisualizationMode chartVisualizationMode={chartVisualizationMode} setChartVisualizationMode={setChartVisualizationMode} chartsScaleMode={chartsScaleMode} setChartsScaleMode={setChartsScaleMode}/>}
                             <div className="overflow-scroll grid grid-cols-1 gap-4 max-h-[800px]">
                                 <ChartsList simulation={simulation} project={selectedProject} scaleMode={chartsScaleMode}/>
@@ -226,7 +228,9 @@ export const TabsContentSimulationFactory: React.FC<TabsContentSimulationFactory
                             </div>
                         </>
 
-                    }
+                :
+                <></>
+                }
                 </ResultsContent>
             )
         default:

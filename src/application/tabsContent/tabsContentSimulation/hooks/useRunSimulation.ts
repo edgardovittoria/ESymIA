@@ -1,15 +1,13 @@
 import {useEffect, useState} from "react";
 import {Simulation} from "../../../../model/Simulation";
 import {getSimulationByName} from "../../../../faunadb/api/simulationAPIs";
-import {ComponentEntity, useFaunaQuery} from "cad-library";
+import {useFaunaQuery} from "cad-library";
 import {Project} from "../../../../model/Project";
-import {getMaterialListFrom} from "./auxiliaryFunctions/auxiliaryFunctions";
 import {useDispatch, useSelector} from "react-redux";
 import {createSimulation, simulationSelector, updateSimulation} from "../../../../store/projectSlice";
-import {MeshApprovedSelector, MesherOutputSelector} from "../../../../store/mesherSlice";
-import {setSimulationStatus, setSolverOutput, SimulationStatusSelector} from "../../../../store/solverSlice";
-import {Port, Probe, TempLumped} from "../../../../model/Port";
-import {exportSolverJson} from "../../../../importExport/exportFunctions";
+import {MeshApprovedSelector} from "../../../../store/mesherSlice";
+import {setSimulationStatus, setSolverOutput} from "../../../../store/solverSlice";
+import {Port, TempLumped} from "../../../../model/Port";
 import axios from "axios";
 import {SolverOutput} from "../../../../model/SolverInputOutput";
 
@@ -20,9 +18,7 @@ export const useRunSimulation =
 
         const dispatch = useDispatch()
         const simulations = useSelector(simulationSelector)
-        const mesherOutput = useSelector(MesherOutputSelector)
         const meshApproved = useSelector(MeshApprovedSelector)
-        const simulationStatus = useSelector(SimulationStatusSelector)
         const [newSimulation, setNewSimulation] = useState<Simulation>({} as Simulation);
         const {execQuery} = useFaunaQuery()
 
@@ -58,16 +54,6 @@ export const useRunSimulation =
                 })
 
 
-                let dataToSendToSolver = {
-                    mesherOutput: undefined,
-                    ports: ports,
-                    lumped_elements: lumped_array,
-                    materials: getMaterialListFrom(associatedProject?.model.components as ComponentEntity[]),
-                    frequencies: frequencyArray,
-                    signals: signalsValuesArray,
-                    powerPort: (associatedProject) && associatedProject.signal?.powerPort
-
-                }
                 //TODO: add http request to execute the simulation
                 /*
                 * axios.post("url", dataToSendToSolver).then((res) => {
@@ -89,7 +75,7 @@ export const useRunSimulation =
                 //exportSolverJson(dataToSendToSolver)
                 setTimeout(() => {
                     dispatch(setSimulationStatus("completed"))
-                    execQuery(getSimulationByName, 'simulation1').then(res => {
+                    execQuery(getSimulationByName, 'simulation1').then(() => {
 
                     })
                         .catch(() => {
