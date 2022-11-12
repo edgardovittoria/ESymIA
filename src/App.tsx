@@ -63,10 +63,10 @@ function App() {
     //USE EFFECT
     useEffect(() => {
         if (user.userName) {
-            execQuery(getFoldersByOwner, user.userName)
+            execQuery(getFoldersByOwner, user.email)
                 .then(folders => {
-                    execQuery(getSimulationProjectsByOwner, user.userName).then(projects => {
-                        execQuery(getSharedSimulationProjects, user.userName).then(sharedProjects => {
+                    execQuery(getSimulationProjectsByOwner, user.email).then(projects => {
+                        execQuery(getSharedSimulationProjects, user.email).then(sharedProjects => {
                             let allProjects = [...projects, ...sharedProjects]
                             console.log(allProjects)
                             let folder = constructFolderStructure(folders, allProjects)

@@ -132,6 +132,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     </Item>
                     <Separator/>
                     <Item onClick={(p) => {
+                        //TODO: change remove function
                         p.event.stopPropagation()
                         dispatch(removeProject(project.faunaDocumentId as string))
                         setProjectsTab(projectsTab.filter(p => p.name !== project.name))

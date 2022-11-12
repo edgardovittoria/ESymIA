@@ -9,7 +9,7 @@ import {projectToShareSelector, shareProject} from "../../../store/projectSlice"
 import {Project} from "../../../model/Project";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import {
-    addIDInFolderProjectsList, addIDInFolderProjectsListOfSharedUser,
+    addIDInFolderProjectsListOfSharedUser,
     getFoldersByOwner,
     updateProjectInFauna
 } from "../../../faunadb/api/projectsFolderAPIs";
@@ -33,10 +33,12 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
         axios.get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles`, {
             headers: {authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`}
         }).then(res => {
+            //TODO: change role to Premium
             res.data.filter((r: { name: string; }) => r.name === "Base").forEach((role: { id: string; }) => {
                 axios.get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles/${role.id}/users`, {
                     headers: {authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`}
                 }).then(res => {
+                    //console.log(res.data)
                     res.data.forEach((u: { name: string; }) => {
                         usersList.push(u.name)
                     })
@@ -61,8 +63,8 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
 
     const filteredPeople: string[] =
         query === ''
-            ? users.filter(p => p !== user.userName)
-            : users.filter(p => p !== user.userName).filter((person) =>
+            ? users.filter(p => p !== user.email)
+            : users.filter(p => p !== user.email).filter((person) =>
                 person.toLowerCase()
                     .replace(/\s+/g, '')
                     .includes(query.toLowerCase().replace(/\s+/g, ''))
@@ -125,7 +127,6 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
                                                             dispatch(shareProject({projectToShare: projectToShare as Project, user: selected}))
                                                             execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...(projectToShare as Project).sharedWith as string[], selected]} as Project)
                                                             execQuery(getFoldersByOwner, selected).then(res => {
-                                                                console.log(res)
                                                                 execQuery(addIDInFolderProjectsListOfSharedUser, projectToShare?.faunaDocumentId, res[0])
                                                             })
                                                             handleClose()

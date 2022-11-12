@@ -26,6 +26,27 @@ export const getFoldersByOwner = async (faunaClient: faunadb.Client, faunaQuery:
     return response as FaunaFolder[]
 }
 
+export const getFoldersByOwnerUsername = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, owner: string) => {
+    const response = await faunaClient.query(
+        faunaQuery.Select("data",
+            faunaQuery.Map(
+                faunaQuery.Paginate(faunaQuery.Match(faunaQuery.Index("folders_by_owner_username"), owner)),
+                faunaQuery.Lambda("folder", {
+                    id: faunaQuery.Select(["ref", "id"], faunaQuery.Get(faunaQuery.Var("folder"))),
+                    folder: faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Var("folder")))
+                })
+            )
+        )
+    )
+        .catch((err) => console.error(
+            'Error: [%s] %s: %s',
+            err.name,
+            err.message,
+            err.errors()[0].description,
+        ));
+    return response as FaunaFolder[]
+}
+
 export const getSimulationProjectsByOwner = async (
     faunaClient: faunadb.Client,
     faunaQuery: typeof faunadb.query,

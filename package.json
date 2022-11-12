@@ -19,7 +19,7 @@
     "@types/three": "^0.132.2",
     "axios": "^0.24.0",
     "browser-image-compression": "^1.0.17",
-    "cad-library": "^0.1.40",
+    "cad-library": "^0.1.42",
     "chart.js": "^3.7.0",
     "faunadb": "^4.5.4",
     "font-awesome": "^4.7.0",
