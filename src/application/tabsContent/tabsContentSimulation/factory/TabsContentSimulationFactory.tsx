@@ -229,7 +229,9 @@ export const TabsContentSimulationFactory: React.FC<TabsContentSimulationFactory
                         </>
 
                 :
-                <></>
+                <div className='w-full text-center mt-80'> 
+                    Launch a simulation and come back here to visulize the results.
+                </div>
                 }
                 </ResultsContent>
             )
