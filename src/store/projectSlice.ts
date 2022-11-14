@@ -22,6 +22,7 @@ export type ProjectState = {
     selectedFolder: Folder,
     selectedComponent: ComponentEntity[]
     projectToShare?: Project
+    projectToRename?: Project
 }
 
 export const ProjectSlice = createSlice({
@@ -75,6 +76,18 @@ export const ProjectSlice = createSlice({
         },
         setProjectToShare(state: ProjectState, action: PayloadAction<Project>){
           state.projectToShare = action.payload
+        },
+        renameProject(state: ProjectState, action: PayloadAction<{projectToRename: Project, name: string}>){
+            let project = findProjectByName(takeAllProjectsIn(state.projects), action.payload.projectToRename.name);
+            if(project) {
+                project.name = action.payload.name
+                state.selectedFolder.projectList = state.selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId)
+                state.selectedFolder.projectList.push(project)
+            }
+
+        },
+        setProjectToRename(state: ProjectState, action: PayloadAction<Project>){
+            state.projectToRename = action.payload
         },
         selectProject(state: ProjectState, action: PayloadAction<string | undefined>) {
             if (action.payload !== undefined) {
@@ -190,7 +203,7 @@ export const {
     //qui vanno inserite tutte le azioni che vogliamo esporatare
     addProject, removeProject, importModel, selectProject, createSimulation, updateSimulation, addPorts,
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
-    setProjectsFolderToUser, moveObject, removeFolder, shareProject, setProjectToShare
+    setProjectsFolderToUser, moveObject, removeFolder, shareProject, setProjectToShare, renameProject, setProjectToRename
 } = ProjectSlice.actions
 
 
@@ -204,6 +217,7 @@ export const selectedProjectSelector = (state: { projects: ProjectState }) => fi
 export const selectedComponentSelector = (state: { projects: ProjectState }) => state.projects.selectedComponent;
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulations;
 export const projectToShareSelector = (state: {projects: ProjectState}) => state.projects.projectToShare
+export const projectToRenameSelector = (state: {projects: ProjectState}) => state.projects.projectToRename
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
     let allFolders: Folder[] = []
     return recursiveFindFolders(state.projects.projects, allFolders) 

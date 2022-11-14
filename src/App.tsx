@@ -34,6 +34,7 @@ import {
     getSimulationProjectsByOwner
 } from "./faunadb/api/projectsFolderAPIs";
 import {SearchUserAndShare} from "./application/modals/searchUserAndShare/searchUserAndShare";
+import {RenameModal} from "./application/modals/renameModal/RenameModal";
 
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
     const [showCreateNewFolderModal, setShowCreateNewFolderModal] = useState(false);
     const [showModalLoadFromDB, setShowModalLoadFromDB] = useState(false)
     const [showSearchUser, setShowSearchUser] = useState(false);
+    const [showRename, setShowRename] = useState(false);
     const menuItems = getMenuItemsArrayBasedOnTabType(tabSelected)
     const [menuItemSelected, setMenuItemSelected] = useState(menuItems[0]);
     const [selectedSimulation, setSelectedSimulation] = useState<Simulation | undefined>(undefined);
@@ -115,6 +117,7 @@ function App() {
                     setSelectedSimulation={setSelectedSimulation}
                     setMenuItem={setMenuItemSelected}
                     setShowSearchUser={setShowSearchUser}
+                    setShowRename={setShowRename}
                 />
                 :
                 <TabsContentSimulationFactory
@@ -148,6 +151,7 @@ function App() {
                 }
             />}
             {showSearchUser && <SearchUserAndShare setShowSearchUser={setShowSearchUser}/>}
+            {showRename && <RenameModal setShowRename={setShowRename}/>}
         </>
 
 

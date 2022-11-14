@@ -15,7 +15,7 @@ import {
     allProjectFoldersSelector,
     moveObject,
     removeProject,
-    SelectedFolderSelector, setProjectToShare, shareProject
+    SelectedFolderSelector, setProjectToRename, setProjectToShare, shareProject
 } from "../../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 
@@ -25,11 +25,12 @@ interface DraggableProjectCardProps {
     setProjectsTab: Function,
     handleCardClick: Function,
     setShowSearchUser: (v:boolean) => void
+    setShowRename: (v:boolean) => void
 }
 
 export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     {
-        project, setProjectsTab, projectsTab, handleCardClick, setShowSearchUser
+        project, setProjectsTab, projectsTab, handleCardClick, setShowSearchUser, setShowRename
     }
 ) => {
 
@@ -104,7 +105,9 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     </Submenu>
                     <Item onClick={(p) => {
                         p.event.stopPropagation()
-                    }} disabled>
+                        dispatch(setProjectToRename(project))
+                        setShowRename(true)
+                    }}>
                         <BiRename
                             className="mr-4 text-primaryColor w-[20px] h-[20px]"
                         />

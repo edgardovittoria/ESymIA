@@ -16,13 +16,14 @@ interface TabsContentProjectManagementFactoryProps {
     setSimulationCoreMenuItemSelected: Function,
     setSelectedSimulation: Function,
     setMenuItem: Function,
-    setShowSearchUser: (v:boolean) => void
+    setShowSearchUser: (v:boolean) => void,
+    setShowRename: (v:boolean) => void
 }
 
 export const TabsContentProjectManagementFactory: React.FC<TabsContentProjectManagementFactoryProps> = (
     {
         menuItem, setShowModal, setShowNewFolderModal, projectsTab, setProjectsTab, selectTab,
-        setSimulationCoreMenuItemSelected, setSelectedSimulation, setMenuItem, setShowSearchUser
+        setSimulationCoreMenuItemSelected, setSelectedSimulation, setMenuItem, setShowSearchUser, setShowRename
     }
 ) => {
 
@@ -56,6 +57,7 @@ export const TabsContentProjectManagementFactory: React.FC<TabsContentProjectMan
                             setProjectsTab={setProjectsTab}
                             selectTab={selectTab}
                             setShowSearchUser={setShowSearchUser}
+                            setShowRename={setShowRename}
                         />
                     </div>
                     <RightPanel/>

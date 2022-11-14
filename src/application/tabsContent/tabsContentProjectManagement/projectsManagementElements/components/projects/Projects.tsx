@@ -18,12 +18,14 @@ interface ProjectsProps {
     projectsTab: Project[],
     setProjectsTab: Function,
     selectTab: Function,
-    setShowSearchUser: (v:boolean) => void
+    setShowSearchUser: (v:boolean) => void,
+    setShowRename: (v:boolean) => void,
 }
 
 export const Projects: React.FC<ProjectsProps> = (
     {
-        setShowModal, setShowNewFolderModal, projectsTab, setProjectsTab, selectTab, setShowSearchUser
+        setShowModal, setShowNewFolderModal, projectsTab, setProjectsTab, selectTab, setShowSearchUser,
+        setShowRename
     }
 ) => {
 
@@ -112,6 +114,7 @@ export const Projects: React.FC<ProjectsProps> = (
                                                               handleCardClick={handleCardClick}
                                                               key={project.faunaDocumentId}
                                                               setShowSearchUser={setShowSearchUser}
+                                                              setShowRename={setShowRename}
                                         />
                                     )
                                 })}
@@ -125,6 +128,7 @@ export const Projects: React.FC<ProjectsProps> = (
                                                               handleCardClick={handleCardClick}
                                                               key={project.faunaDocumentId}
                                                               setShowSearchUser={setShowSearchUser}
+                                                              setShowRename={setShowRename}
                                         />
                                     )
                                 })}
