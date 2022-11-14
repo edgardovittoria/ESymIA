@@ -19,9 +19,8 @@ import {BsFillFolderSymlinkFill} from "react-icons/bs"
 import {useDispatch, useSelector} from "react-redux";
 import {
     allProjectFoldersSelector,
-    moveObject, removeFolder,
-    SelectedFolderSelector,
-    selectFolder, setFolderToRename
+    moveObject, removeFolder, SelectedFolderSelector,
+    selectFolder, setFolderToRename, setProjectToRename
 } from "../../../../../../../store/projectSlice";
 import {useFaunaQuery} from "cad-library";
 
@@ -94,6 +93,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
 
     function handleContextMenu(event: any) {
         event.preventDefault();
+        dispatch(setProjectToRename(undefined))
         show(event)
     }
 

@@ -15,7 +15,7 @@ import {
     allProjectFoldersSelector,
     moveObject,
     removeProject,
-    SelectedFolderSelector, setProjectToRename, setProjectToShare, shareProject
+    SelectedFolderSelector, setFolderToRename, setProjectToRename, setProjectToShare, shareProject
 } from "../../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 
@@ -55,6 +55,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
 
     function handleContextMenu(event: any) {
         event.preventDefault();
+        dispatch(setFolderToRename(undefined))
         show(event)
     }
 

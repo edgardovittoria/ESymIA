@@ -1,9 +1,9 @@
 import React, {Fragment, useState} from 'react';
 import {Dialog, Transition} from "@headlessui/react";
-import {folderToRenameSelector, projectToRenameSelector, renameProject} from "../../../../store/projectSlice";
+import {renameProject} from "../../../../store/projectSlice";
 import {Project} from "../../../../model/Project";
 import {updateProjectInFauna} from "../../../../faunadb/api/projectsFolderAPIs";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {useFaunaQuery} from "cad-library";
 
 interface RenameProjectProps {

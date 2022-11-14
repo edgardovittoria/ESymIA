@@ -85,9 +85,8 @@ export const ProjectSlice = createSlice({
                 state.selectedFolder.projectList = state.selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId)
                 state.selectedFolder.projectList.push(project)
             }
-            state.projectToRename = undefined
         },
-        setFolderToRename(state: ProjectState, action: PayloadAction<Folder>){
+        setFolderToRename(state: ProjectState, action: PayloadAction<Folder | undefined>){
             state.folderToRename = action.payload
         },
         renameFolder(state: ProjectState, action: PayloadAction<{folderToRename: Folder, name: string}>){
@@ -96,9 +95,8 @@ export const ProjectSlice = createSlice({
                 ...action.payload.folderToRename,
                 name: action.payload.name
             })
-            state.folderToRename = undefined
         },
-        setProjectToRename(state: ProjectState, action: PayloadAction<Project>){
+        setProjectToRename(state: ProjectState, action: PayloadAction<Project | undefined>){
             state.projectToRename = action.payload
         },
         selectProject(state: ProjectState, action: PayloadAction<string | undefined>) {

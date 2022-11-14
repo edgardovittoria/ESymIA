@@ -1,15 +1,10 @@
 import React, {Fragment, useState} from 'react';
-import {Project} from "../../../../model/Project";
 import {Folder} from "../../../../model/Folder";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {useFaunaQuery} from "cad-library";
 import {Dialog, Transition} from "@headlessui/react";
-import {renameFolder, renameProject, SelectedFolderSelector} from "../../../../store/projectSlice";
-import {
-    addIDInSubFoldersList,
-    removeIDInSubFoldersList, updateFolderInFauna,
-    updateProjectInFauna
-} from "../../../../faunadb/api/projectsFolderAPIs";
+import {renameFolder} from "../../../../store/projectSlice";
+import {updateFolderInFauna} from "../../../../faunadb/api/projectsFolderAPIs";
 
 interface RenameFolderProps {
     folderToRename: Folder,
@@ -23,7 +18,6 @@ export const RenameFolder: React.FC<RenameFolderProps> = (
 ) => {
 
     const dispatch = useDispatch()
-    const selectedFolder = useSelector(SelectedFolderSelector)
 
     const [name, setName] = useState("");
 
