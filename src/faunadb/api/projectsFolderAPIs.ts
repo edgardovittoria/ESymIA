@@ -375,6 +375,22 @@ export const updateProjectInFauna = async (faunaClient: faunadb.Client, faunaQue
 
 }
 
+export const updateFolderInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToUpdate: Folder) => {
+    const response = await faunaClient.query(
+        faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderToUpdate.faunaDocumentId), {
+            data: convertFolderInFaunaFolderDetails(folderToUpdate)
+        })
+    )
+        .catch((err) => console.error(
+            'Error: [%s] %s: %s',
+            err.name,
+            err.message,
+            err.errors()[0].description,
+        ));
+    return response
+
+}
+
 export const getSharedSimulationProjects = async (
     faunaClient: faunadb.Client,
     faunaQuery: typeof faunadb.query,

@@ -21,7 +21,7 @@ import {
     allProjectFoldersSelector,
     moveObject, removeFolder,
     SelectedFolderSelector,
-    selectFolder
+    selectFolder, setFolderToRename
 } from "../../../../../../../store/projectSlice";
 import {useFaunaQuery} from "cad-library";
 
@@ -29,11 +29,12 @@ interface DroppableAndDraggableFolderProps {
     folder: Folder,
     path: Folder[],
     setPath: Function,
+    setShowRename: (v:boolean) => void
 }
 
 export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderProps> = (
     {
-        folder, path, setPath
+        folder, path, setPath, setShowRename
     }
 ) => {
 
@@ -142,7 +143,9 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                 </Submenu>
                 <Item onClick={(p) => {
                     p.event.stopPropagation()
-                }} disabled>
+                    dispatch(setFolderToRename(folder))
+                    setShowRename(true)
+                }}>
                     <BiRename
                         className="mr-4 text-primaryColor w-[20px] h-[20px]"
                     />

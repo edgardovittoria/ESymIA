@@ -23,6 +23,7 @@ export type ProjectState = {
     selectedComponent: ComponentEntity[]
     projectToShare?: Project
     projectToRename?: Project
+    folderToRename?: Folder
 }
 
 export const ProjectSlice = createSlice({
@@ -84,7 +85,18 @@ export const ProjectSlice = createSlice({
                 state.selectedFolder.projectList = state.selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId)
                 state.selectedFolder.projectList.push(project)
             }
-
+            state.projectToRename = undefined
+        },
+        setFolderToRename(state: ProjectState, action: PayloadAction<Folder>){
+            state.folderToRename = action.payload
+        },
+        renameFolder(state: ProjectState, action: PayloadAction<{folderToRename: Folder, name: string}>){
+            removeFolderFromStore(state, action.payload.folderToRename)
+            addFolderToStore(state, {
+                ...action.payload.folderToRename,
+                name: action.payload.name
+            })
+            state.folderToRename = undefined
         },
         setProjectToRename(state: ProjectState, action: PayloadAction<Project>){
             state.projectToRename = action.payload
@@ -176,12 +188,6 @@ export const ProjectSlice = createSlice({
             }
         },
         setAssociatedSignal(state: ProjectState, action: PayloadAction<Signal>) {
-            /*let selectedPort = findSelectedPort(findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject));
-            if (selectedPort) {
-                if (selectedPort.category === 'port' || selectedPort.category === 'lumped') {
-                    selectedPort.associatedSignal = action.payload
-                }
-            }*/
             let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
             if(project) project.signal = action.payload
         },
@@ -203,7 +209,8 @@ export const {
     //qui vanno inserite tutte le azioni che vogliamo esporatare
     addProject, removeProject, importModel, selectProject, createSimulation, updateSimulation, addPorts,
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
-    setProjectsFolderToUser, moveObject, removeFolder, shareProject, setProjectToShare, renameProject, setProjectToRename
+    setProjectsFolderToUser, moveObject, removeFolder, shareProject, setProjectToShare, renameProject, setProjectToRename,
+    renameFolder, setFolderToRename
 } = ProjectSlice.actions
 
 
@@ -218,6 +225,7 @@ export const selectedComponentSelector = (state: { projects: ProjectState }) => 
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulations;
 export const projectToShareSelector = (state: {projects: ProjectState}) => state.projects.projectToShare
 export const projectToRenameSelector = (state: {projects: ProjectState}) => state.projects.projectToRename
+export const folderToRenameSelector = (state: {projects: ProjectState}) => state.projects.folderToRename
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
     let allFolders: Folder[] = []
     return recursiveFindFolders(state.projects.projects, allFolders) 

@@ -18,8 +18,8 @@ interface ProjectsProps {
     projectsTab: Project[],
     setProjectsTab: Function,
     selectTab: Function,
-    setShowSearchUser: (v:boolean) => void,
-    setShowRename: (v:boolean) => void,
+    setShowSearchUser: (v: boolean) => void,
+    setShowRename: (v: boolean) => void,
 }
 
 export const Projects: React.FC<ProjectsProps> = (
@@ -101,7 +101,10 @@ export const Projects: React.FC<ProjectsProps> = (
                                 {folders.length > 0 && <h5 className="w-[100%]">Folders</h5>}
                                 {folders.map((folder) => {
                                     return (
-                                        <DroppableAndDraggableFolder key={folder.faunaDocumentId} folder={folder} path={path} setPath={setPath}/>
+                                        <DroppableAndDraggableFolder key={folder.faunaDocumentId} folder={folder}
+                                                                     path={path} setPath={setPath}
+                                                                     setShowRename={setShowRename}
+                                        />
                                     )
                                 })}
                             </div>
