@@ -1,17 +1,16 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {Combobox, Dialog, Transition} from "@headlessui/react";
-import {BiCheck} from "react-icons/bi";
-import {HiArrowsUpDown} from "react-icons/hi2";
+import {Dialog, Transition} from "@headlessui/react";
 import {ImSpinner} from "react-icons/im";
 import {SearchUser} from "./components/SearchUser";
 import {useDispatch, useSelector} from "react-redux";
-import {projectToShareSelector, shareProject} from "../../../store/projectSlice";
+import {folderToShareSelector, projectToShareSelector, setFolderToShare, setProjectToShare, shareFolder, shareProject} from "../../../store/projectSlice";
 import {Project} from "../../../model/Project";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import {
-    addIDInFolderProjectsListOfSharedUser,
-    getFoldersByOwner,
-    updateProjectInFauna
+    updateFolderInFauna,
+    updateFoldersSharingInfo,
+    updateProjectInFauna,
+    updateProjectSharingInfo
 } from "../../../faunadb/api/projectsFolderAPIs";
 import axios from "axios";
 
@@ -51,11 +50,15 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
 
     const dispatch = useDispatch()
     const projectToShare = useSelector(projectToShareSelector)
+    const folderToShare = useSelector(folderToShareSelector)
     const user = useSelector(usersStateSelector)
 
     const {execQuery} = useFaunaQuery()
 
-    const handleClose = () => setShowSearchUser(false);
+    const handleClose = () => {
+        dispatch(setProjectToShare(undefined))
+        dispatch(setFolderToShare(undefined))
+        setShowSearchUser(false)};
 
     const [selected, setSelected] = useState("")
     const [query, setQuery] = useState('')
@@ -124,11 +127,16 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
                                                         type="button"
                                                         className="button buttonPrimary py-1 px-2 text-sm"
                                                         onClick={() => {
-                                                            dispatch(shareProject({projectToShare: projectToShare as Project, user: selected}))
-                                                            execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...(projectToShare as Project).sharedWith as string[], selected]} as Project)
-                                                            execQuery(getFoldersByOwner, selected).then(res => {
-                                                                execQuery(addIDInFolderProjectsListOfSharedUser, projectToShare?.faunaDocumentId, res[0])
-                                                            })
+                                                            if(projectToShare){
+                                                                dispatch(shareProject({projectToShare: projectToShare, user: selected}))
+                                                                execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...projectToShare.sharedWith as string[], selected]})
+                                                                execQuery(updateProjectSharingInfo, projectToShare?.faunaDocumentId, selected)
+                                                            }
+                                                            else if(folderToShare){
+                                                                dispatch(shareFolder({folderToShare: folderToShare, user: selected}))
+                                                                execQuery(updateFolderInFauna, {...folderToShare, sharedWith: [...folderToShare.sharedWith as string[], selected]})
+                                                                execQuery(updateFoldersSharingInfo, folderToShare?.faunaDocumentId, selected)
+                                                            }
                                                             handleClose()
                                                         }}
                                                     >

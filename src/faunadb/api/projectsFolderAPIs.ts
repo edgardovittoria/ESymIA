@@ -1,5 +1,5 @@
 import faunadb from "faunadb";
-import { FaunaFolder, FaunaFolderDetails, FaunaProject, FaunaProjectDetails } from "../../model/FaunaModels";
+import { FaunaFolder, FaunaFolderDetails, FaunaProject, FaunaProjectDetails, FaunaUserSharingInfo } from "../../model/FaunaModels";
 import { Folder } from "../../model/Folder";
 import { Project } from "../../model/Project";
 
@@ -429,4 +429,48 @@ export const getSharedSimulationProjects = async (
             err.errors()[0].description,
         ));
     return response as FaunaProject[]
+}
+
+export const updateProjectSharingInfo = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, idProjectToShare: string, userToShare: string) => {
+    faunaClient.query(faunaQuery.Select(["ref", "id"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userToShare)))).then(id => {
+        faunaClient.query(faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userToShare)))).then(data => {
+            faunaClient.query(faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('SharingInfo'), id), {
+                data: {
+                    ...(data as FaunaUserSharingInfo),
+                    sharedProjects: [...(data as FaunaUserSharingInfo).sharedProjects, idProjectToShare]
+                }
+            }))
+        })
+
+    })
+        .catch((err) => console.error(
+            'Error: [%s] %s: %s',
+            err.name,
+            err.message,
+            err.errors()[0].description,
+        ));
+    return ""
+
+}
+
+export const updateFoldersSharingInfo = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, idFolderToShare: string, userToShare: string) => {
+    faunaClient.query(faunaQuery.Select(["ref", "id"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userToShare)))).then(id => {
+        faunaClient.query(faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userToShare)))).then(data => {
+            faunaClient.query(faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('SharingInfo'), id), {
+                data: {
+                    ...(data as FaunaUserSharingInfo),
+                    sharedFolders: [...(data as FaunaUserSharingInfo).sharedFolders, idFolderToShare]
+                }
+            }))
+        })
+
+    })
+        .catch((err) => console.error(
+            'Error: [%s] %s: %s',
+            err.name,
+            err.message,
+            err.errors()[0].description,
+        ));
+    return ""
+
 }

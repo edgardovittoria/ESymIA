@@ -1,10 +1,10 @@
-import {ComponentEntity, ImportActionParamsObject, UsersState} from 'cad-library';
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Project} from "../model/Project";
-import {Port, Probe, RLCParams} from "../model/Port";
-import {Simulation} from "../model/Simulation";
-import {Signal} from "../model/Port";
-import {Folder} from "../model/Folder";
+import { ComponentEntity, ImportActionParamsObject, UsersState } from 'cad-library';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Project } from "../model/Project";
+import { Port, Probe, RLCParams } from "../model/Port";
+import { Simulation } from "../model/Simulation";
+import { Signal } from "../model/Port";
+import { Folder } from "../model/Folder";
 import {
     addFolderToStore,
     addProjectToStore,
@@ -21,9 +21,10 @@ export type ProjectState = {
     selectedProject: string | undefined,
     selectedFolder: Folder,
     selectedComponent: ComponentEntity[]
-    projectToShare?: Project
+    projectToShare?: Project,
     projectToRename?: Project
-    folderToRename?: Folder
+    folderToRename?: Folder,
+    folderToShare?: Folder
 }
 
 export const ProjectSlice = createSlice({
@@ -52,9 +53,6 @@ export const ProjectSlice = createSlice({
         addProject(state: ProjectState, action: PayloadAction<Project>) {
             addProjectToStore(state, action.payload)
         },
-        setFaunaDocumentId(state: ProjectState, action: PayloadAction<string>) {
-            state.projects.faunaDocumentId = action.payload
-        },
         setProjectsFolderToUser(state: ProjectState, action: PayloadAction<Folder>) {
             state.projects = action.payload
         },
@@ -71,32 +69,39 @@ export const ProjectSlice = createSlice({
                 moveFolder(state, action.payload.objectToMove, action.payload.targetFolder)
             }
         },
-        shareProject(state: ProjectState, action: PayloadAction<{projectToShare: Project, user: string}>){
+        shareProject(state: ProjectState, action: PayloadAction<{ projectToShare: Project, user: string }>) {
             let project = findProjectByName(takeAllProjectsIn(state.projects), action.payload.projectToShare.name);
             (project && project.sharedWith) && project.sharedWith.push(action.payload.user)
         },
-        setProjectToShare(state: ProjectState, action: PayloadAction<Project>){
-          state.projectToShare = action.payload
+        shareFolder(state: ProjectState, action: PayloadAction<{ folderToShare: Folder, user: string }>) {
+            let folder = recursiveFindFolders(state.projects, []).filter(folder => folder.faunaDocumentId === action.payload.folderToShare.faunaDocumentId)[0];
+            (folder && folder.sharedWith) && folder.sharedWith.push(action.payload.user)
         },
-        renameProject(state: ProjectState, action: PayloadAction<{projectToRename: Project, name: string}>){
+        setProjectToShare(state: ProjectState, action: PayloadAction<Project | undefined>) {
+            state.projectToShare = action.payload
+        },
+        setFolderToShare(state: ProjectState, action: PayloadAction<Folder | undefined>) {
+            state.folderToShare = action.payload
+        },
+        renameProject(state: ProjectState, action: PayloadAction<{ projectToRename: Project, name: string }>) {
             let project = findProjectByName(takeAllProjectsIn(state.projects), action.payload.projectToRename.name);
-            if(project) {
+            if (project) {
                 project.name = action.payload.name
                 state.selectedFolder.projectList = state.selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId)
                 state.selectedFolder.projectList.push(project)
             }
         },
-        setFolderToRename(state: ProjectState, action: PayloadAction<Folder | undefined>){
+        setFolderToRename(state: ProjectState, action: PayloadAction<Folder | undefined>) {
             state.folderToRename = action.payload
         },
-        renameFolder(state: ProjectState, action: PayloadAction<{folderToRename: Folder, name: string}>){
+        renameFolder(state: ProjectState, action: PayloadAction<{ folderToRename: Folder, name: string }>) {
             removeFolderFromStore(state, action.payload.folderToRename)
             addFolderToStore(state, {
                 ...action.payload.folderToRename,
                 name: action.payload.name
             })
         },
-        setProjectToRename(state: ProjectState, action: PayloadAction<Project | undefined>){
+        setProjectToRename(state: ProjectState, action: PayloadAction<Project | undefined>) {
             state.projectToRename = action.payload
         },
         selectProject(state: ProjectState, action: PayloadAction<string | undefined>) {
@@ -111,7 +116,7 @@ export const ProjectSlice = createSlice({
             removeFolderFromStore(state, action.payload)
         },
         selectFolder(state: ProjectState, action: PayloadAction<string>) {
-                recursiveSelectFolder(state, state.projects.subFolders, action.payload)
+            recursiveSelectFolder(state, state.projects.subFolders, action.payload)
         },
         importModel(state: ProjectState, action: PayloadAction<ImportActionParamsObject>) {
             let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
@@ -187,7 +192,7 @@ export const ProjectSlice = createSlice({
         },
         setAssociatedSignal(state: ProjectState, action: PayloadAction<Signal>) {
             let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
-            if(project) project.signal = action.payload
+            if (project) project.signal = action.payload
         },
         setScreenshot(state: ProjectState, action: PayloadAction<string>) {
             let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
@@ -197,9 +202,9 @@ export const ProjectSlice = createSlice({
         }
     },
     extraReducers:
-        {
-            //qui inseriamo i metodi : PENDING, FULLFILLED, REJECT utili per la gestione delle richieste asincrone
-        }
+    {
+        //qui inseriamo i metodi : PENDING, FULLFILLED, REJECT utili per la gestione delle richieste asincrone
+    }
 })
 
 
@@ -208,25 +213,26 @@ export const {
     addProject, removeProject, importModel, selectProject, createSimulation, updateSimulation, addPorts,
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
     setProjectsFolderToUser, moveObject, removeFolder, shareProject, setProjectToShare, renameProject, setProjectToRename,
-    renameFolder, setFolderToRename
+    renameFolder, setFolderToRename, setFolderToShare, shareFolder
 } = ProjectSlice.actions
 
 
 export const projectsSelector = (state: { projects: ProjectState }) => takeAllProjectsIn(state.projects.projects)
-export const folderByIDSelector = (state: {projects: ProjectState}, id: string) => {
+export const folderByIDSelector = (state: { projects: ProjectState }, id: string) => {
     return recursiveFindFolders(state.projects.projects, [] as Folder[]).filter(f => f.faunaDocumentId === id)[0]
 }
-export const mainFolderSelector = (state: {projects: ProjectState}) => state.projects.projects
+export const mainFolderSelector = (state: { projects: ProjectState }) => state.projects.projects
 export const SelectedFolderSelector = (state: { projects: ProjectState }) => state.projects.selectedFolder;
 export const selectedProjectSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
 export const selectedComponentSelector = (state: { projects: ProjectState }) => state.projects.selectedComponent;
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulations;
-export const projectToShareSelector = (state: {projects: ProjectState}) => state.projects.projectToShare
-export const projectToRenameSelector = (state: {projects: ProjectState}) => state.projects.projectToRename
-export const folderToRenameSelector = (state: {projects: ProjectState}) => state.projects.folderToRename
+export const projectToShareSelector = (state: { projects: ProjectState }) => state.projects.projectToShare
+export const folderToShareSelector = (state: { projects: ProjectState }) => state.projects.folderToShare
+export const projectToRenameSelector = (state: { projects: ProjectState }) => state.projects.projectToRename
+export const folderToRenameSelector = (state: { projects: ProjectState }) => state.projects.folderToRename
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
     let allFolders: Folder[] = []
-    return recursiveFindFolders(state.projects.projects, allFolders) 
+    return recursiveFindFolders(state.projects.projects, allFolders)
 }
 
 export const findProjectByName = (projects: Project[], name: string | undefined) => {

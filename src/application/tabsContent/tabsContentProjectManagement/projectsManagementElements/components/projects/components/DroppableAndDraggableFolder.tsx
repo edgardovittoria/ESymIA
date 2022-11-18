@@ -20,7 +20,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {
     allProjectFoldersSelector,
     moveObject, removeFolder, SelectedFolderSelector,
-    selectFolder, setFolderToRename, setProjectToRename
+    selectFolder, setFolderToRename, setFolderToShare, setProjectToRename
 } from "../../../../../../../store/projectSlice";
 import {useFaunaQuery} from "cad-library";
 
@@ -29,11 +29,12 @@ interface DroppableAndDraggableFolderProps {
     path: Folder[],
     setPath: Function,
     setShowRename: (v:boolean) => void
+    setShowSearchUser: (v:boolean) => void
 }
 
 export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderProps> = (
     {
-        folder, path, setPath, setShowRename
+        folder, path, setPath, setShowRename, setShowSearchUser
     }
 ) => {
 
@@ -154,7 +155,9 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                 <Separator/>
                 <Item onClick={(p) => {
                     p.event.stopPropagation()
-                }} disabled>
+                    dispatch(setFolderToShare(folder))
+                    setShowSearchUser(true)
+                }} >
                     <BiShareAlt
                         className="mr-4 text-primaryColor w-[20px] h-[20px]"
                     />

@@ -104,6 +104,7 @@ export const Projects: React.FC<ProjectsProps> = (
                                         <DroppableAndDraggableFolder key={folder.faunaDocumentId} folder={folder}
                                                                      path={path} setPath={setPath}
                                                                      setShowRename={setShowRename}
+                                                                     setShowSearchUser={setShowSearchUser}
                                         />
                                     )
                                 })}

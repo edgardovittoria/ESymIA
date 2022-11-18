@@ -57,9 +57,6 @@ function App() {
     const [menuItemSelected, setMenuItemSelected] = useState(menuItems[0]);
     const [selectedSimulation, setSelectedSimulation] = useState<Simulation | undefined>(undefined);
     const mainFolder = useSelector(mainFolderSelector)
-
-    
-
     const {execQuery} = useFaunaQuery()
 
     //USE EFFECT

@@ -1,21 +1,8 @@
-import React, {Fragment, useState} from 'react';
-import {Dialog, Transition} from "@headlessui/react";
-import {ImSpinner} from "react-icons/im";
-import {SearchUser} from "../searchUserAndShare/components/SearchUser";
+import React, {} from 'react';
 import {
     folderToRenameSelector,
-    projectToRenameSelector,
-    renameProject,
-    shareProject
-} from "../../../store/projectSlice";
-import {Project} from "../../../model/Project";
-import {
-    addIDInFolderProjectsListOfSharedUser,
-    getFoldersByOwner,
-    updateProjectInFauna
-} from "../../../faunadb/api/projectsFolderAPIs";
-import {useDispatch, useSelector} from "react-redux";
-import {useFaunaQuery} from "cad-library";
+    projectToRenameSelector} from "../../../store/projectSlice";
+import {useSelector} from "react-redux";
 import {RenameProject} from "./components/RenameProject";
 import {RenameFolder} from "./components/RenameFolder";
 

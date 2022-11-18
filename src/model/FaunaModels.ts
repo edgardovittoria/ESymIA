@@ -27,8 +27,14 @@ export type FaunaFolder = {
 export type FaunaFolderDetails = {
     name: string,
     owner: UsersState,
-    sharedWith: UsersState[],
+    sharedWith?: string[],
     projectList: string[],
     subFolders: string[],
     parent: string,
+}
+
+export type FaunaUserSharingInfo = {
+    user: string,
+    sharedFolders: string[],
+    sharedProjects: string[]
 }
