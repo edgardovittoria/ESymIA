@@ -24,4 +24,4 @@ export const {
 
 } = SharingInfoSlice.actions
 
-export const StateSelector = (state: { : SharingInfoState }) => state.;
+//export const StateSelector = (state: { : SharingInfoState }) => state.;

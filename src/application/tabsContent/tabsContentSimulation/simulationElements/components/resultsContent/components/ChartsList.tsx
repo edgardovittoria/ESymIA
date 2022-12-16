@@ -75,7 +75,10 @@ export const ChartsList: React.FC<ChartsListProps> = ({
         };
         break;
       case "linear":
-        updatedOptions = options;
+        updatedOptions = {
+          ...options,
+          scales: {}
+        }
         break;
       default:
         break;

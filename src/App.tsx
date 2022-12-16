@@ -35,6 +35,7 @@ import {
 } from "./faunadb/api/projectsFolderAPIs";
 import {SearchUserAndShare} from "./application/modals/searchUserAndShare/searchUserAndShare";
 import {RenameModal} from "./application/modals/renameModal/RenameModal";
+import {s3} from "./aws/s3Config";
 
 
 function App() {
@@ -133,6 +134,8 @@ function App() {
             />}
             {(showCreateNewFolderModal) && <CreateNewFolderModal setShowNewFolderModal={setShowCreateNewFolderModal}/>}
             {(showModalLoadFromDB) && <ImportModelFromDBModal
+                s3Config={s3}
+                bucket={process.env.REACT_APP_AWS_BUCKET_NAME as string}
                 showModalLoad={setShowModalLoadFromDB}
                 importAction={importModel}
                 importActionParams={
