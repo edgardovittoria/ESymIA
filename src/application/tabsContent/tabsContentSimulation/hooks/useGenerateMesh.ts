@@ -11,6 +11,7 @@ import {
     setMesherOutput,
     setMeshGenerated
 } from "../../../../store/mesherSlice";
+import {data} from "autoprefixer";
 
 export const useGenerateMesh = (
     components: ComponentEntity[], quantumDimensions: [number, number, number]
@@ -32,12 +33,13 @@ export const useGenerateMesh = (
             }
             console.log(objToSendToMesher)
             //TODO: add http request to generate mesh and set mesherOutput
-            axios.get('http://localhost:3001/mesherOutput', {
+            axios.post('https://64wwc8684a.execute-api.us-east-1.amazonaws.com/meshing', objToSendToMesher, {
                 /*onDownloadProgress: progressEvent => {
                     console.log(progressEvent)
                     dispatch(setDownloadPercentage(Math.round((progressEvent.loaded * 100) / progressEvent.total)))
                 }*/
             }).then(res => {
+                console.log(res.data)
                 dispatch(setMesherOutput(res.data))
             })
             //exportJson(objToSendToMesher)
