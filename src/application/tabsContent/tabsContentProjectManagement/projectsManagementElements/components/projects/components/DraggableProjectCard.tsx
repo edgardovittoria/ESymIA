@@ -128,7 +128,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                         p.event.stopPropagation()
                         dispatch(setProjectToShare(project))
                         setShowSearchUser(true)
-                    }} disabled={user.userRole !== 'Base'}>
+                    }} disabled={user.userRole !== 'Premium'}>
                         <BiShareAlt
                             className="mr-4 text-primaryColor w-[20px] h-[20px]"
                         />
@@ -136,7 +136,6 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     </Item>
                     <Separator/>
                     <Item onClick={(p) => {
-                        //TODO: change remove function
                         p.event.stopPropagation()
                         dispatch(removeProject(project.faunaDocumentId as string))
                         setProjectsTab(projectsTab.filter(p => p.name !== project.name))

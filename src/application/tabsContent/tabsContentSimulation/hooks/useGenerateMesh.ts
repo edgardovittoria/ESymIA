@@ -32,7 +32,6 @@ export const useGenerateMesh = (
                 quantum: quantumDimensions
             }
             console.log(objToSendToMesher)
-            //TODO: add http request to generate mesh and set mesherOutput
             axios.post('https://64wwc8684a.execute-api.us-east-1.amazonaws.com/meshing', objToSendToMesher, {
                 /*onDownloadProgress: progressEvent => {
                     console.log(progressEvent)

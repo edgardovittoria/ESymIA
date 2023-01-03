@@ -9,9 +9,7 @@ interface ModelOutlinerProps {
 }
 
 export const ModelOutliner: React.FC<ModelOutlinerProps> = ({}) => {
-
-    //TODO: remove selection of componenst
-
+    
     const selectedProject = useSelector(selectedProjectSelector)
 
     return (

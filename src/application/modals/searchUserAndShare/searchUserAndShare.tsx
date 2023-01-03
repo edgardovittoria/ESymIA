@@ -32,8 +32,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
         axios.get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles`, {
             headers: {authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`}
         }).then(res => {
-            //TODO: change role to Premium
-            res.data.filter((r: { name: string; }) => r.name === "Base").forEach((role: { id: string; }) => {
+            res.data.filter((r: { name: string; }) => r.name === "Premium").forEach((role: { id: string; }) => {
                 axios.get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles/${role.id}/users`, {
                     headers: {authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`}
                 }).then(res => {
