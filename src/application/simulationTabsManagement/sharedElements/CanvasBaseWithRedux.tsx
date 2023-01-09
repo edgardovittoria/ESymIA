@@ -41,7 +41,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = (
         if(selectedProject){
             execQuery(updateProjectInFauna, selectedProject)
         }
-    }, [selectedProject?.model, selectedProject?.ports, selectedProject?.signal, selectedProject?.simulation])
+    }, [selectedProject?.model, selectedProject?.ports, selectedProject?.signal, selectedProject?.simulation, selectedProject?.meshData])
 
 
     return (

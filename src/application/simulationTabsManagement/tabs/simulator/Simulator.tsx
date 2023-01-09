@@ -30,10 +30,12 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   console.log("render simulator tab")
   let allMaterials = getMaterialListFrom(selectedProject?.model.components as ComponentEntity[])
-  let materialsNames: string[] = [];
-  allMaterials.forEach(m => materialsNames.push(m.name))
-  const [selectedMaterials, setSelectedMaterials] =
-    useState<string[]>(materialsNames);
+  let materialsNames: string[] = [allMaterials[0].name];
+  allMaterials.forEach(m => {
+      if(materialsNames.filter(mat => mat !== m.name).length > 0) materialsNames.push(m.name)
+  })
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>(materialsNames);
+  console.log(materialsNames)
   return (
     <>
       <CanvasBaseWithRedux section="Simulator">
