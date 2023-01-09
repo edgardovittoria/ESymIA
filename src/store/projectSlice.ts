@@ -14,6 +14,7 @@ import {
     recursiveFindFolders, recursiveSelectFolder, removeFolderFromStore, removeProjectFromStore,
     takeAllProjectsIn
 } from "./auxiliaryFunctions/managementProjectsAndFoldersFunction";
+import { MesherOutput } from '../model/MesherInputOutput';
 
 
 export type ProjectState = {
@@ -24,7 +25,7 @@ export type ProjectState = {
     projectToShare?: Project,
     projectToRename?: Project
     folderToRename?: Folder,
-    folderToShare?: Folder
+    folderToShare?: Folder,
 }
 
 export const ProjectSlice = createSlice({
@@ -121,6 +122,7 @@ export const ProjectSlice = createSlice({
         importModel(state: ProjectState, action: PayloadAction<ImportActionParamsObject>) {
             let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
             if (selectedProject) {
+                console.log("load model")
                 selectedProject.model = action.payload.canvas
             }
         },
@@ -230,6 +232,10 @@ export const projectToShareSelector = (state: { projects: ProjectState }) => sta
 export const folderToShareSelector = (state: { projects: ProjectState }) => state.projects.folderToShare
 export const projectToRenameSelector = (state: { projects: ProjectState }) => state.projects.projectToRename
 export const folderToRenameSelector = (state: { projects: ProjectState }) => state.projects.folderToRename
+export const meshSelectedProjectSelector = (state: { projects: ProjectState }) => {
+    let selectedProject = findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)
+    return selectedProject?.mesherOutput
+}
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
     let allFolders: Folder[] = []
     return recursiveFindFolders(state.projects.projects, allFolders)
@@ -239,4 +245,3 @@ export const findProjectByName = (projects: Project[], name: string | undefined)
     return (name !== undefined) ? projects.filter(project => project.name === name)[0] : undefined
 }
 export const findSelectedPort = (project: Project | undefined) => (project) ? project.ports.filter(port => port.isSelected)[0] : undefined
-
