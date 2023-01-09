@@ -1,5 +1,5 @@
-import { ComponentEntity, useFaunaQuery } from "cad-library";
-import React, { useEffect, useState } from "react";
+import { ComponentEntity } from "cad-library";
+import React, { useEffect } from "react";
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { Project } from "../../../../model/Project";
@@ -12,7 +12,6 @@ import {
 } from "../../../../store/solverSlice";
 import {
   updateSimulation,
-  simulationSelector,
   setQuantum,
   setMesh,
   setDownloadPercentage,
@@ -23,7 +22,6 @@ import { Simulation } from "../../../../model/Simulation";
 import { SolverOutput } from "../../../../model/SolverInputOutput";
 import { Port, TempLumped } from "../../../../model/Port";
 import axios from "axios";
-import { getSimulationByName } from "../../../../faunadb/simulationAPIs";
 import {
   generateSTLListFromComponents,
   getMaterialListFrom,
@@ -32,19 +30,16 @@ import {
 interface GenerateMeshProps {
   setMenuItem: Function;
   selectedProject: Project;
-  setSelectedSimulation: Function;
 }
 
 export const GenerateMesh: React.FC<GenerateMeshProps> = ({
   setMenuItem,
   selectedProject,
-  setSelectedSimulation,
 }) => {
   const solverDownloadPercentage = useSelector(
     SolverDownloadPercentageSelector
   );
   const simulationStatus = useSelector(SimulationStatusSelector);
-  const { execQuery } = useFaunaQuery();
 
   const dispatch = useDispatch();
   let quantumDimensions = selectedProject.meshData.quantum;
@@ -76,7 +71,6 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
         associatedProject: selectedProject?.name as string,
       };
       dispatch(updateSimulation(simulation));
-      setSelectedSimulation(simulation);
 
       let frequencyArray: number[] = [];
       if (selectedProject)

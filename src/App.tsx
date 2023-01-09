@@ -9,7 +9,6 @@ import {
 } from "./store/projectSlice";
 import {Project} from "./model/Project";
 import {useDispatch, useSelector} from "react-redux";
-import {Simulation} from "./model/Simulation";
 import {MenuBar} from './application/MenuBar';
 import {
     DashboardTabsContentFactory
@@ -41,7 +40,6 @@ function App() {
     const [projectsTab, setProjectsTab] = useState<Project[]>([]);
     const menuItems = getMenuItemsArrayBasedOnTabType(tabSelected)
     const [menuItemSelected, setMenuItemSelected] = useState(menuItems[0]);
-    const [selectedSimulation, setSelectedSimulation] = useState<Simulation | undefined>(undefined);
     const mainFolder = useSelector(mainFolderSelector)
     const {execQuery} = useFaunaQuery()
 
@@ -94,15 +92,12 @@ function App() {
                     setProjectsTab={setProjectsTab}
                     selectTab={setTabSelected}
                     setSimulationCoreMenuItemSelected={setMenuItemSelected}
-                    setSelectedSimulation={setSelectedSimulation}
                     setMenuItem={setMenuItemSelected}
                 />
                 :
                 <SimulationTabsContentFactory
                     menuItem={menuItemSelected}
                     setMenuItem={setMenuItemSelected}
-                    selectedSimulation={selectedSimulation}
-                    setSelectedSimulation={setSelectedSimulation}
                 />
             }
         </>

@@ -18,14 +18,12 @@ interface SimulatorProps {
   selectedTabLeftPanel: string;
   setSelectedTabLeftPanel: Function;
   setMenuItem: Function;
-  setSelectedSimulation: Function
 }
 
 export const Simulator: React.FC<SimulatorProps> = ({
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
-  setMenuItem,
-  setSelectedSimulation
+  setMenuItem
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   console.log("render simulator tab")
@@ -64,7 +62,6 @@ export const Simulator: React.FC<SimulatorProps> = ({
       </LeftPanel>
       {/* <RightPanelSimulation> */}
         <GenerateMesh
-        setSelectedSimulation={setSelectedSimulation}
           setMenuItem={setMenuItem}
           selectedProject={selectedProject as Project}
         />

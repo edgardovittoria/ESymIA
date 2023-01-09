@@ -8,7 +8,6 @@ import {
 import { ChartVisualizationMode } from "./ChartVisualizationMode";
 import { ChartsList } from "./ChartsList";
 import { ResultsLeftPanelTab } from "./ResultsLeftPanelTab";
-import { Simulation } from "../../../../model/Simulation";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
@@ -16,15 +15,11 @@ import { LeftPanel } from "../../sharedElements/LeftPanel";
 interface ResultsProps {
   selectedTabLeftPanel: string;
   setSelectedTabLeftPanel: Function;
-  selectedSimulation: Simulation | undefined;
-  setSelectedSimulation: Function;
 }
 
 export const Results: React.FC<ResultsProps> = ({
   selectedTabLeftPanel,
-  setSelectedTabLeftPanel,
-  selectedSimulation,
-  setSelectedSimulation,
+  setSelectedTabLeftPanel
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   let selectedPort = findSelectedPort(selectedProject);
@@ -46,8 +41,6 @@ export const Results: React.FC<ResultsProps> = ({
         >
           {selectedTabLeftPanel === "Results" ? (
             <ResultsLeftPanelTab
-              setSelectedSimulation={setSelectedSimulation}
-              selectedSimulation={selectedSimulation}
               selectedPort={selectedPort ? selectedPort.name : "undefined"}
               setSelectedPort={(portName: string) =>
                 dispatch(selectPort(portName))

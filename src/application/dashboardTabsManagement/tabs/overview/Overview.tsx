@@ -12,13 +12,11 @@ interface OverviewProps {
     selectTab: Function,
     setMenuItem: Function,
     setSimulationCoreMenuItemSelected: Function,
-    setSelectedSimulation: Function,
 }
 
 export const Overview: React.FC<OverviewProps> = (
     {
         setShowModal, projectsTab, setProjectsTab, selectTab, setMenuItem, setSimulationCoreMenuItemSelected,
-        setSelectedSimulation
     }
 ) => {
 
@@ -117,7 +115,6 @@ export const Overview: React.FC<OverviewProps> = (
                 <Simulations
                     selectTab={selectTab}
                     setSimulationCoreMenuItemSelected={setSimulationCoreMenuItemSelected}
-                    setSelectedSimulation={setSelectedSimulation}
                     setProjectsTab={setProjectsTab}
                     projectsTab={projectsTab}
                 />

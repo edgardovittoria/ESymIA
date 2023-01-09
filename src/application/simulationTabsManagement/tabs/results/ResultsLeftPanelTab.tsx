@@ -1,28 +1,18 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { GiPowerButton } from "react-icons/gi";
 import { useSelector } from "react-redux";
-import { Simulation } from "../../../../model/Simulation";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
 
 interface ResultsLeftPanelTabProps {
-  setSelectedSimulation: Function;
-  selectedSimulation: Simulation | undefined;
   selectedPort: string;
   setSelectedPort: Function;
 }
 
 export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
-  setSelectedSimulation,
-  selectedSimulation,
   selectedPort,
   setSelectedPort,
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
-  useEffect(() => {
-    selectedProject &&
-      !selectedSimulation &&
-      setSelectedSimulation(selectedProject.simulation);
-  }, []);
 
   return (
     <>
@@ -30,16 +20,8 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
         <div>
           <>
             <div
-              className={
-                selectedSimulation &&
-                selectedProject.simulation.name === selectedSimulation.name
-                  ? `flex mb-2 p-[5px] hover:cursor-pointer hover:bg-gray-200 bg-gray-200`
-                  : `flex mb-2 p-[5px]  hover:cursor-pointer hover:bg-gray-200`
-              }
+              className="flex mb-2 p-[5px] hover:cursor-pointer hover:bg-gray-200 bg-gray-200"
               key={selectedProject.simulation.name}
-              onClick={() => {
-                setSelectedSimulation(selectedProject.simulation);
-              }}
             >
               <div className="w-[12%] flex items-center">
                 <GiPowerButton
@@ -51,25 +33,22 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                 {selectedProject.simulation.name}
               </div>
             </div>
-            {selectedSimulation &&
-              selectedSimulation.name === selectedProject.simulation.name && (
-                <>
-                  {selectedProject.ports.map((port) => {
-                    return (
-                      <div
-                        className={
-                          selectedPort === port.name
-                            ? "w-[80%] ml-10 hover:cursor-pointer hover:bg-gray-200 bg-gray-200 p-1 rounded"
-                            : "w-[80%] ml-10 hover:cursor-pointer hover:bg-gray-200 p-1 rounded"
-                        }
-                        onClick={() => setSelectedPort(port.name)}
-                      >
-                        {port.name}
-                      </div>
-                    );
-                  })}
-                </>
-              )}
+            <>
+              {selectedProject.ports.map((port) => {
+                return (
+                  <div
+                    className={
+                      selectedPort === port.name
+                        ? "w-[80%] ml-10 hover:cursor-pointer hover:bg-gray-200 bg-gray-200 p-1 rounded"
+                        : "w-[80%] ml-10 hover:cursor-pointer hover:bg-gray-200 p-1 rounded"
+                    }
+                    onClick={() => setSelectedPort(port.name)}
+                  >
+                    {port.name}
+                  </div>
+                );
+              })}
+            </>
           </>
         </div>
       ) : (

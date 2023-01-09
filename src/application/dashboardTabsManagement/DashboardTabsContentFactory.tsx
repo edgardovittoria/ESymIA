@@ -11,7 +11,6 @@ interface DashboardTabsContentFactoryProps {
   setProjectsTab: Function;
   selectTab: Function;
   setSimulationCoreMenuItemSelected: Function;
-  setSelectedSimulation: Function;
   setMenuItem: Function;
 }
 
@@ -23,7 +22,6 @@ export const DashboardTabsContentFactory: React.FC<
   setProjectsTab,
   selectTab,
   setSimulationCoreMenuItemSelected,
-  setSelectedSimulation,
   setMenuItem,
 }) => {
   const [showCreateNewProjectModal, setShowCreateNewProjectModal] =
@@ -40,10 +38,7 @@ export const DashboardTabsContentFactory: React.FC<
               setProjectsTab={setProjectsTab}
               selectTab={selectTab}
               setMenuItem={setMenuItem}
-              setSimulationCoreMenuItemSelected={
-                setSimulationCoreMenuItemSelected
-              }
-              setSelectedSimulation={setSelectedSimulation}
+              setSimulationCoreMenuItemSelected={setSimulationCoreMenuItemSelected}
             />
           </div>
           {/* <RightPanel /> */}
@@ -86,10 +81,7 @@ export const DashboardTabsContentFactory: React.FC<
           <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
             <Simulations
               selectTab={selectTab}
-              setSimulationCoreMenuItemSelected={
-                setSimulationCoreMenuItemSelected
-              }
-              setSelectedSimulation={setSelectedSimulation}
+              setSimulationCoreMenuItemSelected={setSimulationCoreMenuItemSelected}
               setProjectsTab={setProjectsTab}
               projectsTab={projectsTab}
             />

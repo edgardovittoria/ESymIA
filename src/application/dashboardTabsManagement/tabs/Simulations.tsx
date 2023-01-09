@@ -17,14 +17,13 @@ import {useDispatch, useSelector} from "react-redux";
 interface SimulationsProps {
     selectTab: Function,
     setSimulationCoreMenuItemSelected: Function,
-    setSelectedSimulation: Function,
     setProjectsTab: Function,
     projectsTab: Project[]
 }
 
 export const Simulations: React.FC<SimulationsProps> = (
     {
-        selectTab, setSimulationCoreMenuItemSelected, setSelectedSimulation,
+        selectTab, setSimulationCoreMenuItemSelected,
         setProjectsTab, projectsTab
     }
 ) => {
@@ -116,7 +115,6 @@ export const Simulations: React.FC<SimulationsProps> = (
                                                                    selectTab(simulation.associatedProject)
                                                                }
                                                                dispatch(selectProject(simulation.associatedProject))
-                                                               setSelectedSimulation(simulation)
                                                                setSimulationCoreMenuItemSelected('Results')
                                                            }}
                                         />
