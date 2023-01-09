@@ -33,7 +33,7 @@ export const DashboardTabsContentFactory: React.FC<
     case "Overview":
       return (
         <div className="container flex mx-auto pt-8">
-          <div className="flex flex-wrap w-4/5 mr-7 justify-between h-[650px]">
+          <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
             <Overview
               setShowModal={setShowCreateNewProjectModal}
               projectsTab={projectsTab}
@@ -61,7 +61,7 @@ export const DashboardTabsContentFactory: React.FC<
     case "Projects":
       return (
         <div className="container flex mx-auto pt-8">
-          <div className="flex flex-wrap w-4/5 mr-7 justify-between h-[650px]">
+          <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
             <Projects
               setShowModal={setShowCreateNewProjectModal}
               projectsTab={projectsTab}
@@ -83,7 +83,7 @@ export const DashboardTabsContentFactory: React.FC<
     case "Simulations":
       return (
         <div className="container flex mx-auto pt-8">
-          <div className="flex flex-wrap w-4/5 mr-7 justify-between h-[650px]">
+          <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
             <Simulations
               selectTab={selectTab}
               setSimulationCoreMenuItemSelected={

@@ -101,7 +101,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
 
     return (
         <div
-            className={`flex items-center py-[5px] px-[10px] border-2 border-gray-300 mt-[10px] ml-[10px] rounded-lg hover:cursor-pointer hover:border-gray-600 w-1/4`}
+            className={`flex items-center py-[5px] px-[10px] border-2 border-gray-300 mt-[10px] ml-[10px] rounded-lg hover:cursor-pointer hover:border-gray-600 w-1/5`}
             ref={ref => {
                 drag(drop(ref))
             }}

@@ -60,7 +60,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     return (
         <>
             <div
-                className="w-[25%] p-[15px] flex flex-col justify-between h-[250px] border-2 border-green-200 mr-6 mt-4 rounded-lg hover:cursor-pointer hover:border-secondaryColor"
+                className="w-[20%] p-[15px] flex flex-col justify-between h-[250px] border-2 border-green-200 mr-6 mt-4 rounded-lg hover:cursor-pointer hover:border-secondaryColor"
                 key={project.name} ref={drag}
                 onClick={() => handleCardClick(project)}
                 style={{opacity: isDragging ? 0.5 : 1}} onContextMenu={handleContextMenu}>
