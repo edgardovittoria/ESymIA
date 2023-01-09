@@ -1,13 +1,12 @@
 import React, {useEffect, useRef} from 'react';
 import {InstancedMesh, Object3D} from "three";
 import {Material} from "cad-library";
-import {useSelector} from "react-redux";
 import { MesherOutput } from '../../../../../../model/MesherInputOutput';
-import { MeshGeneratedSelector } from '../../../../../../store/mesherSlice';
+import { Project } from '../../../../../../model/Project';
 
 
 interface InstancedMeshProps {
-    mesherOutput: MesherOutput,
+    selectedProject: Project
     mesherMatrices: boolean[][][][],
     index: number,
     materialsList: Material[],
@@ -15,11 +14,12 @@ interface InstancedMeshProps {
 
 export const MyInstancedMesh: React.FC<InstancedMeshProps> = (
     {
-        mesherOutput, mesherMatrices, index, materialsList
+        selectedProject, mesherMatrices, index, materialsList
     }
 ) => {
 
-    const meshGenerated = useSelector(MeshGeneratedSelector)
+    let mesherOutput = selectedProject.meshData.mesh
+    let meshGenerated = selectedProject.meshData.meshGenerated
 
     const meshRef = useRef<InstancedMesh[]>([]);
     const tempObject = new Object3D();

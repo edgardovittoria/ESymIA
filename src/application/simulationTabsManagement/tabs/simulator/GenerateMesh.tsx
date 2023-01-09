@@ -4,16 +4,6 @@ import { AiOutlineThunderbolt } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { Project } from "../../../../model/Project";
 import {
-  DownloadPercentageSelector,
-  MeshApprovedSelector,
-  MesherOutputSelector,
-  MeshGeneratedSelector,
-  setDownloadPercentage,
-  setMeshApproved,
-  setMesherOutput,
-  setMeshGenerated,
-} from "../../../../store/mesherSlice";
-import {
   setSimulationStatus,
   setSolverDownloadPercentage,
   setSolverOutput,
@@ -21,9 +11,13 @@ import {
   SolverDownloadPercentageSelector,
 } from "../../../../store/solverSlice";
 import {
-  createSimulation,
-  simulationSelector,
   updateSimulation,
+  simulationSelector,
+  setQuantum,
+  setMesh,
+  setDownloadPercentage,
+  setMeshGenerated,
+  setMeshApproved,
 } from "../../../../store/projectSlice";
 import { Simulation } from "../../../../model/Simulation";
 import { SolverOutput } from "../../../../model/SolverInputOutput";
@@ -37,7 +31,7 @@ import {
 
 interface GenerateMeshProps {
   setMenuItem: Function;
-  selectedProject?: Project;
+  selectedProject: Project;
   setSelectedSimulation: Function;
 }
 
@@ -46,22 +40,18 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
   selectedProject,
   setSelectedSimulation,
 }) => {
-  const meshApproved = useSelector(MeshApprovedSelector);
-  const meshGenerated = useSelector(MeshGeneratedSelector);
-  const mesherOutput = useSelector(MesherOutputSelector);
-  const mesherDownloadPercentage = useSelector(DownloadPercentageSelector);
   const solverDownloadPercentage = useSelector(
     SolverDownloadPercentageSelector
   );
   const simulationStatus = useSelector(SimulationStatusSelector);
-
-  const simulations = useSelector(simulationSelector);
   const { execQuery } = useFaunaQuery();
 
   const dispatch = useDispatch();
-  const [quantumDimensions, setQuantumDimensions] = useState<
-    [number, number, number]
-  >([0.0, 0.0, 0.0]);
+  let quantumDimensions = selectedProject.meshData.quantum;
+  let mesherOutput = selectedProject.meshData.mesh;
+  let meshApproved = selectedProject.meshData.meshApproved;
+  let meshGenerated = selectedProject.meshData.meshGenerated;
+  let mesherDownloadPercentage = selectedProject.meshData.downloadPercentage;
 
   function checkQuantumDimensionsValidity() {
     let validity = true;
@@ -74,20 +64,18 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
   }
 
   useEffect(() => {
-    if (meshApproved) {
+    if (meshApproved && !selectedProject.simulation) {
+      // TODO: setSimulationStatus may be removed.
       dispatch(setSimulationStatus("started"));
       let simulation: Simulation = {
-        name:
-          selectedProject?.name +
-          " - sim" +
-          ((simulations as Simulation[]).length + 1).toString(),
+        name: selectedProject?.name + " - sim",
         started: Date.now().toString(),
         ended: "",
         results: {} as SolverOutput,
         status: "Queued",
         associatedProject: selectedProject?.name as string,
       };
-      dispatch(createSimulation(simulation));
+      dispatch(updateSimulation(simulation));
       setSelectedSimulation(simulation);
 
       let frequencyArray: number[] = [];
@@ -149,6 +137,35 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
   }, [meshApproved]);
 
   useEffect(() => {
+    if (mesherOutput) {
+      dispatch(
+        setQuantum([
+          mesherOutput.cell_size.cell_size_x,
+          mesherOutput.cell_size.cell_size_y,
+          mesherOutput.cell_size.cell_size_z,
+        ])
+      );
+    }
+    if (mesherDownloadPercentage < 10 && meshGenerated !== "Not Generated") {
+      setTimeout(() => {
+        dispatch(setDownloadPercentage(mesherDownloadPercentage + 1));
+      }, 500);
+    }
+    if (mesherDownloadPercentage === 10)
+      dispatch(setMeshGenerated("Generated"));
+    if (solverDownloadPercentage < 10 && simulationStatus === "started") {
+      setTimeout(() => {
+        dispatch(setSolverDownloadPercentage(solverDownloadPercentage + 1));
+      }, 500);
+    }
+  }, [
+    meshGenerated,
+    mesherDownloadPercentage,
+    solverDownloadPercentage,
+    simulationStatus,
+  ]);
+
+  useEffect(() => {
     if (meshGenerated === "Generating") {
       let components = selectedProject?.model.components as ComponentEntity[];
       let objToSendToMesher = {
@@ -174,36 +191,11 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
         )
         .then((res) => {
           console.log(res.data);
-          dispatch(setMesherOutput(res.data));
+          dispatch(setMesh(res.data));
         });
       //exportJson(objToSendToMesher)
     }
-
-    if (mesherOutput) {
-      setQuantumDimensions([
-        mesherOutput.cell_size.cell_size_x,
-        mesherOutput.cell_size.cell_size_y,
-        mesherOutput.cell_size.cell_size_z,
-      ]);
-    }
-    if (mesherDownloadPercentage < 10 && meshGenerated !== "Not Generated") {
-      setTimeout(() => {
-        dispatch(setDownloadPercentage(mesherDownloadPercentage + 1));
-      }, 500);
-    }
-    if (mesherDownloadPercentage === 10)
-      dispatch(setMeshGenerated("Generated"));
-    if (solverDownloadPercentage < 10 && simulationStatus === "started") {
-      setTimeout(() => {
-        dispatch(setSolverDownloadPercentage(solverDownloadPercentage + 1));
-      }, 500);
-    }
-  }, [
-    meshGenerated,
-    mesherDownloadPercentage,
-    solverDownloadPercentage,
-    simulationStatus,
-  ]);
+  }, [meshGenerated]);
 
   return (
     <>
@@ -222,49 +214,58 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
             <div className="flex justify-between mt-2">
               <div className="w-[30%]">
                 <input
+                  disabled={selectedProject.simulation?.status === "Completed"}
                   min={0}
                   className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
                   type="number"
                   step={0.000001}
                   value={quantumDimensions[0]}
                   onChange={(event) =>
-                    setQuantumDimensions([
-                      parseFloat(event.target.value),
-                      quantumDimensions[1],
-                      quantumDimensions[2],
-                    ])
+                    dispatch(
+                      setQuantum([
+                        parseFloat(event.target.value),
+                        quantumDimensions[1],
+                        quantumDimensions[2],
+                      ])
+                    )
                   }
                 />
               </div>
               <div className="w-[30%]">
                 <input
+                  disabled={selectedProject.simulation?.status === "Completed"}
                   min={0.0}
                   className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
                   type="number"
                   step={0.000001}
                   value={quantumDimensions[1]}
                   onChange={(event) =>
-                    setQuantumDimensions([
-                      quantumDimensions[0],
-                      parseFloat(event.target.value),
-                      quantumDimensions[2],
-                    ])
+                    dispatch(
+                      setQuantum([
+                        quantumDimensions[0],
+                        parseFloat(event.target.value),
+                        quantumDimensions[2],
+                      ])
+                    )
                   }
                 />
               </div>
               <div className="w-[30%]">
                 <input
+                  disabled={selectedProject.simulation?.status === "Completed"}
                   min={0}
                   className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
                   type="number"
                   step={0.000001}
                   value={quantumDimensions[2]}
                   onChange={(event) =>
-                    setQuantumDimensions([
-                      quantumDimensions[0],
-                      quantumDimensions[1],
-                      parseFloat(event.target.value),
-                    ])
+                    dispatch(
+                      setQuantum([
+                        quantumDimensions[0],
+                        quantumDimensions[1],
+                        parseFloat(event.target.value),
+                      ])
+                    )
                   }
                 />
               </div>
@@ -355,11 +356,10 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
                 </button>
               </div>
             )}
-            {simulationStatus === "completed" && meshApproved && (
+            {selectedProject.simulation?.status === "Completed" && (
               <button
                 className="button buttonPrimary w-[100%]"
                 onClick={() => {
-                  dispatch(setMeshApproved(false));
                   dispatch(setSimulationStatus("notStarted"));
                   dispatch(setSolverDownloadPercentage(0));
                   setMenuItem("Results");

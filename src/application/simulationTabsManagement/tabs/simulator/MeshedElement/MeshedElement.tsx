@@ -1,25 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import {TransformControls} from "@react-three/drei";
 import {Material} from "cad-library";
-import {useSelector} from "react-redux";
-import {selectedProjectSelector} from "../../../../../store/projectSlice";
 import {MesherOutput} from "../../../../../model/MesherInputOutput";
 import {MyInstancedMesh} from "./components/MyInstancedMesh";
-import {MeshGeneratedSelector} from "../../../../../store/mesherSlice";
+import { Project } from '../../../../../model/Project';
 
 interface PanelContentProps {
-    mesherOutput: MesherOutput,
-    selectedMaterials: string[]
+    selectedMaterials: string[],
+    selectedProject: Project
 }
 
 export const MeshedElement: React.FC<PanelContentProps> = (
     {
-        mesherOutput, selectedMaterials
+        selectedMaterials, selectedProject
     }
 ) => {
 
-    const selectedProject = useSelector(selectedProjectSelector)
-    const meshGenerated = useSelector(MeshGeneratedSelector)
+    let meshGenerated = selectedProject.meshData.meshGenerated
+    let mesherOutput = selectedProject.meshData.mesh
 
     let materialsList: Material[] = []
     selectedProject?.model?.components.forEach(c => materialsList.push(c.material as Material))
@@ -28,7 +26,7 @@ export const MeshedElement: React.FC<PanelContentProps> = (
     const [modelMaterials, setModelMaterials] = useState<Material[]>([]);
 
     let matrices: boolean[][][][] = []
-    let entries = Object.entries(mesherOutput.mesher_matrices)
+    let entries = (mesherOutput) && Object.entries(mesherOutput.mesher_matrices)
     let selectedEntries: [string, any][] = []
     let materials: Material[] = []
     let finalMaterialList: Material[] = []
@@ -38,7 +36,7 @@ export const MeshedElement: React.FC<PanelContentProps> = (
         if (mesherOutput) {
 
             selectedMaterials.forEach(sm => {
-                selectedEntries = [...selectedEntries, ...entries.filter(e => e[0] === sm)]
+                if (entries) selectedEntries = [...selectedEntries, ...entries.filter(e => e[0] === sm)]
                 materials = [...materials, ...materialsList.filter(m => m.name === sm)]
             })
 
@@ -61,7 +59,7 @@ export const MeshedElement: React.FC<PanelContentProps> = (
                         return (
                             <MyInstancedMesh
                                 key={index}
-                                mesherOutput={mesherOutput}
+                                selectedProject={selectedProject}
                                 mesherMatrices={mesherMatrices}
                                 index={index}
                                 materialsList={modelMaterials}

@@ -1,5 +1,6 @@
 import { CanvasState, UsersState } from "cad-library"
 import {Port, Probe, Signal} from "./Port"
+import { MeshData } from "./Project"
 import { Simulation } from "./Simulation"
 
 export type FaunaProject = {
@@ -13,10 +14,12 @@ export type FaunaProjectDetails = {
     model: CanvasState,
     ports: (Port | Probe)[],
     signal: Signal,
-    simulations: Simulation[],
+    simulation?: Simulation,
+    meshData: MeshData,
     screenshot: string | undefined,
     owner: UsersState
-    sharedWith?: string[]
+    sharedWith?: string[],
+
 }
 
 export type FaunaFolder = {

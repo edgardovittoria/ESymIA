@@ -36,7 +36,7 @@ export const Simulations: React.FC<SimulationsProps> = (
 
     function getAllSimulation(folder: Folder) {
         folder.projectList.forEach(p => {
-            p.simulations.forEach(s => simulations.push(s))
+            (p.simulation) && simulations.push(p.simulation)
         })
         folder.subFolders.forEach(f => {
             getAllSimulation(f)

@@ -14,6 +14,7 @@ import {
     recursiveFindFolders, recursiveSelectFolder, removeFolderFromStore, removeProjectFromStore,
     takeAllProjectsIn
 } from "./auxiliaryFunctions/managementProjectsAndFoldersFunction";
+import { MesherOutput } from '../model/MesherInputOutput';
 
 
 export type ProjectState = {
@@ -125,26 +126,27 @@ export const ProjectSlice = createSlice({
                 selectedProject.model = action.payload.canvas
             }
         },
-        createSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
-            let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
-            selectedProject?.simulations.push(action.payload);
-            state.projects.projectList.forEach(project => {
-                if (project.name === selectedProject?.name) {
-                    project.simulations.push(action.payload)
-                }
-            })
-        },
+        // createSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
+        //     let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+        //     if (selectedProject) selectedProject.simulation = action.payload;
+        //     // state.projects.projectList.forEach(project => {
+        //     //     if (project.name === selectedProject?.name) {
+        //     //         project.simulations.push(action.payload)
+        //     //     }
+        //     // })
+        // },
         updateSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
             let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
-            if (selectedProject?.simulations) {
-                selectedProject.simulations = selectedProject.simulations.filter(s => s.name !== action.payload.name)
-                selectedProject.simulations.push(action.payload)
-            }
-            state.projects.projectList.forEach(project => {
-                if (project.name === selectedProject?.name) {
-                    project.simulations = selectedProject.simulations
-                }
-            })
+            if (selectedProject) selectedProject.simulation = action.payload;
+            // if (selectedProject?.simulations) {
+            //     selectedProject.simulations = selectedProject.simulations.filter(s => s.name !== action.payload.name)
+            //     selectedProject.simulations.push(action.payload)
+            // }
+            // state.projects.projectList.forEach(project => {
+            //     if (project.name === selectedProject?.name) {
+            //         project.simulations = selectedProject.simulations
+            //     }
+            // })
         },
         addPorts(state: ProjectState, action: PayloadAction<Port | Probe>) {
             let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
@@ -200,7 +202,27 @@ export const ProjectSlice = createSlice({
             if (selectedProject) {
                 selectedProject.screenshot = action.payload
             }
-        }
+        },
+        setQuantum(state: ProjectState, action: PayloadAction<[number, number, number]>){
+            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            if (project) project.meshData.quantum = action.payload
+        },
+        setMesh(state: ProjectState, action: PayloadAction<MesherOutput>){
+            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            if (project) project.meshData.mesh = action.payload
+        },
+        setDownloadPercentage(state: ProjectState, action: PayloadAction<number>){
+            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            if (project) project.meshData.downloadPercentage = action.payload
+        },
+        setMeshGenerated(state: ProjectState, action: PayloadAction<"Not Generated" | "Generated" | "Generating">){
+            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            if (project) project.meshData.meshGenerated = action.payload
+        },
+        setMeshApproved(state: ProjectState, action: PayloadAction<boolean>){
+            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            if (project) project.meshData.meshApproved = action.payload
+        },
     },
     extraReducers:
     {
@@ -211,10 +233,10 @@ export const ProjectSlice = createSlice({
 
 export const {
     //qui vanno inserite tutte le azioni che vogliamo esporatare
-    addProject, removeProject, importModel, selectProject, createSimulation, updateSimulation, addPorts,
+    addProject, removeProject, importModel, selectProject, updateSimulation, addPorts,
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
     setProjectsFolderToUser, moveObject, removeFolder, shareProject, setProjectToShare, renameProject, setProjectToRename,
-    renameFolder, setFolderToRename, setFolderToShare, shareFolder
+    renameFolder, setFolderToRename, setFolderToShare, shareFolder, setQuantum, setMesh, setDownloadPercentage, setMeshGenerated, setMeshApproved
 } = ProjectSlice.actions
 
 
@@ -226,7 +248,7 @@ export const mainFolderSelector = (state: { projects: ProjectState }) => state.p
 export const SelectedFolderSelector = (state: { projects: ProjectState }) => state.projects.selectedFolder;
 export const selectedProjectSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
 export const selectedComponentSelector = (state: { projects: ProjectState }) => state.projects.selectedComponent;
-export const simulationSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulations;
+export const simulationSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;
 export const projectToShareSelector = (state: { projects: ProjectState }) => state.projects.projectToShare
 export const folderToShareSelector = (state: { projects: ProjectState }) => state.projects.folderToShare
 export const projectToRenameSelector = (state: { projects: ProjectState }) => state.projects.projectToRename
@@ -235,7 +257,6 @@ export const allProjectFoldersSelector = (state: { projects: ProjectState }) => 
     let allFolders: Folder[] = []
     return recursiveFindFolders(state.projects.projects, allFolders)
 }
-
 export const findProjectByName = (projects: Project[], name: string | undefined) => {
     return (name !== undefined) ? projects.filter(project => project.name === name)[0] : undefined
 }

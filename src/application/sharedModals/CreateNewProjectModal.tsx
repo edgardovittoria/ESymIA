@@ -39,7 +39,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = (
                 model: {} as CanvasState,
                 ports: [],
                 signal: undefined,
-                simulations: [],
+                meshData: {downloadPercentage:0, meshApproved: false, meshGenerated: "Not Generated", quantum: [0.0, 0.0, 0.0]},
                 screenshot: undefined,
                 owner: user,
                 sharedWith: [] as string[]

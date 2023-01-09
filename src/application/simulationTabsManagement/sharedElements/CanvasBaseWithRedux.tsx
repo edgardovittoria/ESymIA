@@ -15,7 +15,6 @@ import {
 import {importModel, selectedProjectSelector, setScreenshot} from '../../../store/projectSlice';
 import {updateProjectInFauna} from '../../../faunadb/projectsFolderAPIs';
 import {Provider, ReactReduxContext, useDispatch, useSelector} from "react-redux";
-import {MesherOutputSelector} from "../../../store/mesherSlice";
 import { s3 } from '../../../aws/s3Config';
 import { Screenshot } from './Screenshot';
 
@@ -31,7 +30,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = (
 ) => {
 
     const selectedProject = useSelector(selectedProjectSelector)
-    const mesherOutput = useSelector(MesherOutputSelector)
+    let mesherOutput = selectedProject?.meshData.mesh
     const [showModalLoadFromDB, setShowModalLoadFromDB] = useState(false)
 
     const {execQuery} = useFaunaQuery()
@@ -42,7 +41,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = (
         if(selectedProject){
             execQuery(updateProjectInFauna, selectedProject)
         }
-    }, [selectedProject?.model, selectedProject?.ports, selectedProject?.signal, selectedProject?.simulations])
+    }, [selectedProject?.model, selectedProject?.ports, selectedProject?.signal, selectedProject?.simulation])
 
 
     return (

@@ -1,6 +1,7 @@
 import {CanvasState, UsersState} from "cad-library";
 import {Simulation} from "./Simulation";
 import {Port, Probe, Signal} from "./Port";
+import { MesherOutput } from "./MesherInputOutput";
 
 export type Project = {
     name: string,
@@ -8,9 +9,18 @@ export type Project = {
     model: CanvasState,
     ports: (Port | Probe)[],
     signal: Signal | undefined,
-    simulations: Simulation[],
+    simulation?: Simulation,
+    meshData: MeshData,
     screenshot: string | undefined,
     owner: UsersState
     sharedWith?: string[]
     faunaDocumentId?: string
+}
+
+export type MeshData = {
+    mesh?: MesherOutput,
+    meshGenerated: "Not Generated" | "Generated" | "Generating",
+    meshApproved: boolean,
+    downloadPercentage: number,
+    quantum: [number, number, number]
 }

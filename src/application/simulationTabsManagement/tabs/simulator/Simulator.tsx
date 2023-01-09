@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { MesherOutputSelector } from "../../../../store/mesherSlice";
 import {
   selectedProjectSelector,
 } from "../../../../store/projectSlice";
@@ -13,6 +12,7 @@ import { ComponentEntity } from "cad-library";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
+import { Project } from "../../../../model/Project";
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;
@@ -28,7 +28,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
   setSelectedSimulation
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
-  const mesherOutput = useSelector(MesherOutputSelector);
+  console.log("render simulator tab")
   let allMaterials = getMaterialListFrom(selectedProject?.model.components as ComponentEntity[])
   let materialsNames: string[] = [];
   allMaterials.forEach(m => materialsNames.push(m.name))
@@ -37,9 +37,9 @@ export const Simulator: React.FC<SimulatorProps> = ({
   return (
     <>
       <CanvasBaseWithRedux section="Simulator">
-        {mesherOutput && (
+        {selectedProject && (
           <MeshedElement
-            mesherOutput={mesherOutput}
+            selectedProject={selectedProject}
             selectedMaterials={selectedMaterials}
           />
         )}
@@ -64,7 +64,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
         <GenerateMesh
         setSelectedSimulation={setSelectedSimulation}
           setMenuItem={setMenuItem}
-          selectedProject={selectedProject}
+          selectedProject={selectedProject as Project}
         />
       {/* </RightPanelSimulation> */}
     </>

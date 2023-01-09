@@ -54,7 +54,7 @@ export const Physics: React.FC<PhysicsProps> = ({
                   position={port.inputElement.transformationParams.position}
                   scale={port.inputElement.transformationParams.scale}
                   rotation={port.inputElement.transformationParams.rotation}
-                  onClick={() => selectPort(port.name)}
+                  onClick={() => dispatch(selectPort(port.name))}
                 >
                   <FactoryShapes entity={port.inputElement} color="#00ff00" />
                 </mesh>
@@ -64,7 +64,7 @@ export const Physics: React.FC<PhysicsProps> = ({
                   position={port.outputElement.transformationParams.position}
                   scale={port.outputElement.transformationParams.scale}
                   rotation={port.outputElement.transformationParams.rotation}
-                  onClick={() => selectPort(port.name)}
+                  onClick={() => dispatch(selectPort(port.name))}
                 >
                   <FactoryShapes entity={port.outputElement} />
                 </mesh>
@@ -88,7 +88,7 @@ export const Physics: React.FC<PhysicsProps> = ({
               <group
                 key={port.name}
                 name={port.name}
-                onClick={() => selectPort(port.name)}
+                onClick={() => dispatch(selectPort(port.name))}
                 position={(port as Probe).groupPosition}
               >
                 {(port as Probe).elements.map((element, index) => {

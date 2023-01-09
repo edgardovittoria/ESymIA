@@ -1,10 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {} from 'react';
 import {useSelector} from "react-redux";
 import {selectedProjectSelector} from "../../../../store/projectSlice";
 import {FaCircle} from "react-icons/fa";
 import {Switch} from '@headlessui/react'
-import {getMaterialListFrom} from "./auxiliaryFunctions/auxiliaryFunctions";
-import {ComponentEntity} from "cad-library";
 
 interface SimulatorLeftPanelTabProps {
     selectedMaterials: string[],
@@ -18,21 +16,6 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
 ) => {
 
     const selectedProject = useSelector(selectedProjectSelector)
-    let allMaterials = getMaterialListFrom(selectedProject?.model.components as ComponentEntity[])
-    let objArray: Map<string, boolean> = new Map<string, boolean>()
-    const [enabled, setEnabled] = useState<Map<string, boolean>>(objArray)
-
-    useEffect(() => {
-        if (selectedProject) {
-            allMaterials.forEach(m => {
-                objArray.set(m.name, true)
-            })
-            setEnabled(objArray)
-            let materialsName: string[] = []
-            allMaterials.forEach(m => materialsName.push(m.name))
-            setSelectedMaterials(materialsName)
-        }
-    }, []);
     
     return (
         <>
@@ -52,10 +35,8 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
                                         </div>
                                         <div className="w-[30%] text-left flex items-center">
                                             <Switch
-                                                checked={enabled.get(component.material?.name as string)}
+                                                checked={selectedMaterials.filter(m => m === component.material?.name).length > 0}
                                                 onChange={(e) => {
-                                                    enabled.set(component.material?.name as string, !enabled.get(component.material?.name as string))
-                                                    setEnabled(enabled)
                                                     if (selectedMaterials.filter(sm => sm === component.material?.name)[0]) {
                                                         setSelectedMaterials(selectedMaterials.filter(sm => sm !== component.material?.name))
                                                     } else {
@@ -63,12 +44,12 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
                                                     }
                                                 }}
                                                 className={`${
-                                                    enabled.get(component.material?.name as string) ? 'bg-green-400' : 'bg-gray-300'
+                                                    selectedMaterials.filter(m => m === component.material?.name).length > 0 ? 'bg-green-400' : 'bg-gray-300'
                                                 } relative inline-flex h-4 w-9 items-center rounded-full`}
                                             >
                                             <span
                                                 className={`${
-                                                    enabled.get(component.material?.name as string) ? 'translate-x-5' : 'translate-x-1'
+                                                    selectedMaterials.filter(m => m === component.material?.name).length > 0 ? 'translate-x-5' : 'translate-x-1'
                                                 } inline-block h-3 w-3 transform rounded-full bg-white transition`}
                                             />
                                             </Switch>

@@ -35,14 +35,7 @@ export const Results: React.FC<ResultsProps> = ({
   const [chartVisualizationMode, setChartVisualizationMode] = useState<
     "grid" | "full"
   >("grid");
-  let simulation: Simulation;
-  if (selectedSimulation) {
-    simulation = selectedProject?.simulations?.filter(
-      (s) => s.name === selectedSimulation?.name
-    )[0] as Simulation;
-  } else {
-    simulation = selectedProject?.simulations[0] as Simulation;
-  } 
+  let simulation = selectedProject?.simulation
   return (
     <div className="flex">
       <div className="w-[20%]">
@@ -68,7 +61,7 @@ export const Results: React.FC<ResultsProps> = ({
         </LeftPanel>
       </div>
       <div className="w-[78%] ">
-        {selectedProject && selectedProject.simulations.length > 0 ? (
+        {selectedProject && simulation ? (
           chartVisualizationMode === "full" ? (
             <>
               {selectedTabLeftPanel === "Results" && (
