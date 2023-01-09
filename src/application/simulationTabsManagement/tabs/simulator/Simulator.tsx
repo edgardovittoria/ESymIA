@@ -4,15 +4,15 @@ import { MesherOutputSelector } from "../../../../store/mesherSlice";
 import {
   selectedProjectSelector,
 } from "../../../../store/projectSlice";
-import { ModelOutliner } from "../ModelOutliner";
-import { Models } from "../Models";
 import { SimulatorLeftPanelTab } from "./SimulatorLeftPanelTab";
-import { LeftPanel } from "../LeftPanel";
 import { GenerateMesh } from "./GenerateMesh";
-import { CanvasBaseWithRedux } from "../CanvasBaseWithRedux";
+import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
 import { MeshedElement } from "./MeshedElement/MeshedElement";
 import { getMaterialListFrom } from "./auxiliaryFunctions/auxiliaryFunctions";
 import { ComponentEntity } from "cad-library";
+import { LeftPanel } from "../../sharedElements/LeftPanel";
+import { Models } from "../../sharedElements/Models";
+import { ModelOutliner } from "../../sharedElements/ModelOutliner";
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;

@@ -6,10 +6,7 @@ import {
   selectPort,
   updatePortPosition,
 } from "../../../../store/projectSlice";
-import { ModelOutliner } from "../ModelOutliner";
-import { Models } from "../Models";
-import { LeftPanel } from "../LeftPanel";
-import { CanvasBaseWithRedux } from "../CanvasBaseWithRedux";
+import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
 import * as THREE from "three";
 import { Probe } from "../../../../model/Port";
 import { Line } from "@react-three/drei";
@@ -27,6 +24,9 @@ import { ModalSignals } from "./inputSignal/ModalSignals";
 import { useState } from "react";
 import { Project } from "../../../../model/Project";
 import { InputSignalManagement } from "./inputSignal/InputSignalManagement";
+import { LeftPanel } from "../../sharedElements/LeftPanel";
+import { Models } from "../../sharedElements/Models";
+import { ModelOutliner } from "../../sharedElements/ModelOutliner";
 
 interface PhysicsProps {
   selectedTabLeftPanel: string;

@@ -6,12 +6,12 @@ import {
   selectPort,
 } from "../../../../store/projectSlice";
 import { ChartVisualizationMode } from "./ChartVisualizationMode";
-import { ModelOutliner } from "../ModelOutliner";
-import { Models } from "../Models";
-import { LeftPanel } from "../LeftPanel";
 import { ChartsList } from "./ChartsList";
 import { ResultsLeftPanelTab } from "./ResultsLeftPanelTab";
 import { Simulation } from "../../../../model/Simulation";
+import { Models } from "../../sharedElements/Models";
+import { ModelOutliner } from "../../sharedElements/ModelOutliner";
+import { LeftPanel } from "../../sharedElements/LeftPanel";
 
 interface ResultsProps {
   selectedTabLeftPanel: string;

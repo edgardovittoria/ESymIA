@@ -14,7 +14,6 @@ import {
     recursiveFindFolders, recursiveSelectFolder, removeFolderFromStore, removeProjectFromStore,
     takeAllProjectsIn
 } from "./auxiliaryFunctions/managementProjectsAndFoldersFunction";
-import { MesherOutput } from '../model/MesherInputOutput';
 
 
 export type ProjectState = {
