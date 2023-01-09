@@ -120,18 +120,12 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           ended: Date.now().toString(),
           status: "Completed",
         };
-        console.log(simulationUpdated);
         dispatch(updateSimulation(simulationUpdated));
       });
       //console.log(dataToSendToSolver)
       //exportSolverJson(dataToSendToSolver)
       setTimeout(() => {
         dispatch(setSimulationStatus("completed"));
-        execQuery(getSimulationByName, "simulation1")
-          .then(() => {})
-          .catch(() => {
-            //management of exceptions
-          });
       }, 5000);
     }
   }, [meshApproved]);
