@@ -11,6 +11,8 @@ import { LeftPanel } from "../LeftPanel";
 import { GenerateMesh } from "./GenerateMesh";
 import { CanvasBaseWithRedux } from "../CanvasBaseWithRedux";
 import { MeshedElement } from "./MeshedElement/MeshedElement";
+import { getMaterialListFrom } from "./auxiliaryFunctions/auxiliaryFunctions";
+import { ComponentEntity } from "cad-library";
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;
@@ -27,7 +29,9 @@ export const Simulator: React.FC<SimulatorProps> = ({
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const mesherOutput = useSelector(MesherOutputSelector);
+  let allMaterials = getMaterialListFrom(selectedProject?.model.components as ComponentEntity[])
   let materialsNames: string[] = [];
+  allMaterials.forEach(m => materialsNames.push(m.name))
   const [selectedMaterials, setSelectedMaterials] =
     useState<string[]>(materialsNames);
   return (

@@ -232,10 +232,6 @@ export const projectToShareSelector = (state: { projects: ProjectState }) => sta
 export const folderToShareSelector = (state: { projects: ProjectState }) => state.projects.folderToShare
 export const projectToRenameSelector = (state: { projects: ProjectState }) => state.projects.projectToRename
 export const folderToRenameSelector = (state: { projects: ProjectState }) => state.projects.folderToRename
-export const meshSelectedProjectSelector = (state: { projects: ProjectState }) => {
-    let selectedProject = findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)
-    return selectedProject?.mesherOutput
-}
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
     let allFolders: Folder[] = []
     return recursiveFindFolders(state.projects.projects, allFolders)
