@@ -33,7 +33,6 @@ export const Simulator: React.FC<SimulatorProps> = ({
       if(materialsNames.filter(mat => mat !== m.name).length > 0) materialsNames.push(m.name)
   })
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>(materialsNames);
-  console.log(materialsNames)
   return (
     <>
       <CanvasBaseWithRedux section="Simulator">

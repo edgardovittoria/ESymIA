@@ -24,7 +24,7 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
                     <ul className="ml-0 pl-3">
                         {selectedProject.model.components && selectedProject.model.components.map((component, index) => {
                             return (
-                                <li key={component.name} className='p-[3px] rounded mt-1'>
+                                <li key={index} className='p-[3px] rounded mt-1'>
                                     <div className="flex">
                                         <div className="flex w-[10%] items-center">
                                             <FaCircle

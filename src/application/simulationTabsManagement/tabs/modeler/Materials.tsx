@@ -15,9 +15,9 @@ export const Materials: React.FC<MaterialsProps> = ({}) => {
             {(selectedProject && selectedProject.model.components !== undefined) ?
                 <div>
                     <ul className="ml-0 pl-3">
-                        {selectedProject.model.components.map((component) => {
+                        {selectedProject.model.components.map((component, index) => {
                                 return (
-                                    <li key={component.name} className="mt-2">
+                                    <li key={index} className="mt-2">
                                         <div className="flex">
                                             <div className="flex w-[10%] items-center">
                                                 <FaCircle
