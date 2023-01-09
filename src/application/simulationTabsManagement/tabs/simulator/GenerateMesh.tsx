@@ -186,7 +186,9 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
         .then((res) => {
           console.log(res.data);
           dispatch(setMesh(res.data));
-        });
+        })
+          .catch(err => console.log(err))
+      ;
       //exportJson(objToSendToMesher)
     }
   }, [meshGenerated]);
