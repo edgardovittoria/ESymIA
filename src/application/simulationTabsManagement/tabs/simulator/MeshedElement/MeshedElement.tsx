@@ -7,17 +7,17 @@ import { Project } from '../../../../../model/Project';
 
 interface PanelContentProps {
     selectedMaterials: string[],
-    selectedProject: Project
+    selectedProject: Project,
+    mesherOutput?: MesherOutput
 }
 
 export const MeshedElement: React.FC<PanelContentProps> = (
     {
-        selectedMaterials, selectedProject
+        selectedMaterials, selectedProject, mesherOutput
     }
 ) => {
 
     let meshGenerated = selectedProject.meshData.meshGenerated
-    let mesherOutput = selectedProject.meshData.mesh
 
     let materialsList: Material[] = []
     selectedProject?.model?.components.forEach(c => materialsList.push(c.material as Material))
@@ -63,6 +63,7 @@ export const MeshedElement: React.FC<PanelContentProps> = (
                                 mesherMatrices={mesherMatrices}
                                 index={index}
                                 materialsList={modelMaterials}
+                                mesherOutput={mesherOutput}
                             />
                         )
                     })}

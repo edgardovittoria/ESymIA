@@ -25,6 +25,7 @@
     "faunadb": "^4.5.4",
     "font-awesome": "^4.7.0",
     "react": "^17.0.2",
+    "react-aws-s3-typescript": "^1.1.5",
     "react-chartjs-2": "^4.0.1",
     "react-contexify": "^5.0.0",
     "react-dnd": "^15.1.2",

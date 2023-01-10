@@ -7,7 +7,6 @@ import {AiOutlineBarChart} from "react-icons/ai";
 import {Folder} from "../../../model/Folder";
 import {
     findProjectByFaunaID,
-    findProjectByName,
     mainFolderSelector,
     projectsSelector,
     selectProject

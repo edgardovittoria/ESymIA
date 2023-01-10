@@ -18,7 +18,7 @@ export type Project = {
 }
 
 export type MeshData = {
-    mesh?: MesherOutput,
+    mesh?: string,
     meshGenerated: "Not Generated" | "Generated" | "Generating",
     meshApproved: boolean,
     downloadPercentage: number,

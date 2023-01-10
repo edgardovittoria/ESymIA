@@ -71,7 +71,7 @@ export const ProjectSlice = createSlice({
             }
         },
         shareProject(state: ProjectState, action: PayloadAction<{ projectToShare: Project, user: string }>) {
-            let project = findProjectByName(takeAllProjectsIn(state.projects), action.payload.projectToShare.name);
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToShare.name);
             (project && project.sharedWith) && project.sharedWith.push(action.payload.user)
         },
         shareFolder(state: ProjectState, action: PayloadAction<{ folderToShare: Folder, user: string }>) {
@@ -85,7 +85,7 @@ export const ProjectSlice = createSlice({
             state.folderToShare = action.payload
         },
         renameProject(state: ProjectState, action: PayloadAction<{ projectToRename: Project, name: string }>) {
-            let project = findProjectByName(takeAllProjectsIn(state.projects), action.payload.projectToRename.name);
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToRename.name);
             if (project) {
                 project.name = action.payload.name
                 state.selectedFolder.projectList = state.selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId)
@@ -120,7 +120,7 @@ export const ProjectSlice = createSlice({
             recursiveSelectFolder(state, state.projects.subFolders, action.payload)
         },
         importModel(state: ProjectState, action: PayloadAction<ImportActionParamsObject>) {
-            let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             if (selectedProject) {
                 console.log("load model")
                 selectedProject.model = action.payload.canvas
@@ -136,7 +136,7 @@ export const ProjectSlice = createSlice({
         //     // })
         // },
         updateSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
-            let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             if (selectedProject) selectedProject.simulation = action.payload;
             // if (selectedProject?.simulations) {
             //     selectedProject.simulations = selectedProject.simulations.filter(s => s.name !== action.payload.name)
@@ -149,24 +149,24 @@ export const ProjectSlice = createSlice({
             // })
         },
         addPorts(state: ProjectState, action: PayloadAction<Port | Probe>) {
-            let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             selectedProject?.ports.push(action.payload)
         },
         selectPort(state: ProjectState, action: PayloadAction<string>) {
-            let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             selectedProject?.ports.forEach(port => {
                 port.isSelected = port.name === action.payload;
             })
         },
         deletePort(state: ProjectState, action: PayloadAction<string>) {
-            let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             let updatedPortsArray = selectedProject?.ports.filter(port => port.name !== action.payload)
             if (selectedProject && updatedPortsArray) {
                 selectedProject.ports = updatedPortsArray
             }
         },
         setPortType(state: ProjectState, action: PayloadAction<{ name: string, type: number }>) {
-            let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             selectedProject?.ports.forEach(port => {
                 if (port.category === 'port' || port.category === 'lumped') {
                     if (port.name === action.payload.name) {
@@ -176,7 +176,7 @@ export const ProjectSlice = createSlice({
             })
         },
         updatePortPosition(state: ProjectState, action: PayloadAction<{ type: 'first' | 'last' | 'probe', position: [number, number, number] }>) {
-            let selectedPort = findSelectedPort(findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject))
+            let selectedPort = findSelectedPort(findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject))
             if (selectedPort) {
                 if (selectedPort.category === 'port' || selectedPort.category === 'lumped') {
                     (action.payload.type === 'first') ? selectedPort.inputElement.transformationParams.position = action.payload.position : selectedPort.outputElement.transformationParams.position = action.payload.position
@@ -186,7 +186,7 @@ export const ProjectSlice = createSlice({
             }
         },
         setRLCParams(state: ProjectState, action: PayloadAction<RLCParams>) {
-            let selectedPort = findSelectedPort(findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject));
+            let selectedPort = findSelectedPort(findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject));
             if (selectedPort) {
                 if (selectedPort.category === 'port' || selectedPort.category === 'lumped') {
                     selectedPort.rlcParams = action.payload
@@ -194,33 +194,33 @@ export const ProjectSlice = createSlice({
             }
         },
         setAssociatedSignal(state: ProjectState, action: PayloadAction<Signal>) {
-            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.signal = action.payload
         },
         setScreenshot(state: ProjectState, action: PayloadAction<string>) {
-            let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject)
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             if (selectedProject) {
                 selectedProject.screenshot = action.payload
             }
         },
         setQuantum(state: ProjectState, action: PayloadAction<[number, number, number]>){
-            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.quantum = action.payload
         },
-        setMesh(state: ProjectState, action: PayloadAction<MesherOutput>){
-            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+        setMesh(state: ProjectState, action: PayloadAction<string>){
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.mesh = action.payload
         },
         setDownloadPercentage(state: ProjectState, action: PayloadAction<number>){
-            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.downloadPercentage = action.payload
         },
         setMeshGenerated(state: ProjectState, action: PayloadAction<"Not Generated" | "Generated" | "Generating">){
-            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.meshGenerated = action.payload
         },
         setMeshApproved(state: ProjectState, action: PayloadAction<boolean>){
-            let project = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.meshApproved = action.payload
         },
     },
@@ -248,7 +248,7 @@ export const mainFolderSelector = (state: { projects: ProjectState }) => state.p
 export const SelectedFolderSelector = (state: { projects: ProjectState }) => state.projects.selectedFolder;
 export const selectedProjectSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
 // export const selectedComponentSelector = (state: { projects: ProjectState }) => state.projects.selectedComponent;
-export const simulationSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;
+export const simulationSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;
 export const projectToShareSelector = (state: { projects: ProjectState }) => state.projects.projectToShare
 export const folderToShareSelector = (state: { projects: ProjectState }) => state.projects.folderToShare
 export const projectToRenameSelector = (state: { projects: ProjectState }) => state.projects.projectToRename
@@ -256,9 +256,6 @@ export const folderToRenameSelector = (state: { projects: ProjectState }) => sta
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
     let allFolders: Folder[] = []
     return recursiveFindFolders(state.projects.projects, allFolders)
-}
-export const findProjectByName = (projects: Project[], name: string | undefined) => {
-    return (name !== undefined) ? projects.filter(project => project.name === name)[0] : undefined
 }
 export const findProjectByFaunaID = (projects: Project[], faunaDocumentId: string | undefined) => {
     return (faunaDocumentId !== undefined) ? projects.filter(project => project.faunaDocumentId === faunaDocumentId)[0] : undefined

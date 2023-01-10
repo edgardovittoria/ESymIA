@@ -88,8 +88,8 @@ export const ChartsList: React.FC<ChartsListProps> = ({
 
   return (
     <>
-      {chartsDataOptionsList.map((chartData) => (
-        <div className="box w-[100%]">
+      {chartsDataOptionsList.map((chartData, index) => (
+        <div className="box w-[100%]" key={index}>
           <Line
             options={optionsWithScaleMode(chartData.options, scaleMode)}
             data={chartData.data}

@@ -10,15 +10,15 @@ interface InstancedMeshProps {
     mesherMatrices: boolean[][][][],
     index: number,
     materialsList: Material[],
+    mesherOutput?: MesherOutput
 }
 
 export const MyInstancedMesh: React.FC<InstancedMeshProps> = (
     {
-        selectedProject, mesherMatrices, index, materialsList
+        selectedProject, mesherMatrices, index, materialsList, mesherOutput
     }
 ) => {
 
-    let mesherOutput = selectedProject.meshData.mesh
     let meshGenerated = selectedProject.meshData.meshGenerated
 
     const meshRef = useRef<InstancedMesh[]>([]);
