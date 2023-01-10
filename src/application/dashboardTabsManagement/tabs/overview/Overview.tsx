@@ -4,31 +4,26 @@ import {ImportSimProjectButton} from './importSimProjectButton';
 import {Simulations} from "../Simulations";
 import {useDispatch, useSelector} from "react-redux";
 import {projectsSelector, selectProject} from "../../../../store/projectSlice";
+import { useMenuItems, useTabs } from '../../../../contexts/tabsAndMenuitemsHooks';
 
 interface OverviewProps {
-    setShowModal: Function,
-    projectsTab: Project[],
-    setProjectsTab: Function,
-    selectTab: Function,
-    setMenuItem: Function,
-    setSimulationCoreMenuItemSelected: Function,
+    setShowModal: Function
 }
 
 export const Overview: React.FC<OverviewProps> = (
     {
-        setShowModal, projectsTab, setProjectsTab, selectTab, setMenuItem, setSimulationCoreMenuItemSelected,
+        setShowModal
     }
 ) => {
-
+    const {addProjectTab, selectTab} = useTabs()
+    const {selectMenuItem} = useMenuItems()
     const dispatch = useDispatch()
     const projects = useSelector(projectsSelector)
     //const [cardMenuHovered, setCardMenuHovered] = useState(false);
 
 
     const handleCardClick = (project: Project) => {
-        if (!(projectsTab.filter(projectTab => projectTab.faunaDocumentId === project.faunaDocumentId).length > 0)) {
-            setProjectsTab(projectsTab.concat(project))
-        }
+        addProjectTab(project)
         dispatch(selectProject(project.faunaDocumentId))
         selectTab(project.faunaDocumentId)
     }
@@ -47,7 +42,7 @@ export const Overview: React.FC<OverviewProps> = (
                     </button>
                     <ImportSimProjectButton
                         className="text-primaryColor bg-transparent border-none hover:underline hover:text-black"
-                        setMenuItem={setMenuItem}>
+                        setMenuItem={selectMenuItem}>
                         Import Project
                     </ImportSimProjectButton>
                 </div>
@@ -112,12 +107,7 @@ export const Overview: React.FC<OverviewProps> = (
 
             </div>
             <div className="mt-3 justify-between w-full h-1/2">
-                <Simulations
-                    selectTab={selectTab}
-                    setSimulationCoreMenuItemSelected={setSimulationCoreMenuItemSelected}
-                    setProjectsTab={setProjectsTab}
-                    projectsTab={projectsTab}
-                />
+                <Simulations />
             </div>
 
 

@@ -1,13 +1,12 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo} from 'react';
 import './App.css';
 import './GlobalColors.css'
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-contexify/dist/ReactContexify.css';
 import {TabsContainer} from "./application/TabsContainer";
 import {
-    mainFolderSelector, setProjectsFolderToUser
+    setProjectsFolderToUser
 } from "./store/projectSlice";
-import {Project} from "./model/Project";
 import {useDispatch, useSelector} from "react-redux";
 import {MenuBar} from './application/MenuBar';
 import {
@@ -27,6 +26,7 @@ import {
     getSharedSimulationProjects,
     getSimulationProjectsByOwner
 } from "./faunadb/projectsFolderAPIs";
+import { useTabs } from './contexts/tabsAndMenuitemsHooks';
 
 function App() {
 
@@ -35,12 +35,7 @@ function App() {
     //SELECTORS
     const user = useSelector(usersStateSelector)
 
-    //STATE VARIABLES
-    const [tabSelected, setTabSelected] = useState("DASHBOARD");
-    const [projectsTab, setProjectsTab] = useState<Project[]>([]);
-    const menuItems = getMenuItemsArrayBasedOnTabType(tabSelected)
-    const [menuItemSelected, setMenuItemSelected] = useState(menuItems[0]);
-    const mainFolder = useSelector(mainFolderSelector)
+    const {tabSelected} = useTabs()
     const {execQuery} = useFaunaQuery()
 
     //USE EFFECT
@@ -61,58 +56,26 @@ function App() {
         }
     }, [user.userName]);
 
-    useEffect(() => {
-        if (tabSelected === "DASHBOARD") {
-            setMenuItemSelected(menuItems[0])
-            dispatch(selectFolder(mainFolder.faunaDocumentId as string))
-        } else if (menuItemSelected !== 'Results') {
-            setMenuItemSelected(menuItems[0])
-        }
-    }, [tabSelected])
-
 
     //MEMOIZED COMPONENTS
     const memoizedTabsContainer = useMemo(() => <TabsContainer
-        selectTab={setTabSelected}
-        selectedTab={tabSelected}
-        projectsTab={projectsTab}
-        setProjectsTab={setProjectsTab}
         user={user}
-    />, [tabSelected, projectsTab, user]);
+    />, [user]);
 
     return (
         <>
             {memoizedTabsContainer}
-            <MenuBar setMenuItem={setMenuItemSelected} activeMenuItem={menuItemSelected} menuItems={menuItems}/>
+            <MenuBar />
             {(tabSelected === 'DASHBOARD')
                 ?
-                <DashboardTabsContentFactory
-                    menuItem={menuItemSelected}
-                    projectsTab={projectsTab}
-                    setProjectsTab={setProjectsTab}
-                    selectTab={setTabSelected}
-                    setSimulationCoreMenuItemSelected={setMenuItemSelected}
-                    setMenuItem={setMenuItemSelected}
-                />
+                <DashboardTabsContentFactory />
                 :
-                <SimulationTabsContentFactory
-                    menuItem={menuItemSelected}
-                    setMenuItem={setMenuItemSelected}
-                />
+                <SimulationTabsContentFactory />
             }
         </>
 
 
     );
-}
-
-const getMenuItemsArrayBasedOnTabType = (tabType: string) => {
-    switch (tabType) {
-        case "DASHBOARD":
-            return ['Overview', 'Projects', 'Simulations']
-        default:
-            return ['Modeler', 'Physics', 'Simulator', 'Results']
-    }
 }
 
 export default App;

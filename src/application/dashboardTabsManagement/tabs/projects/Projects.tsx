@@ -10,17 +10,15 @@ import { SearchUserAndShare } from './components/searchUserAndShare/searchUserAn
 import { CreateNewFolderModal } from './components/CreateNewFolderModal';
 import { mainFolderSelector, SelectedFolderSelector, selectFolder, selectProject } from '../../../../store/projectSlice';
 import { RenameModal } from './components/renameModal/RenameModal';
+import { useTabs } from '../../../../contexts/tabsAndMenuitemsHooks';
 
 interface ProjectsProps {
-    setShowModal: Function,
-    projectsTab: Project[],
-    setProjectsTab: Function,
-    selectTab: Function,
+    setShowModal: Function
 }
 
 export const Projects: React.FC<ProjectsProps> = (
     {
-        setShowModal, projectsTab, setProjectsTab, selectTab
+        setShowModal
     }
 ) => {
 
@@ -30,14 +28,13 @@ export const Projects: React.FC<ProjectsProps> = (
     const user = useSelector(usersStateSelector)
     const [path, setPath] = useState([mainFolder]);
 
+    const {addProjectTab, selectTab} = useTabs()
     const [showSearchUser, setShowSearchUser] = useState(false);
     const [showRename, setShowRename] = useState(false);
     const [showCreateNewFolderModal, setShowCreateNewFolderModal] = useState(false);
 
     const handleCardClick = (project: Project) => {
-        if (!(projectsTab.filter(projectTab => projectTab.faunaDocumentId === project.faunaDocumentId).length > 0)) {
-            setProjectsTab(projectsTab.concat(project))
-        }
+        addProjectTab(project)
         dispatch(selectProject(project.faunaDocumentId))
         selectTab(project.faunaDocumentId)
     }
@@ -112,8 +109,7 @@ export const Projects: React.FC<ProjectsProps> = (
                                 {projects.length > 0 && <h5 className="w-[100%]">Projects</h5>}
                                 {projects.filter(p => p.owner.userName === user.userName).map(project => {
                                     return (
-                                        <DraggableProjectCard project={project} projectsTab={projectsTab}
-                                                              setProjectsTab={setProjectsTab}
+                                        <DraggableProjectCard project={project} 
                                                               handleCardClick={handleCardClick}
                                                               key={project.faunaDocumentId}
                                                               setShowSearchUser={setShowSearchUser}
@@ -126,8 +122,7 @@ export const Projects: React.FC<ProjectsProps> = (
                                 {projects.length > 0 && <h5 className="w-[100%]">Shared Projects</h5>}
                                 {projects.filter(p => p.owner.userName !== user.userName).map(project => {
                                     return (
-                                        <DraggableProjectCard project={project} projectsTab={projectsTab}
-                                                              setProjectsTab={setProjectsTab}
+                                        <DraggableProjectCard project={project}
                                                               handleCardClick={handleCardClick}
                                                               key={project.faunaDocumentId}
                                                               setShowSearchUser={setShowSearchUser}

@@ -3,20 +3,20 @@ import { Physics } from "./tabs/physics/Physics";
 import { Results } from "./tabs/results/Results";
 import { Simulator } from "./tabs/simulator/Simulator";
 import { Modeler } from "./tabs/modeler/Modeler";
+import { useMenuItems } from "../../contexts/tabsAndMenuitemsHooks";
 
 
 
 interface SimulationTabsContentFactoryProps {
-  menuItem: string;
-  setMenuItem: Function;
 }
 
 export const SimulationTabsContentFactory: React.FC<
   SimulationTabsContentFactoryProps
-> = ({ menuItem, setMenuItem }) => {  
+> = () => {  
   const [selectedTabLeftPanel, setSelectedTabLeftPanel] = useState("Modeler");
+  const {menuItemSelected} = useMenuItems()
 
-  switch (menuItem) {
+  switch (menuItemSelected) {
     case "Modeler":
       return (
         <Modeler
@@ -36,7 +36,6 @@ export const SimulationTabsContentFactory: React.FC<
         <Simulator
           selectedTabLeftPanel={selectedTabLeftPanel}
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
-          setMenuItem={setMenuItem}
         />
       );
     case "Results":

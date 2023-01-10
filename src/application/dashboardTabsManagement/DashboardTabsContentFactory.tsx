@@ -1,54 +1,29 @@
 import React, { useState } from "react";
-import { Project } from "../../model/Project";
 import { Overview } from "./tabs/overview/Overview";
 import { Simulations } from "./tabs/Simulations";
 import { CreateNewProjectModal } from "../sharedModals/CreateNewProjectModal";
 import { Projects } from "./tabs/projects/Projects";
+import { useMenuItems } from "../../contexts/tabsAndMenuitemsHooks";
 
-interface DashboardTabsContentFactoryProps {
-  menuItem: string;
-  projectsTab: Project[];
-  setProjectsTab: Function;
-  selectTab: Function;
-  setSimulationCoreMenuItemSelected: Function;
-  setMenuItem: Function;
-}
+interface DashboardTabsContentFactoryProps {}
 
 export const DashboardTabsContentFactory: React.FC<
   DashboardTabsContentFactoryProps
-> = ({
-  menuItem,
-  projectsTab,
-  setProjectsTab,
-  selectTab,
-  setSimulationCoreMenuItemSelected,
-  setMenuItem,
-}) => {
+> = () => {
   const [showCreateNewProjectModal, setShowCreateNewProjectModal] =
     useState(false);
+  const { menuItemSelected } = useMenuItems();
 
-  switch (menuItem) {
+  switch (menuItemSelected) {
     case "Overview":
       return (
         <div className="container flex mx-auto pt-8">
           <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
-            <Overview
-              setShowModal={setShowCreateNewProjectModal}
-              projectsTab={projectsTab}
-              setProjectsTab={setProjectsTab}
-              selectTab={selectTab}
-              setMenuItem={setMenuItem}
-              setSimulationCoreMenuItemSelected={setSimulationCoreMenuItemSelected}
-            />
+            <Overview setShowModal={setShowCreateNewProjectModal} />
           </div>
           {/* <RightPanel /> */}
           {showCreateNewProjectModal && (
-            <CreateNewProjectModal
-              setShow={setShowCreateNewProjectModal}
-              projectsTab={projectsTab}
-              setProjectsTab={setProjectsTab}
-              selectTab={selectTab}
-            />
+            <CreateNewProjectModal setShow={setShowCreateNewProjectModal} />
           )}
         </div>
       );
@@ -57,21 +32,11 @@ export const DashboardTabsContentFactory: React.FC<
       return (
         <div className="container flex mx-auto pt-8">
           <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
-            <Projects
-              setShowModal={setShowCreateNewProjectModal}
-              projectsTab={projectsTab}
-              setProjectsTab={setProjectsTab}
-              selectTab={selectTab}
-            />
+            <Projects setShowModal={setShowCreateNewProjectModal} />
           </div>
           {/* <RightPanel /> */}
           {showCreateNewProjectModal && (
-            <CreateNewProjectModal
-              setShow={setShowCreateNewProjectModal}
-              projectsTab={projectsTab}
-              setProjectsTab={setProjectsTab}
-              selectTab={selectTab}
-            />
+            <CreateNewProjectModal setShow={setShowCreateNewProjectModal} />
           )}
         </div>
       );
@@ -79,12 +44,7 @@ export const DashboardTabsContentFactory: React.FC<
       return (
         <div className="container flex mx-auto pt-8">
           <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
-            <Simulations
-              selectTab={selectTab}
-              setSimulationCoreMenuItemSelected={setSimulationCoreMenuItemSelected}
-              setProjectsTab={setProjectsTab}
-              projectsTab={projectsTab}
-            />
+            <Simulations />
           </div>
           {/* <RightPanel /> */}
         </div>

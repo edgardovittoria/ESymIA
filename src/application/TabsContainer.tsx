@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {FaBell, FaPlus, FaTimes, FaUser} from "react-icons/fa";
-import {Project} from "../model/Project";
 import {useAuth0} from "@auth0/auth0-react";
 import {SetUserInfo, UsersState} from 'cad-library';
 import {HiOutlineLogout} from "react-icons/hi";
@@ -8,27 +7,20 @@ import {useDispatch} from 'react-redux';
 import {selectProject} from '../store/projectSlice';
 import {GiSettingsKnobs} from "react-icons/gi";
 import { CreateNewProjectModal } from './sharedModals/CreateNewProjectModal';
+import { useTabs } from '../contexts/tabsAndMenuitemsHooks';
 
 interface TabsContainerProps {
-    selectTab: Function,
-    selectedTab: string,
-    projectsTab: Project[]
-    setProjectsTab: Function,
     user: UsersState
 }
 
 export const TabsContainer: React.FC<TabsContainerProps> = (
     {
-        selectTab, selectedTab, projectsTab, setProjectsTab, user
+        user
     }
 ) => {
-
+    
+    const {tabSelected, selectTab, projectsTabs, closeProjectTab} = useTabs()
     const dispatch = useDispatch()
-
-    const closeProjectTab = (projectID: string) => {
-        setProjectsTab(projectsTab.filter(projectTab => projectTab.faunaDocumentId !== projectID))
-        selectTab("DASHBOARD")
-    }
 
     const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
 
@@ -50,17 +42,17 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
                             dispatch(selectProject(undefined))
                         }}>
                             <div
-                                className={(selectedTab === 'DASHBOARD') ? `px-3 py-2 bg-white rounded-tl text-black` : `px-3 py-2 hover:cursor-pointer`}
+                                className={(tabSelected === 'DASHBOARD') ? `px-3 py-2 bg-white rounded-tl text-black` : `px-3 py-2 hover:cursor-pointer`}
                                 aria-current="page"
                             >Dashboard
                             </div>
                         </li>
-                        {projectsTab.map(projectTab => {
+                        {projectsTabs.map(projectTab => {
                             return <li key={projectTab.faunaDocumentId} className={`bg-[#dadada] rounded-tr`}>
                                 <div
-                                    className={(selectedTab === projectTab.faunaDocumentId) ? 'px-3 py-2 bg-white flex' : 'px-3 py-2 flex'}>
+                                    className={(tabSelected === projectTab.faunaDocumentId) ? 'px-3 py-2 bg-white flex' : 'px-3 py-2 flex'}>
                                     <div
-                                        className={(selectedTab === projectTab.faunaDocumentId) ? 'text-black' : 'text-gray-400 hover:cursor-pointer'}
+                                        className={(tabSelected === projectTab.faunaDocumentId) ? 'text-black' : 'text-gray-400 hover:cursor-pointer'}
                                         aria-current="page" onClick={() => {
                                         selectTab(projectTab.faunaDocumentId)
                                         dispatch(selectProject(projectTab.faunaDocumentId))
@@ -119,9 +111,6 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
             {showCreateNewProjectModal && (
             <CreateNewProjectModal
               setShow={setShowCreateNewProjectModal}
-              projectsTab={projectsTab}
-              setProjectsTab={setProjectsTab}
-              selectTab={selectTab}
             />
           )}
         </>

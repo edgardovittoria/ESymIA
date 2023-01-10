@@ -16,11 +16,10 @@ import {
     SelectedFolderSelector, setFolderToRename, setProjectToRename, setProjectToShare} from "../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import { Project } from '../../../../../model/Project';
+import { useTabs } from '../../../../../contexts/tabsAndMenuitemsHooks';
 
 interface DraggableProjectCardProps {
     project: Project,
-    projectsTab: Project[],
-    setProjectsTab: Function,
     handleCardClick: Function,
     setShowSearchUser: (v:boolean) => void
     setShowRename: (v:boolean) => void
@@ -28,11 +27,12 @@ interface DraggableProjectCardProps {
 
 export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     {
-        project, setProjectsTab, projectsTab, handleCardClick, setShowSearchUser, setShowRename
+        project, handleCardClick, setShowSearchUser, setShowRename
     }
 ) => {
 
     const dispatch = useDispatch()
+    const {closeProjectTab} = useTabs()
     const {execQuery} = useFaunaQuery()
     const selectedFolder = useSelector(SelectedFolderSelector)
     const allProjectFolders = useSelector(allProjectFoldersSelector)
@@ -136,7 +136,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     <Item onClick={(p) => {
                         p.event.stopPropagation()
                         dispatch(removeProject(project.faunaDocumentId as string))
-                        setProjectsTab(projectsTab.filter(p => p.name !== project.name))
+                        closeProjectTab(project)
                         execQuery(deleteSimulationProjectFromFauna, project.faunaDocumentId)
                         execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
                     }}>

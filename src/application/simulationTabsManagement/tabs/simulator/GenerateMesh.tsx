@@ -1,5 +1,5 @@
-import { ComponentEntity } from "cad-library";
-import React, {useEffect} from "react";
+import { ComponentEntity, exportToSTL, Material } from "cad-library";
+import React, { useEffect } from "react";
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { Project } from "../../../../model/Project";
@@ -22,30 +22,26 @@ import { Simulation } from "../../../../model/Simulation";
 import { SolverOutput } from "../../../../model/SolverInputOutput";
 import { Port, TempLumped } from "../../../../model/Port";
 import axios from "axios";
-import {
-  generateSTLListFromComponents,
-  getMaterialListFrom,
-} from "./auxiliaryFunctions/auxiliaryFunctions";
-import {MesherOutput} from "../../../../model/MesherInputOutput";
-import {uploadFileS3} from "../../../../aws/mesherAPIs";
+import { MesherOutput } from "../../../../model/MesherInputOutput";
+import { uploadFileS3 } from "../../../../aws/mesherAPIs";
+import { useMenuItems } from "../../../../contexts/tabsAndMenuitemsHooks";
 
 interface GenerateMeshProps {
-  setMenuItem: Function;
   selectedProject: Project;
-  setMesherOutput: Function;
   mesherOutput?: MesherOutput;
+  allMaterials?: Material[]
 }
 
 export const GenerateMesh: React.FC<GenerateMeshProps> = ({
-  setMenuItem,
   selectedProject,
-  setMesherOutput,
-  mesherOutput
+  mesherOutput,
+  allMaterials
 }) => {
   const solverDownloadPercentage = useSelector(
     SolverDownloadPercentageSelector
   );
   const simulationStatus = useSelector(SimulationStatusSelector);
+  const {selectMenuItem} = useMenuItems()
 
   const dispatch = useDispatch();
   let quantumDimensions = selectedProject.meshData.quantum;
@@ -53,6 +49,31 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
   let meshGenerated = selectedProject.meshData.meshGenerated;
   let mesherDownloadPercentage = selectedProject.meshData.downloadPercentage;
 
+  function generateSTLListFromComponents(
+    materialList: Material[],
+    components: ComponentEntity[]
+  ) {
+    let filteredComponents: ComponentEntity[][] = [];
+
+    materialList.forEach((m) => {
+      components &&
+        filteredComponents.push(
+          components.filter((c) => c.material?.name === m.name)
+        );
+    });
+
+    let STLList: { material: string; STL: string }[] = [];
+
+    filteredComponents.forEach((fc) => {
+      let STLToPush = exportToSTL(fc);
+      STLList.push({
+        material: fc[0].material?.name as string,
+        STL: STLToPush,
+      });
+    });
+
+    return STLList;
+  }
 
   function checkQuantumDimensionsValidity() {
     let validity = true;
@@ -90,9 +111,6 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           signalsValuesArray.push(sv.signal)
         );
 
-      let ports =
-        selectedProject &&
-        selectedProject.ports.filter((port) => port.category === "port");
       let lumped_elements =
         selectedProject &&
         selectedProject.ports.filter((port) => port.category === "lumped");
@@ -158,24 +176,26 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
   ]);
 
   const saveMeshToS3 = async (mesherOutput: any) => {
-    let blobFile = new Blob([JSON.stringify(mesherOutput)])
-    let meshFile = new File([blobFile], `mesh.json`, {type: 'application/json'})
+    let blobFile = new Blob([JSON.stringify(mesherOutput)]);
+    let meshFile = new File([blobFile], `mesh.json`, {
+      type: "application/json",
+    });
 
-    uploadFileS3(meshFile).then(res => {
-      if(res){
-        dispatch(setMesh(res.key))
+    uploadFileS3(meshFile).then((res) => {
+      if (res) {
+        dispatch(setMesh(res.key));
       }
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     if (meshGenerated === "Generating") {
       let components = selectedProject?.model.components as ComponentEntity[];
       let objToSendToMesher = {
         STLList:
-          components &&
+          components && allMaterials &&
           generateSTLListFromComponents(
-            getMaterialListFrom(components),
+            allMaterials,
             components
           ),
         quantum: quantumDimensions,
@@ -192,10 +212,9 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           }
         )
         .then((res) => {
-          saveMeshToS3(res.data).then(r => {})
+          saveMeshToS3(res.data).then(() => {});
         })
-          .catch(err => console.log(err))
-      ;
+        .catch((err) => console.log(err));
     }
   }, [meshGenerated]);
 
@@ -216,7 +235,10 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
             <div className="flex justify-between mt-2">
               <div className="w-[30%]">
                 <input
-                  disabled={selectedProject.simulation?.status === "Completed" || selectedProject.model.components === undefined}
+                  disabled={
+                    selectedProject.simulation?.status === "Completed" ||
+                    selectedProject.model.components === undefined
+                  }
                   min={0}
                   className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
                   type="number"
@@ -235,7 +257,10 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
               </div>
               <div className="w-[30%]">
                 <input
-                  disabled={selectedProject.simulation?.status === "Completed" || selectedProject.model.components === undefined}
+                  disabled={
+                    selectedProject.simulation?.status === "Completed" ||
+                    selectedProject.model.components === undefined
+                  }
                   min={0.0}
                   className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
                   type="number"
@@ -254,7 +279,10 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
               </div>
               <div className="w-[30%]">
                 <input
-                  disabled={selectedProject.simulation?.status === "Completed" || selectedProject.model.components === undefined}
+                  disabled={
+                    selectedProject.simulation?.status === "Completed" ||
+                    selectedProject.model.components === undefined
+                  }
                   min={0}
                   className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
                   type="number"
@@ -364,7 +392,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
                 onClick={() => {
                   dispatch(setSimulationStatus("notStarted"));
                   dispatch(setSolverDownloadPercentage(0));
-                  setMenuItem("Results");
+                  selectMenuItem("Results");
                 }}
               >
                 Results
