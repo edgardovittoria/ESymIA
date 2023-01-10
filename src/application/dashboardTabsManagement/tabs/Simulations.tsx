@@ -122,11 +122,11 @@ export const Simulations: React.FC<SimulationsProps> = () => {
                               projectsTabs.filter(
                                 (p) =>
                                   p.faunaDocumentId === proj?.faunaDocumentId
-                              )
+                              ).length > 0
                             ) {
                               selectTab(proj.faunaDocumentId);
                             } else {
-                                console.log('ci siamo')
+                              console.log("ci siamo");
                               addProjectTab(proj);
                               selectTab(proj?.faunaDocumentId);
                             }
