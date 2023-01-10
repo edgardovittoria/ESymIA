@@ -68,7 +68,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
         ended: "",
         results: {} as SolverOutput,
         status: "Queued",
-        associatedProject: selectedProject?.name as string,
+        associatedProject: selectedProject?.faunaDocumentId as string,
       };
       dispatch(updateSimulation(simulation));
 

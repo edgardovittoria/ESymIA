@@ -25,8 +25,8 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
 
     const dispatch = useDispatch()
 
-    const closeProjectTab = (projectLabel: string) => {
-        setProjectsTab(projectsTab.filter(projectTab => projectTab.name !== projectLabel))
+    const closeProjectTab = (projectID: string) => {
+        setProjectsTab(projectsTab.filter(projectTab => projectTab.faunaDocumentId !== projectID))
         selectTab("DASHBOARD")
     }
 
@@ -56,18 +56,18 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
                             </div>
                         </li>
                         {projectsTab.map(projectTab => {
-                            return <li key={projectTab.name} className={`bg-[#dadada] rounded-tr`}>
+                            return <li key={projectTab.faunaDocumentId} className={`bg-[#dadada] rounded-tr`}>
                                 <div
-                                    className={(selectedTab === projectTab.name) ? 'px-3 py-2 bg-white flex' : 'px-3 py-2 flex'}>
+                                    className={(selectedTab === projectTab.faunaDocumentId) ? 'px-3 py-2 bg-white flex' : 'px-3 py-2 flex'}>
                                     <div
-                                        className={(selectedTab === projectTab.name) ? 'text-black' : 'text-gray-400 hover:cursor-pointer'}
+                                        className={(selectedTab === projectTab.faunaDocumentId) ? 'text-black' : 'text-gray-400 hover:cursor-pointer'}
                                         aria-current="page" onClick={() => {
-                                        selectTab(projectTab.name)
-                                        dispatch(selectProject(projectTab.name))
+                                        selectTab(projectTab.faunaDocumentId)
+                                        dispatch(selectProject(projectTab.faunaDocumentId))
                                     }}>{projectTab.name}
                                     </div>
                                     <div className="ml-8" onClick={() => {
-                                        closeProjectTab(projectTab.name)
+                                        closeProjectTab(projectTab.faunaDocumentId as string)
                                         dispatch(selectProject(undefined))
                                     }}>
                                         <FaTimes className="w-[12px] h-[12px] text-gray-400"/>

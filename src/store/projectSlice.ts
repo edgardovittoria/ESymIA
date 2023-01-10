@@ -21,7 +21,7 @@ export type ProjectState = {
     projects: Folder,
     selectedProject: string | undefined,
     selectedFolder: Folder,
-    selectedComponent: ComponentEntity[]
+    // selectedComponent: ComponentEntity[]
     projectToShare?: Project,
     projectToRename?: Project
     folderToRename?: Folder,
@@ -48,7 +48,7 @@ export const ProjectSlice = createSlice({
             projectList: [],
             parent: "root"
         },
-        selectedComponent: []
+        // selectedComponent: []
     } as ProjectState,
     reducers: {
         addProject(state: ProjectState, action: PayloadAction<Project>) {
@@ -246,8 +246,8 @@ export const folderByIDSelector = (state: { projects: ProjectState }, id: string
 }
 export const mainFolderSelector = (state: { projects: ProjectState }) => state.projects.projects
 export const SelectedFolderSelector = (state: { projects: ProjectState }) => state.projects.selectedFolder;
-export const selectedProjectSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
-export const selectedComponentSelector = (state: { projects: ProjectState }) => state.projects.selectedComponent;
+export const selectedProjectSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
+// export const selectedComponentSelector = (state: { projects: ProjectState }) => state.projects.selectedComponent;
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByName(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;
 export const projectToShareSelector = (state: { projects: ProjectState }) => state.projects.projectToShare
 export const folderToShareSelector = (state: { projects: ProjectState }) => state.projects.folderToShare
@@ -259,5 +259,8 @@ export const allProjectFoldersSelector = (state: { projects: ProjectState }) => 
 }
 export const findProjectByName = (projects: Project[], name: string | undefined) => {
     return (name !== undefined) ? projects.filter(project => project.name === name)[0] : undefined
+}
+export const findProjectByFaunaID = (projects: Project[], faunaDocumentId: string | undefined) => {
+    return (faunaDocumentId !== undefined) ? projects.filter(project => project.faunaDocumentId === faunaDocumentId)[0] : undefined
 }
 export const findSelectedPort = (project: Project | undefined) => (project) ? project.ports.filter(port => port.isSelected)[0] : undefined

@@ -6,6 +6,7 @@ import {MdWatchLater} from "react-icons/md";
 import {AiOutlineBarChart} from "react-icons/ai";
 import {Folder} from "../../../model/Folder";
 import {
+    findProjectByFaunaID,
     findProjectByName,
     mainFolderSelector,
     projectsSelector,
@@ -107,12 +108,12 @@ export const Simulations: React.FC<SimulationsProps> = (
                                         style={{visibility: "hidden"}}>
                                         <AiOutlineBarChart color={'#00ae52'} style={{width: "30px", height: "30px"}}
                                                            onClick={() => {
-                                                               let proj = findProjectByName(projects, simulation.associatedProject)
-                                                               if(proj && projectsTab.includes(proj)){
-                                                                   selectTab(simulation.associatedProject)
+                                                               let proj = findProjectByFaunaID(projects, simulation.associatedProject)
+                                                               if(proj && projectsTab.filter(p => p.faunaDocumentId === proj?.faunaDocumentId)){
+                                                                   selectTab(proj.faunaDocumentId)
                                                                }else{
                                                                    setProjectsTab([...projectsTab, proj])
-                                                                   selectTab(simulation.associatedProject)
+                                                                   selectTab(proj?.faunaDocumentId)
                                                                }
                                                                dispatch(selectProject(simulation.associatedProject))
                                                                setSimulationCoreMenuItemSelected('Results')

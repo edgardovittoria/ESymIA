@@ -56,6 +56,47 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
     selectedProject?.meshData,
   ]);
 
+  const canvasMeshes = useMemo(() => 
+  <>
+  {selectedProject?.model.components.map((component) => {
+    return (
+      <mesh
+        userData={{
+          keyComponent: component.keyComponent,
+          isSelected: false,
+        }}
+        key={component.keyComponent}
+        onPointerEnter={(event) => {
+          setPreviousColor(
+            (
+              (event.object as Mesh)
+                .material as MeshPhongMaterial
+            ).color
+          );
+          (event.object as Mesh).material =
+            new THREE.MeshPhongMaterial({
+              color: "#0423fa",
+              wireframe: true,
+            });
+        }}
+        onPointerLeave={(event) => {
+          (event.object as Mesh).material =
+            new THREE.MeshPhongMaterial({
+              color: previousColor,
+              wireframe: false,
+            });
+        }}
+        position={component.transformationParams.position}
+        scale={component.transformationParams.scale}
+        rotation={component.transformationParams.rotation}
+      >
+        <FactoryShapes entity={component} />
+      </mesh>
+    );
+  })}
+  </>,
+  [selectedProject?.model])
+
   return (
     <div className="flex justify-center">
       {selectedProject && selectedProject.model.components ? (
@@ -71,43 +112,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                   intensity={0.85}
                 />
                 {/* paint models */}
-                {(!mesherOutput || section !== "Simulator") &&
-                  selectedProject.model.components.map((component) => {
-                    return (
-                      <mesh
-                        userData={{
-                          keyComponent: component.keyComponent,
-                          isSelected: false,
-                        }}
-                        key={component.keyComponent}
-                        onPointerEnter={(event) => {
-                          setPreviousColor(
-                            (
-                              (event.object as Mesh)
-                                .material as MeshPhongMaterial
-                            ).color
-                          );
-                          (event.object as Mesh).material =
-                            new THREE.MeshPhongMaterial({
-                              color: "#0423fa",
-                              wireframe: true,
-                            });
-                        }}
-                        onPointerLeave={(event) => {
-                          (event.object as Mesh).material =
-                            new THREE.MeshPhongMaterial({
-                              color: previousColor,
-                              wireframe: false,
-                            });
-                        }}
-                        position={component.transformationParams.position}
-                        scale={component.transformationParams.scale}
-                        rotation={component.transformationParams.rotation}
-                      >
-                        <FactoryShapes entity={component} />
-                      </mesh>
-                    );
-                  })}
+                {(!mesherOutput || section !== "Simulator") && canvasMeshes}
                 {children}
                 <OrbitControls makeDefault />
                 <GizmoHelper alignment="bottom-left" margin={[150, 80]}>

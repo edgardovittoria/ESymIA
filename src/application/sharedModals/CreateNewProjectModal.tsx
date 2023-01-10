@@ -51,10 +51,11 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = (
                 } as Project
                 execQuery(addIDInFolderProjectsList, newProject.faunaDocumentId, selectedFolder)
                 dispatch(addProject(newProject))
-            })
-            dispatch(selectProject(newProject.name))
+                dispatch(selectProject(newProject.faunaDocumentId))
             setProjectsTab(projectsTab.concat(newProject))
-            selectTab(newProject.name)
+            selectTab(newProject.faunaDocumentId)
+            })
+            
             setShow(false)
         }else{
             alert("Project's name is required!")

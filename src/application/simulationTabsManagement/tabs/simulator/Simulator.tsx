@@ -50,6 +50,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
       >
         {selectedTabLeftPanel === "Simulator" ? (
           <SimulatorLeftPanelTab
+            allMaterials={allMaterials}
             selectedMaterials={selectedMaterials}
             setSelectedMaterials={setSelectedMaterials}
           />

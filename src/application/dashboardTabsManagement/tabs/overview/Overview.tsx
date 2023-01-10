@@ -26,11 +26,11 @@ export const Overview: React.FC<OverviewProps> = (
 
 
     const handleCardClick = (project: Project) => {
-        if (!(projectsTab.filter(projectTab => projectTab.name === project.name).length > 0)) {
+        if (!(projectsTab.filter(projectTab => projectTab.faunaDocumentId === project.faunaDocumentId).length > 0)) {
             setProjectsTab(projectsTab.concat(project))
         }
-        dispatch(selectProject(project.name))
-        selectTab(project.name)
+        dispatch(selectProject(project.faunaDocumentId))
+        selectTab(project.faunaDocumentId)
     }
 
 

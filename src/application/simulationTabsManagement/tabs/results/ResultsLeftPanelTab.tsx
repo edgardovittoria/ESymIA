@@ -37,6 +37,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
               {selectedProject.ports.map((port) => {
                 return (
                   <div
+                    key={port.name}
                     className={
                       selectedPort === port.name
                         ? "w-[80%] ml-10 hover:cursor-pointer hover:bg-gray-200 bg-gray-200 p-1 rounded"
