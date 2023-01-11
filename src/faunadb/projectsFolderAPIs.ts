@@ -138,6 +138,8 @@ const recursiveSubFoldersRetrieving = (subFolders: string[], all_folders: FaunaF
     return sfs
 }
 
+
+
 export const createFolderInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToSave: Folder) => {
     const response = await faunaClient.query(
         faunaQuery.Create(faunaQuery.Collection("Folders"), {
@@ -321,25 +323,6 @@ export const addIDInFolderProjectsList = async (faunaClient: faunadb.Client, fau
 
 }
 
-export const addIDInFolderProjectsListOfSharedUser = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, projectFaunaID: string, folderOfSharedUser: FaunaFolder) => {
-    console.log('folder', folderOfSharedUser)
-    const response = await faunaClient.query(
-        faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderOfSharedUser.id), {
-            data: {
-                ...folderOfSharedUser.folder,
-                projectList: [...folderOfSharedUser.folder.projectList, projectFaunaID]
-            }
-        })
-    )
-        .catch((err) => console.error(
-            'Error: [%s] %s: %s',
-            err.name,
-            err.message,
-            err.errors()[0].description,
-        ));
-    return response
-
-}
 
 const convertFolderInFaunaFolderDetails = (folder: Folder): FaunaFolderDetails => {
     let faunaFolder = {
@@ -473,4 +456,44 @@ export const updateFoldersSharingInfo = async (faunaClient: faunadb.Client, faun
         ));
     return ""
 
+}
+
+
+export const getSharingInfoByUserEmail = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, userEmail: string) => {
+    const response = await faunaClient.query(
+        faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userEmail))),   
+            )
+        .catch((err) => console.error(
+            'Error: [%s] %s: %s',
+            err.name,
+            err.message,
+            err.errors()[0].description,
+        ));
+    return response as FaunaUserSharingInfo
+}
+
+export const getFolderByFaunaID = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, faunaID: string) => {
+    const response = await faunaClient.query(
+        faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("get_folder_by_id"), faunaID))),   
+            )
+        .catch((err) => console.error(
+            'Error: [%s] %s: %s',
+            err.name,
+            err.message,
+            err.errors()[0].description,
+        ));
+    return {id: faunaID, folder: response} as FaunaFolder
+}
+
+export const getProjectByFaunaID = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, faunaID: string) => {
+    const response = await faunaClient.query(
+        faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("get_project_by_id"), faunaID))),   
+            )
+        .catch((err) => console.error(
+            'Error: [%s] %s: %s',
+            err.name,
+            err.message,
+            err.errors()[0].description,
+        ));
+    return {id: faunaID, project: response} as FaunaProject
 }

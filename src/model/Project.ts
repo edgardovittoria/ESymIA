@@ -1,7 +1,6 @@
-import {CanvasState, UsersState} from "cad-library";
-import {Simulation} from "./Simulation";
-import {Port, Probe, Signal} from "./Port";
-import { MesherOutput } from "./MesherInputOutput";
+import { CanvasState, UsersState } from "cad-library";
+import { Simulation } from "./Simulation";
+import { Port, Probe, Signal } from "./Port";
 
 export type Project = {
     name: string,

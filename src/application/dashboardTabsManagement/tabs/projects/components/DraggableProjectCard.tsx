@@ -17,6 +17,7 @@ import {
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import { Project } from '../../../../../model/Project';
 import { useTabs } from '../../../../../contexts/tabsAndMenuitemsHooks';
+import { Folder } from '../../../../../model/Folder';
 
 interface DraggableProjectCardProps {
     project: Project,
@@ -34,7 +35,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     const dispatch = useDispatch()
     const {closeProjectTab} = useTabs()
     const {execQuery} = useFaunaQuery()
-    const selectedFolder = useSelector(SelectedFolderSelector)
+    const selectedFolder = useSelector(SelectedFolderSelector) as Folder
     const allProjectFolders = useSelector(allProjectFoldersSelector)
     const user = useSelector(usersStateSelector)
 

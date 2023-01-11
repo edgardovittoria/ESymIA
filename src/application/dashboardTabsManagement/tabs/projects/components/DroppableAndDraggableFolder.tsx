@@ -40,7 +40,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
 
     const dispatch = useDispatch()
     const {execQuery} = useFaunaQuery()
-    const selectedFolder = useSelector(SelectedFolderSelector)
+    const selectedFolder = useSelector(SelectedFolderSelector) as Folder
     const allProjectFolders = useSelector(allProjectFoldersSelector)
 
     const [dragDone, setDragDone] = useState(false);

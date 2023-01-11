@@ -1,4 +1,4 @@
-import { ComponentEntity, ImportActionParamsObject, UsersState } from 'cad-library';
+import { ImportActionParamsObject, UsersState } from 'cad-library';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Project } from "../model/Project";
 import { Port, Probe, RLCParams } from "../model/Port";
@@ -11,16 +11,16 @@ import {
     moveFolder,
     moveProject,
 
-    recursiveFindFolders, recursiveSelectFolder, removeFolderFromStore, removeProjectFromStore,
+    recursiveFindFolders, removeFolderFromStore, removeProjectFromStore,
     takeAllProjectsIn
 } from "./auxiliaryFunctions/managementProjectsAndFoldersFunction";
-import { MesherOutput } from '../model/MesherInputOutput';
 
 
 export type ProjectState = {
     projects: Folder,
+    sharedElements: Folder,
     selectedProject: string | undefined,
-    selectedFolder: Folder,
+    selectedFolder: string | undefined,
     // selectedComponent: ComponentEntity[]
     projectToShare?: Project,
     projectToRename?: Project
@@ -39,15 +39,16 @@ export const ProjectSlice = createSlice({
             projectList: [],
             parent: "root"
         },
-        selectedProject: undefined,
-        selectedFolder: {
-            name: "My Files",
+        sharedElements: {
+            name: "My Shared Elements",
             owner: {} as UsersState,
             sharedWith: [],
             subFolders: [],
             projectList: [],
             parent: "root"
         },
+        selectedProject: undefined,
+        selectedFolder: undefined,
         // selectedComponent: []
     } as ProjectState,
     reducers: {
@@ -56,6 +57,9 @@ export const ProjectSlice = createSlice({
         },
         setProjectsFolderToUser(state: ProjectState, action: PayloadAction<Folder>) {
             state.projects = action.payload
+        },
+        setFolderOfElementsSharedWithUser(state: ProjectState, action: PayloadAction<Folder>) {
+            state.sharedElements = action.payload
         },
         removeProject(state: ProjectState, action: PayloadAction<string>) {
             removeProjectFromStore(state, action.payload)
@@ -86,10 +90,11 @@ export const ProjectSlice = createSlice({
         },
         renameProject(state: ProjectState, action: PayloadAction<{ projectToRename: Project, name: string }>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToRename.name);
-            if (project) {
+            let selectedFolder = folderByID(state, state.selectedFolder)
+            if (project && selectedFolder) {
                 project.name = action.payload.name
-                state.selectedFolder.projectList = state.selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId)
-                state.selectedFolder.projectList.push(project)
+                selectedFolder.projectList = selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId)
+                selectedFolder.projectList.push(project)
             }
         },
         setFolderToRename(state: ProjectState, action: PayloadAction<Folder | undefined>) {
@@ -117,7 +122,7 @@ export const ProjectSlice = createSlice({
             removeFolderFromStore(state, action.payload)
         },
         selectFolder(state: ProjectState, action: PayloadAction<string>) {
-            recursiveSelectFolder(state, state.projects.subFolders, action.payload)
+            state.selectedFolder = action.payload
         },
         importModel(state: ProjectState, action: PayloadAction<ImportActionParamsObject>) {
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
@@ -203,23 +208,23 @@ export const ProjectSlice = createSlice({
                 selectedProject.screenshot = action.payload
             }
         },
-        setQuantum(state: ProjectState, action: PayloadAction<[number, number, number]>){
+        setQuantum(state: ProjectState, action: PayloadAction<[number, number, number]>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.quantum = action.payload
         },
-        setMesh(state: ProjectState, action: PayloadAction<string>){
+        setMesh(state: ProjectState, action: PayloadAction<string>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.mesh = action.payload
         },
-        setDownloadPercentage(state: ProjectState, action: PayloadAction<number>){
+        setDownloadPercentage(state: ProjectState, action: PayloadAction<number>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.downloadPercentage = action.payload
         },
-        setMeshGenerated(state: ProjectState, action: PayloadAction<"Not Generated" | "Generated" | "Generating">){
+        setMeshGenerated(state: ProjectState, action: PayloadAction<"Not Generated" | "Generated" | "Generating">) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.meshGenerated = action.payload
         },
-        setMeshApproved(state: ProjectState, action: PayloadAction<boolean>){
+        setMeshApproved(state: ProjectState, action: PayloadAction<boolean>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.meshApproved = action.payload
         },
@@ -236,7 +241,7 @@ export const {
     addProject, removeProject, importModel, selectProject, updateSimulation, addPorts,
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
     setProjectsFolderToUser, moveObject, removeFolder, shareProject, setProjectToShare, renameProject, setProjectToRename,
-    renameFolder, setFolderToRename, setFolderToShare, shareFolder, setQuantum, setMesh, setDownloadPercentage, setMeshGenerated, setMeshApproved
+    renameFolder, setFolderToRename, setFolderToShare, shareFolder, setQuantum, setMesh, setDownloadPercentage, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser
 } = ProjectSlice.actions
 
 
@@ -245,7 +250,8 @@ export const folderByIDSelector = (state: { projects: ProjectState }, id: string
     return recursiveFindFolders(state.projects.projects, [] as Folder[]).filter(f => f.faunaDocumentId === id)[0]
 }
 export const mainFolderSelector = (state: { projects: ProjectState }) => state.projects.projects
-export const SelectedFolderSelector = (state: { projects: ProjectState }) => state.projects.selectedFolder;
+export const sharedElementsFolderSelector = (state: { projects: ProjectState }) => state.projects.sharedElements
+export const SelectedFolderSelector = (state: { projects: ProjectState }) => folderByID(state.projects, state.projects.selectedFolder);
 export const selectedProjectSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
 // export const selectedComponentSelector = (state: { projects: ProjectState }) => state.projects.selectedComponent;
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;
@@ -261,3 +267,12 @@ export const findProjectByFaunaID = (projects: Project[], faunaDocumentId: strin
     return (faunaDocumentId !== undefined) ? projects.filter(project => project.faunaDocumentId === faunaDocumentId)[0] : undefined
 }
 export const findSelectedPort = (project: Project | undefined) => (project) ? project.ports.filter(port => port.isSelected)[0] : undefined
+export const folderByID = (state: ProjectState, folderID: string|undefined) => {
+    if (folderID) {
+        let folders = recursiveFindFolders(state.projects, [] as Folder[]).filter(f => f.faunaDocumentId === folderID)
+        if (folders.length > 0) return folders[0]
+        folders = recursiveFindFolders(state.sharedElements, [] as Folder[]).filter(f => f.faunaDocumentId === folderID)
+        if (folders.length > 0) return folders[0]
+    }
+    return undefined
+}

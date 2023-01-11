@@ -19,7 +19,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
     const dispatch = useDispatch()
 
     const user = useSelector(usersStateSelector)
-    const selectedFolder = useSelector(SelectedFolderSelector)
+    const selectedFolder = useSelector(SelectedFolderSelector) as Folder
 
     const {execQuery} = useFaunaQuery()
 
