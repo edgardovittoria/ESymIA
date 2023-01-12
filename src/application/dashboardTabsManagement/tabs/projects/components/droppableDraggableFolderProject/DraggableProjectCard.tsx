@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {useDrag} from "react-dnd";
 import {Item, Menu, Separator, Submenu, useContextMenu} from "react-contexify";
 import {
     addIDInFolderProjectsList,
     deleteSimulationProjectFromFauna,
     removeIDInFolderProjectsList
-} from "../../../../../faunadb/projectsFolderAPIs";
+} from "../../../../../../faunadb/projectsFolderAPIs";
 import {BiExport, BiRename, BiShareAlt, BiTrash} from "react-icons/bi";
 import {BsFillFolderSymlinkFill} from "react-icons/bs";
 import {useDispatch, useSelector} from "react-redux";
@@ -13,22 +13,22 @@ import {
     allProjectFoldersSelector,
     moveObject,
     removeProject,
-    SelectedFolderSelector, setFolderToRename, setProjectToRename, setProjectToShare} from "../../../../../store/projectSlice";
+    SelectedFolderSelector, setProjectToShare} from "../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
-import { Project } from '../../../../../model/Project';
-import { useTabs } from '../../../../../contexts/tabsAndMenuitemsHooks';
-import { Folder } from '../../../../../model/Folder';
+import { Project } from '../../../../../../model/Project';
+import { useTabs } from '../../../../../../contexts/tabsAndMenuitemsHooks';
+import { Folder } from '../../../../../../model/Folder';
+import { RenameProject } from './RenameProject';
 
 interface DraggableProjectCardProps {
     project: Project,
     handleCardClick: Function,
     setShowSearchUser: (v:boolean) => void
-    setShowRename: (v:boolean) => void
 }
 
 export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     {
-        project, handleCardClick, setShowSearchUser, setShowRename
+        project, handleCardClick, setShowSearchUser
     }
 ) => {
 
@@ -38,6 +38,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     const selectedFolder = useSelector(SelectedFolderSelector) as Folder
     const allProjectFolders = useSelector(allProjectFoldersSelector)
     const user = useSelector(usersStateSelector)
+    const [showRename, setShowRename] = useState(false);
 
     const [{isDragging}, drag, dragPreview] = useDrag(() => ({
         // "type" is required. It is used by the "accept" specification of drop targets.
@@ -48,13 +49,13 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
         })
     }), [selectedFolder.name, selectedFolder.projectList.length])
 
-    const {show} = useContextMenu({
+    const {show, hideAll} = useContextMenu({
         id: project.name,
     });
 
     function handleContextMenu(event: any) {
         event.preventDefault();
-        dispatch(setFolderToRename(undefined))
+        // dispatch(setFolderToRename(undefined))
         show(event)
     }
 
@@ -98,6 +99,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                                         }))
                                         execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
                                         execQuery(addIDInFolderProjectsList, project.faunaDocumentId, f)
+                                        hideAll()
                                     }}>{f.name}</Item>
                                 </div>
                             )
@@ -105,8 +107,8 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     </Submenu>
                     <Item onClick={(p) => {
                         p.event.stopPropagation()
-                        dispatch(setProjectToRename(project.faunaDocumentId))
                         setShowRename(true)
+                        hideAll()
                     }}>
                         <BiRename
                             className="mr-4 text-primaryColor w-[20px] h-[20px]"
@@ -117,6 +119,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     <Item onClick={(p) => {
                         p.event.stopPropagation()
                         exportSimulationProject(project)
+                        hideAll()
                     }}>
                         <BiExport
                             className="mr-4 text-primaryColor w-[20px] h-[20px]"
@@ -127,6 +130,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                         p.event.stopPropagation()
                         dispatch(setProjectToShare(project.faunaDocumentId))
                         setShowSearchUser(true)
+                        hideAll()
                     }} disabled={user.userRole !== 'Premium'}>
                         <BiShareAlt
                             className="mr-4 text-primaryColor w-[20px] h-[20px]"
@@ -140,6 +144,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                         closeProjectTab(project)
                         execQuery(deleteSimulationProjectFromFauna, project.faunaDocumentId)
                         execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
+                        hideAll()
                     }}>
                         <BiTrash
                             className="mr-4 text-primaryColor w-[20px] h-[20px]"
@@ -148,6 +153,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     </Item>
                 </Menu>
             </div>
+            {showRename && <RenameProject projectToRename={project} handleClose={() => setShowRename(false)}/>}
         </>
     )
 

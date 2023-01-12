@@ -1,19 +1,19 @@
 import React, {Fragment, useState} from 'react';
-import {Dialog, Transition} from "@headlessui/react";
-import {updateProjectInFauna} from "../../../../../../../faunadb/projectsFolderAPIs";
 import {useDispatch} from "react-redux";
 import {useFaunaQuery} from "cad-library";
-import { renameProject } from '../../../../../../../store/projectSlice';
-import { Project } from '../../../../../../../model/Project';
+import {Dialog, Transition} from "@headlessui/react";
+import {updateFolderInFauna} from "../../../../../../faunadb/projectsFolderAPIs";
+import { Folder } from '../../../../../../model/Folder';
+import { renameFolder } from '../../../../../../store/projectSlice';
 
-interface RenameProjectProps {
-    projectToRename: Project,
+interface RenameFolderProps {
+    folderToRename: Folder,
     handleClose: () => void
 }
 
-export const RenameProject: React.FC<RenameProjectProps> = (
+export const RenameFolder: React.FC<RenameFolderProps> = (
     {
-        projectToRename, handleClose
+        folderToRename, handleClose
     }
 ) => {
 
@@ -22,7 +22,6 @@ export const RenameProject: React.FC<RenameProjectProps> = (
     const [name, setName] = useState("");
 
     const {execQuery} = useFaunaQuery()
-
 
     return(
         <Transition appear show={true} as={Fragment}>
@@ -51,14 +50,14 @@ export const RenameProject: React.FC<RenameProjectProps> = (
                             leaveTo="opacity-0 scale-95"
                         >
                             <div className="w-1/5 bg-white rounded-lg p-5 shadow-2xl">
-                                <h5>Rename Project</h5>
+                                <h5>Rename Folder</h5>
                                 <hr className="mb-10"/>
                                 <>
                                     <div className="flex items-center">
                                         <span className="w-1/3">Name:</span>
                                         <input type="text"
                                                className="w-full rounded shadow text-black p-1 border-2 border-teal-900"
-                                               defaultValue={(projectToRename) && projectToRename.name}
+                                               defaultValue={folderToRename.name}
                                                onChange={(e) => setName(e.target.value)}
                                         />
                                     </div>
@@ -74,14 +73,14 @@ export const RenameProject: React.FC<RenameProjectProps> = (
                                             type="button"
                                             className="button buttonPrimary py-1 px-2 text-sm"
                                             onClick={() => {
-                                                dispatch(renameProject({
-                                                    projectToRename: projectToRename.faunaDocumentId as string,
+                                                dispatch(renameFolder({
+                                                    folderToRename: folderToRename,
                                                     name: name
                                                 }))
-                                                execQuery(updateProjectInFauna, {
-                                                    ...projectToRename,
+                                                execQuery(updateFolderInFauna, {
+                                                    ...folderToRename,
                                                     name: name
-                                                } as Project)
+                                                } as Folder)
                                                 handleClose()
                                             }}
                                         >

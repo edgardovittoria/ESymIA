@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { DraggableProjectCard } from "./components/DraggableProjectCard";
+import { DraggableProjectCard } from "./components/droppableDraggableFolderProject/DraggableProjectCard";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { DroppableAndDraggableFolder } from "./components/DroppableAndDraggableFolder";
+import { DroppableAndDraggableFolder } from "./components/droppableDraggableFolderProject/DroppableAndDraggableFolder";
 import { useDispatch, useSelector } from "react-redux";
 import { usersStateSelector } from "cad-library";
 import { Project } from "../../../../model/Project";
@@ -14,7 +14,6 @@ import {
 	selectFolder,
 	selectProject,
 } from "../../../../store/projectSlice";
-import { RenameModal } from "./components/renameModal/RenameModal";
 import { useTabs } from "../../../../contexts/tabsAndMenuitemsHooks";
 
 interface ProjectsProps {
@@ -30,7 +29,6 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 
 	const { addProjectTab, selectTab } = useTabs();
 	const [showSearchUser, setShowSearchUser] = useState(false);
-	const [showRename, setShowRename] = useState(false);
 	const [showCreateNewFolderModal, setShowCreateNewFolderModal] =
 		useState(false);
 
@@ -103,7 +101,6 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 											folder={folder}
 											path={path}
 											setPath={setPath}
-											setShowRename={setShowRename}
 											setShowSearchUser={setShowSearchUser}
 										/>
 									);
@@ -120,7 +117,6 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 												handleCardClick={handleCardClick}
 												key={project.faunaDocumentId}
 												setShowSearchUser={setShowSearchUser}
-												setShowRename={setShowRename}
 											/>
 										);
 									})}
@@ -138,7 +134,6 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 												handleCardClick={handleCardClick}
 												key={project.faunaDocumentId}
 												setShowSearchUser={setShowSearchUser}
-												setShowRename={setShowRename}
 											/>
 										);
 									})}
@@ -170,7 +165,7 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 			{showSearchUser && (
 				<SearchUserAndShare setShowSearchUser={setShowSearchUser} />
 			)}
-			{showRename && <RenameModal setShowRename={setShowRename} />}
+			{/* {showRename && <RenameModal setShowRename={setShowRename} />} */}
 			{showCreateNewFolderModal && (
 				<CreateNewFolderModal
 					setShowNewFolderModal={setShowCreateNewFolderModal}
