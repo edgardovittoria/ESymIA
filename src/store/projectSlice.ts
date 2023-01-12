@@ -21,8 +21,6 @@ export type ProjectState = {
     sharedElements: Folder,
     selectedProject: string | undefined,
     selectedFolder: string | undefined,
-    projectToShare?: string,
-    folderToShare?: string,
 }
 
 export const ProjectSlice = createSlice({
@@ -81,12 +79,6 @@ export const ProjectSlice = createSlice({
                 takeAllProjectsIn(folder).forEach(f => f.sharedWith.push(action.payload.user));
             }
         },
-        setProjectToShare(state: ProjectState, action: PayloadAction<string | undefined>) {
-            state.projectToShare = action.payload
-        },
-        setFolderToShare(state: ProjectState, action: PayloadAction<string | undefined>) {
-            state.folderToShare = action.payload
-        },
         renameProject(state: ProjectState, action: PayloadAction<{ projectToRename: string, name: string }>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToRename);
             let selectedFolder = folderByID(state, state.selectedFolder)
@@ -124,27 +116,9 @@ export const ProjectSlice = createSlice({
                 selectedProject.model = action.payload.canvas
             }
         },
-        // createSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
-        //     let selectedProject = findProjectByName(takeAllProjectsIn(state.projects), state.selectedProject);
-        //     if (selectedProject) selectedProject.simulation = action.payload;
-        //     // state.projects.projectList.forEach(project => {
-        //     //     if (project.name === selectedProject?.name) {
-        //     //         project.simulations.push(action.payload)
-        //     //     }
-        //     // })
-        // },
         updateSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             if (selectedProject) selectedProject.simulation = action.payload;
-            // if (selectedProject?.simulations) {
-            //     selectedProject.simulations = selectedProject.simulations.filter(s => s.name !== action.payload.name)
-            //     selectedProject.simulations.push(action.payload)
-            // }
-            // state.projects.projectList.forEach(project => {
-            //     if (project.name === selectedProject?.name) {
-            //         project.simulations = selectedProject.simulations
-            //     }
-            // })
         },
         addPorts(state: ProjectState, action: PayloadAction<Port | Probe>) {
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
@@ -233,8 +207,8 @@ export const {
     //qui vanno inserite tutte le azioni che vogliamo esporatare
     addProject, removeProject, importModel, selectProject, updateSimulation, addPorts,
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
-    setProjectsFolderToUser, moveObject, removeFolder, shareProject, setProjectToShare, renameProject,
-    renameFolder, setFolderToShare, shareFolder, setQuantum, setMesh, setDownloadPercentage, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser
+    setProjectsFolderToUser, moveObject, removeFolder, shareProject, renameProject,
+    renameFolder, shareFolder, setQuantum, setMesh, setDownloadPercentage, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser
 } = ProjectSlice.actions
 
 
@@ -246,10 +220,7 @@ export const mainFolderSelector = (state: { projects: ProjectState }) => state.p
 export const sharedElementsFolderSelector = (state: { projects: ProjectState }) => state.projects.sharedElements
 export const SelectedFolderSelector = (state: { projects: ProjectState }) => folderByID(state.projects, state.projects.selectedFolder);
 export const selectedProjectSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
-// export const selectedComponentSelector = (state: { projects: ProjectState }) => state.projects.selectedComponent;
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;
-export const projectToShareSelector = (state: { projects: ProjectState }) => takeAllProjectsIn(state.projects.projects).filter(p => p.faunaDocumentId === state.projects.projectToShare)[0]
-export const folderToShareSelector = (state: { projects: ProjectState }) => folderByID(state.projects, state.projects.folderToShare)
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
     let allFolders: Folder[] = []
     return recursiveFindFolders(state.projects.projects, allFolders)

@@ -13,22 +13,22 @@ import {
     allProjectFoldersSelector,
     moveObject,
     removeProject,
-    SelectedFolderSelector, setProjectToShare} from "../../../../../../store/projectSlice";
+    SelectedFolderSelector} from "../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import { Project } from '../../../../../../model/Project';
 import { useTabs } from '../../../../../../contexts/tabsAndMenuitemsHooks';
 import { Folder } from '../../../../../../model/Folder';
 import { RenameProject } from './RenameProject';
+import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
 
 interface DraggableProjectCardProps {
     project: Project,
     handleCardClick: Function,
-    setShowSearchUser: (v:boolean) => void
 }
 
 export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     {
-        project, handleCardClick, setShowSearchUser
+        project, handleCardClick
     }
 ) => {
 
@@ -39,6 +39,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     const allProjectFolders = useSelector(allProjectFoldersSelector)
     const user = useSelector(usersStateSelector)
     const [showRename, setShowRename] = useState(false);
+    const [showSearchUser, setShowSearchUser] = useState(false);
 
     const [{isDragging}, drag, dragPreview] = useDrag(() => ({
         // "type" is required. It is used by the "accept" specification of drop targets.
@@ -128,7 +129,6 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     </Item>
                     <Item onClick={(p) => {
                         p.event.stopPropagation()
-                        dispatch(setProjectToShare(project.faunaDocumentId))
                         setShowSearchUser(true)
                         hideAll()
                     }} disabled={user.userRole !== 'Premium'}>
@@ -154,6 +154,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                 </Menu>
             </div>
             {showRename && <RenameProject projectToRename={project} handleClose={() => setShowRename(false)}/>}
+            {showSearchUser && <SearchUserAndShare setShowSearchUser={setShowSearchUser} projectToShare={project}/>}
         </>
     )
 

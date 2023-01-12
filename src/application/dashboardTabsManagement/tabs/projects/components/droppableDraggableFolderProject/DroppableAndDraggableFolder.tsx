@@ -18,24 +18,23 @@ import {useDispatch, useSelector} from "react-redux";
 import {
     allProjectFoldersSelector,
     moveObject, removeFolder, SelectedFolderSelector,
-    selectFolder, setFolderToShare
+    selectFolder
 } from "../../../../../../store/projectSlice";
 import {useFaunaQuery} from "cad-library";
 import { Folder } from '../../../../../../model/Folder';
 import { Project } from '../../../../../../model/Project';
 import { RenameFolder } from './RenameFolder';
+import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
 
 interface DroppableAndDraggableFolderProps {
     folder: Folder,
     path: Folder[],
-    setPath: Function,
-    // setShowRename: (v:boolean) => void
-    setShowSearchUser: (v:boolean) => void
+    setPath: Function
 }
 
 export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderProps> = (
     {
-        folder, path, setPath, setShowSearchUser
+        folder, path, setPath
     }
 ) => {
 
@@ -44,6 +43,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
     const selectedFolder = useSelector(SelectedFolderSelector) as Folder
     const allProjectFolders = useSelector(allProjectFoldersSelector)
     const [showRename, setShowRename] = useState(false);
+    const [showSearchUser, setShowSearchUser] = useState(false);
 
     const [dragDone, setDragDone] = useState(false);
     const [dropTargetFolder, setDropTargetFolder] = useState({} as Folder);
@@ -160,7 +160,6 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                 <Separator/>
                 <Item onClick={(p) => {
                     p.event.stopPropagation()
-                    dispatch(setFolderToShare(folder.faunaDocumentId as string))
                     setShowSearchUser(true)
                     hideAll()
                 }} >
@@ -188,6 +187,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
             </Menu>
         </div>
         {showRename && <RenameFolder folderToRename={folder} handleClose={() => setShowRename(false)}/>}
+        {showSearchUser && <SearchUserAndShare setShowSearchUser={setShowSearchUser} folderToShare={folder}/>}
         </>
     )
 

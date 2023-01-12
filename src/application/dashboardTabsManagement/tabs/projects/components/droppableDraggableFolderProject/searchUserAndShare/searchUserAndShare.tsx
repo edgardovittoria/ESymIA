@@ -3,23 +3,25 @@ import {Dialog, Transition} from "@headlessui/react";
 import {ImSpinner} from "react-icons/im";
 import {SearchUser} from "./components/SearchUser";
 import {useDispatch, useSelector} from "react-redux";
-import {folderToShareSelector, projectToShareSelector, setFolderToShare, setProjectToShare, shareFolder, shareProject} from "../../../../../../store/projectSlice";
+import {shareFolder, shareProject} from "../../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import {
     recursiveUpdateSharingInfoFolderInFauna,
-    updateFolderInFauna,
     updateProjectInFauna,
-} from "../../../../../../faunadb/projectsFolderAPIs";
+} from "../../../../../../../faunadb/projectsFolderAPIs";
 import axios from "axios";
-import { sharingInfoUser } from '../../../../../../model/Folder';
+import { Folder, sharingInfoUser } from '../../../../../../../model/Folder';
+import { Project } from '../../../../../../../model/Project';
 
 interface SearchUserAndShareProps {
-    setShowSearchUser: (v: boolean) => void
+    setShowSearchUser: (v: boolean) => void,
+    projectToShare?: Project,
+    folderToShare?: Folder
 }
 
 export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
     {
-        setShowSearchUser
+        setShowSearchUser, folderToShare, projectToShare
     }
 ) => {
 
@@ -48,24 +50,16 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
     }, []);
 
     const dispatch = useDispatch()
-    const projectToShare = useSelector(projectToShareSelector)
-    const folderToShare = useSelector(folderToShareSelector)
     const user = useSelector(usersStateSelector)
 
     useEffect(() => {
         if(shareDone){
-            console.log(folderToShare)
             execQuery(recursiveUpdateSharingInfoFolderInFauna, folderToShare)
-            handleClose()
+            setShowSearchUser(false)
         }
     }, [folderToShare?.sharedWith])
 
     const {execQuery} = useFaunaQuery()
-
-    const handleClose = () => {
-        dispatch(setProjectToShare(undefined))
-        dispatch(setFolderToShare(undefined))
-        setShowSearchUser(false)};
 
     const [selected, setSelected] = useState("")
     const [query, setQuery] = useState('')
@@ -83,7 +77,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
     return (
         <>
             <Transition appear show={true} as={Fragment}>
-                <Dialog as="div" className="relative z-10" onClose={handleClose}>
+                <Dialog as="div" className="relative z-10" onClose={() => setShowSearchUser(false)}>
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -126,7 +120,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
                                                     <button
                                                         type="button"
                                                         className="button bg-red-500 py-1 px-2 text-white text-sm"
-                                                        onClick={handleClose}
+                                                        onClick={() => setShowSearchUser(false)}
                                                     >
                                                         CANCEL
                                                     </button>

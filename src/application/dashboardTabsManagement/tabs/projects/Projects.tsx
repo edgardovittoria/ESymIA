@@ -6,7 +6,6 @@ import { DroppableAndDraggableFolder } from "./components/droppableDraggableFold
 import { useDispatch, useSelector } from "react-redux";
 import { usersStateSelector } from "cad-library";
 import { Project } from "../../../../model/Project";
-import { SearchUserAndShare } from "./components/searchUserAndShare/searchUserAndShare";
 import { CreateNewFolderModal } from "./components/CreateNewFolderModal";
 import {
 	mainFolderSelector,
@@ -15,6 +14,7 @@ import {
 	selectProject,
 } from "../../../../store/projectSlice";
 import { useTabs } from "../../../../contexts/tabsAndMenuitemsHooks";
+import { SearchUserAndShare } from "./components/droppableDraggableFolderProject/searchUserAndShare/searchUserAndShare";
 
 interface ProjectsProps {
 	setShowModal: Function;
@@ -101,7 +101,6 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 											folder={folder}
 											path={path}
 											setPath={setPath}
-											setShowSearchUser={setShowSearchUser}
 										/>
 									);
 								})}
@@ -116,7 +115,6 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 												project={project}
 												handleCardClick={handleCardClick}
 												key={project.faunaDocumentId}
-												setShowSearchUser={setShowSearchUser}
 											/>
 										);
 									})}
@@ -133,7 +131,6 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 												project={project}
 												handleCardClick={handleCardClick}
 												key={project.faunaDocumentId}
-												setShowSearchUser={setShowSearchUser}
 											/>
 										);
 									})}
