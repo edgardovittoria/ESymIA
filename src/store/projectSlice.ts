@@ -4,7 +4,7 @@ import { Project } from "../model/Project";
 import { Port, Probe, RLCParams } from "../model/Port";
 import { Simulation } from "../model/Simulation";
 import { Signal } from "../model/Port";
-import { Folder } from "../model/Folder";
+import { Folder, sharingInfoUser } from "../model/Folder";
 import {
     addFolderToStore,
     addProjectToStore,
@@ -25,7 +25,7 @@ export type ProjectState = {
     projectToShare?: Project,
     projectToRename?: Project
     folderToRename?: Folder,
-    folderToShare?: Folder,
+    folderToShare?: string,
 }
 
 export const ProjectSlice = createSlice({
@@ -74,18 +74,21 @@ export const ProjectSlice = createSlice({
                 moveFolder(state, action.payload.objectToMove, action.payload.targetFolder)
             }
         },
-        shareProject(state: ProjectState, action: PayloadAction<{ projectToShare: Project, user: string }>) {
+        shareProject(state: ProjectState, action: PayloadAction<{ projectToShare: Project, user: sharingInfoUser }>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToShare.name);
             (project && project.sharedWith) && project.sharedWith.push(action.payload.user)
         },
-        shareFolder(state: ProjectState, action: PayloadAction<{ folderToShare: Folder, user: string }>) {
-            let folder = recursiveFindFolders(state.projects, []).filter(folder => folder.faunaDocumentId === action.payload.folderToShare.faunaDocumentId)[0];
-            (folder && folder.sharedWith) && folder.sharedWith.push(action.payload.user)
+        shareFolder(state: ProjectState, action: PayloadAction<{ folderToShare: string, user: sharingInfoUser }>) {
+            let folder = folderByID(state, action.payload.folderToShare);
+            if (folder) {
+                recursiveFindFolders(folder, []).forEach(f => f.sharedWith.push(action.payload.user));
+                takeAllProjectsIn(folder).forEach(f => f.sharedWith.push(action.payload.user));
+            }
         },
         setProjectToShare(state: ProjectState, action: PayloadAction<Project | undefined>) {
             state.projectToShare = action.payload
         },
-        setFolderToShare(state: ProjectState, action: PayloadAction<Folder | undefined>) {
+        setFolderToShare(state: ProjectState, action: PayloadAction<string | undefined>) {
             state.folderToShare = action.payload
         },
         renameProject(state: ProjectState, action: PayloadAction<{ projectToRename: Project, name: string }>) {
@@ -256,7 +259,7 @@ export const selectedProjectSelector = (state: { projects: ProjectState }) => fi
 // export const selectedComponentSelector = (state: { projects: ProjectState }) => state.projects.selectedComponent;
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;
 export const projectToShareSelector = (state: { projects: ProjectState }) => state.projects.projectToShare
-export const folderToShareSelector = (state: { projects: ProjectState }) => state.projects.folderToShare
+export const folderToShareSelector = (state: { projects: ProjectState }) => folderByID(state.projects, state.projects.folderToShare)
 export const projectToRenameSelector = (state: { projects: ProjectState }) => state.projects.projectToRename
 export const folderToRenameSelector = (state: { projects: ProjectState }) => state.projects.folderToRename
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
@@ -267,7 +270,7 @@ export const findProjectByFaunaID = (projects: Project[], faunaDocumentId: strin
     return (faunaDocumentId !== undefined) ? projects.filter(project => project.faunaDocumentId === faunaDocumentId)[0] : undefined
 }
 export const findSelectedPort = (project: Project | undefined) => (project) ? project.ports.filter(port => port.isSelected)[0] : undefined
-export const folderByID = (state: ProjectState, folderID: string|undefined) => {
+export const folderByID = (state: ProjectState, folderID: string | undefined) => {
     if (folderID) {
         let folders = recursiveFindFolders(state.projects, [] as Folder[]).filter(f => f.faunaDocumentId === folderID)
         if (folders.length > 0) return folders[0]

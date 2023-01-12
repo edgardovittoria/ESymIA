@@ -1,6 +1,7 @@
+import { UsersState } from "cad-library";
 import faunadb from "faunadb";
-import { FaunaFolder, FaunaFolderDetails, FaunaProject, FaunaProjectDetails, FaunaUserSharingInfo } from "../model/FaunaModels";
-import { Folder } from "../model/Folder";
+import { FaunaFolder, FaunaFolderDetails, FaunaProject, FaunaProjectDetails } from "../model/FaunaModels";
+import { Folder, sharingInfoUser } from "../model/Folder";
 import { Project } from "../model/Project";
 
 
@@ -95,7 +96,8 @@ export const constructFolderStructure = (folders: FaunaFolder[], all_projects: F
     let projs = faunaProjects.reduce((projects, fp) => {
         let p: Project = {
             ...fp.project,
-            faunaDocumentId: fp.id
+            faunaDocumentId: fp.id,
+            sharedWith: [] as sharingInfoUser[]
         }
         projects.push(p)
         return projects
@@ -120,7 +122,8 @@ const recursiveSubFoldersRetrieving = (subFolders: string[], all_folders: FaunaF
             let projs = faunaProjects.reduce((projects, fp) => {
                 let p: Project = {
                     ...fp.project,
-                    faunaDocumentId: fp.id
+                    faunaDocumentId: fp.id,
+                    sharedWith: [] as sharingInfoUser[]
                 }
                 projects.push(p)
                 return projects
@@ -138,6 +141,39 @@ const recursiveSubFoldersRetrieving = (subFolders: string[], all_folders: FaunaF
     return sfs
 }
 
+export const constructSharedFolderStructure = (folders: FaunaFolder[], all_projects: FaunaProject[], user: UsersState) => {
+    let rootFolder = {
+        name: "My Shared Elements",
+        owner: user,
+        sharedWith: [],
+        subFolders: [],
+        projectList: [],
+        parent: "root"
+    }
+    let remainingFolders = folders.filter(faunaFolder => folders.filter(f => f.id === faunaFolder.folder.parent).length > 0)
+    let rootSubFoldersIDs = folders.filter(f => remainingFolders.filter(folder => folder.id === f.id).length === 0).reduce((ids, folder) => {
+        ids.push(folder.id)
+        return ids
+    }, [] as string[])
+    let faunaProjects = all_projects.filter(fp => folders.filter(folder => folder.folder.projectList.filter(p => p === fp.id).length > 0).length === 0)
+    let remainingProjects = all_projects.filter(fp => folders.filter(folder => folder.folder.projectList.filter(p => p === fp.id).length > 0).length > 0)
+    let projs = faunaProjects.reduce((projects, fp) => {
+        let p: Project = {
+            ...fp.project,
+            faunaDocumentId: fp.id,
+            sharedWith: [] as sharingInfoUser[]
+        }
+        projects.push(p)
+        return projects
+    }, [] as Project[])
+    let root = {
+        ...rootFolder,
+        faunaDocumentId: "my_shared_elements",
+        subFolders: recursiveSubFoldersRetrieving(rootSubFoldersIDs, folders, remainingProjects),
+        projectList: projs
+    } as Folder
+    return root
+}
 
 
 export const createFolderInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToSave: Folder) => {
@@ -384,7 +420,7 @@ export const getSharedSimulationProjects = async (
             faunaQuery.Map(
                 faunaQuery.Paginate(
                     faunaQuery.Match(
-                        faunaQuery.Index("shared_simulationProjects"),
+                        faunaQuery.Index("get_shared_projects_by_user_email"),
                         user
                     )
                 ),
@@ -414,62 +450,44 @@ export const getSharedSimulationProjects = async (
     return response as FaunaProject[]
 }
 
-export const updateProjectSharingInfo = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, idProjectToShare: string, userToShare: string) => {
-    faunaClient.query(faunaQuery.Select(["ref", "id"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userToShare)))).then(id => {
-        faunaClient.query(faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userToShare)))).then(data => {
-            faunaClient.query(faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('SharingInfo'), id), {
-                data: {
-                    ...(data as FaunaUserSharingInfo),
-                    sharedProjects: [...(data as FaunaUserSharingInfo).sharedProjects, idProjectToShare]
-                }
-            }))
-        })
-
-    })
-        .catch((err) => console.error(
-            'Error: [%s] %s: %s',
-            err.name,
-            err.message,
-            err.errors()[0].description,
-        ));
-    return ""
-
-}
-
-export const updateFoldersSharingInfo = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, idFolderToShare: string, userToShare: string) => {
-    faunaClient.query(faunaQuery.Select(["ref", "id"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userToShare)))).then(id => {
-        faunaClient.query(faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userToShare)))).then(data => {
-            faunaClient.query(faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('SharingInfo'), id), {
-                data: {
-                    ...(data as FaunaUserSharingInfo),
-                    sharedFolders: [...(data as FaunaUserSharingInfo).sharedFolders, idFolderToShare]
-                }
-            }))
-        })
-
-    })
-        .catch((err) => console.error(
-            'Error: [%s] %s: %s',
-            err.name,
-            err.message,
-            err.errors()[0].description,
-        ));
-    return ""
-
-}
-
-
-export const getSharingInfoByUserEmail = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, userEmail: string) => {
+export const getSharedFolders = async (
+    faunaClient: faunadb.Client,
+    faunaQuery: typeof faunadb.query,
+    user: string
+) => {
     const response = await faunaClient.query(
-        faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("sharing_info_by_user_email"), userEmail))),   
+        faunaQuery.Select("data",
+            faunaQuery.Map(
+                faunaQuery.Paginate(
+                    faunaQuery.Match(
+                        faunaQuery.Index("get_shared_folders_by_user_email"),
+                        user
+                    )
+                ),
+                faunaQuery.Lambda("folder", {
+                    id: faunaQuery.Select(
+                        ["ref", "id"],
+                        faunaQuery.Get(
+                            faunaQuery.Var("folder")
+                        )
+                    ),
+                    folder: faunaQuery.Select(
+                        ["data"],
+                        faunaQuery.Get(
+                            faunaQuery.Var("folder")
+                        )
+                    )
+                })
             )
+        )
+    )
         .catch((err) => console.error(
             'Error: [%s] %s: %s',
             err.name,
             err.message,
             err.errors()[0].description,
         ));
-    return response as FaunaUserSharingInfo
+    return response as FaunaFolder[]
 }
 
 export const getFolderByFaunaID = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, faunaID: string) => {

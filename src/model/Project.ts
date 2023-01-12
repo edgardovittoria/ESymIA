@@ -1,6 +1,7 @@
 import { CanvasState, UsersState } from "cad-library";
 import { Simulation } from "./Simulation";
 import { Port, Probe, Signal } from "./Port";
+import { sharingInfoUser } from "./Folder";
 
 export type Project = {
     name: string,
@@ -12,7 +13,7 @@ export type Project = {
     meshData: MeshData,
     screenshot: string | undefined,
     owner: UsersState
-    sharedWith?: string[]
+    sharedWith: sharingInfoUser[]
     faunaDocumentId?: string
 }
 

@@ -7,11 +7,10 @@ import {folderToShareSelector, projectToShareSelector, setFolderToShare, setProj
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import {
     updateFolderInFauna,
-    updateFoldersSharingInfo,
     updateProjectInFauna,
-    updateProjectSharingInfo
 } from "../../../../../../faunadb/projectsFolderAPIs";
 import axios from "axios";
+import { sharingInfoUser } from '../../../../../../model/Folder';
 
 interface SearchUserAndShareProps {
     setShowSearchUser: (v: boolean) => void
@@ -126,14 +125,12 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
                                                         className="button buttonPrimary py-1 px-2 text-sm"
                                                         onClick={() => {
                                                             if(projectToShare){
-                                                                dispatch(shareProject({projectToShare: projectToShare, user: selected}))
-                                                                execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...projectToShare.sharedWith as string[], selected]})
-                                                                execQuery(updateProjectSharingInfo, projectToShare?.faunaDocumentId, selected)
+                                                                dispatch(shareProject({projectToShare: projectToShare, user: {userEmail: selected, read: true, write:true}}))
+                                                                execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...projectToShare.sharedWith as sharingInfoUser[], {userEmail: selected, read: true, write:true} as sharingInfoUser]})
                                                             }
                                                             else if(folderToShare){
-                                                                dispatch(shareFolder({folderToShare: folderToShare, user: selected}))
-                                                                execQuery(updateFolderInFauna, {...folderToShare, sharedWith: [...folderToShare.sharedWith as string[], selected]})
-                                                                execQuery(updateFoldersSharingInfo, folderToShare?.faunaDocumentId, selected)
+                                                                dispatch(shareFolder({folderToShare: folderToShare.faunaDocumentId as string, user: {userEmail: selected, read: true, write:true}}))
+                                                                execQuery(updateFolderInFauna, {...folderToShare, sharedWith: [...folderToShare.sharedWith as sharingInfoUser[], {userEmail: selected, read: true, write:true} as sharingInfoUser]})
                                                             }
                                                             handleClose()
                                                         }}

@@ -155,7 +155,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                 <Separator/>
                 <Item onClick={(p) => {
                     p.event.stopPropagation()
-                    dispatch(setFolderToShare(folder))
+                    dispatch(setFolderToShare(folder.faunaDocumentId as string))
                     setShowSearchUser(true)
                 }} >
                     <BiShareAlt

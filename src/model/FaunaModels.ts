@@ -1,4 +1,5 @@
 import { CanvasState, UsersState } from "cad-library"
+import { sharingInfoUser } from "./Folder"
 import {Port, Probe, Signal} from "./Port"
 import { MeshData } from "./Project"
 import { Simulation } from "./Simulation"
@@ -18,7 +19,7 @@ export type FaunaProjectDetails = {
     meshData: MeshData,
     screenshot: string | undefined,
     owner: UsersState
-    sharedWith?: string[],
+    sharedWith?: sharingInfoUser[],
 
 }
 
@@ -30,14 +31,8 @@ export type FaunaFolder = {
 export type FaunaFolderDetails = {
     name: string,
     owner: UsersState,
-    sharedWith?: string[],
+    sharedWith?: sharingInfoUser[],
     projectList: string[],
     subFolders: string[],
     parent: string,
-}
-
-export type FaunaUserSharingInfo = {
-    user: string,
-    sharedFolders: string[],
-    sharedProjects: string[]
 }

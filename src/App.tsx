@@ -12,24 +12,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { MenuBar } from "./application/MenuBar";
 import { DashboardTabsContentFactory } from "./application/dashboardTabsManagement/DashboardTabsContentFactory";
 import { SimulationTabsContentFactory } from "./application/simulationTabsManagement/SimulationTabsContentFactory";
-import { usersStateSelector, useFaunaQuery, UsersState } from "cad-library";
+import { usersStateSelector, useFaunaQuery } from "cad-library";
 import { selectFolder } from "./store/projectSlice";
 import {
 	constructFolderStructure,
-	getFolderByFaunaID,
+	constructSharedFolderStructure,
 	getFoldersByOwner,
-	getProjectByFaunaID,
+	getSharedFolders,
 	getSharedSimulationProjects,
-	getSharingInfoByUserEmail,
 	getSimulationProjectsByOwner,
 } from "./faunadb/projectsFolderAPIs";
 import { useTabs } from "./contexts/tabsAndMenuitemsHooks";
-import {
-	FaunaFolder,
-	FaunaProject,
-	FaunaUserSharingInfo,
-} from "./model/FaunaModels";
-import { Folder } from "./model/Folder";
 
 function App() {
 	const dispatch = useDispatch();
@@ -50,39 +43,12 @@ function App() {
 					dispatch(selectFolder(folder.faunaDocumentId as string));
 				});
 			});
-			// let sharedFolders: FaunaFolder[] = [];
-			// let sharedProjects: FaunaProject[] = [];
-			// execQuery(getSharingInfoByUserEmail, user.email).then((sharingInfo) => {
-			// 	(sharingInfo as FaunaUserSharingInfo).sharedFolders.map((folderID) => {
-			// 		execQuery(getFolderByFaunaID, folderID).then((folder) =>
-			// 			sharedFolders.push(folder)
-			// 		);
-			// 	});
-			// 	(sharingInfo as FaunaUserSharingInfo).sharedProjects.map(
-			// 		(projectID) => {
-			// 			execQuery(getProjectByFaunaID, projectID).then((project) =>
-			// 				sharedProjects.push(project)
-			// 			);
-			// 		}
-			// 	);
-			// 	let mainSharedFolderElements = {
-			// 		folder: {
-			// 			name: "My Shared Elements",
-			// 			owner: {} as UsersState,
-			// 			sharedWith: [],
-			// 			subFolders: [],
-			// 			projectList: [],
-			// 			parent: "root",
-			// 		},
-			// 		id: "sharedElementsMainFolder",
-			// 	} as FaunaFolder;
-			// 	let sharedElementsFolder = constructFolderStructure(
-			// 		[mainSharedFolderElements, ...sharedFolders],
-			// 		sharedProjects
-			// 	);
-			// 	dispatch(setFolderOfElementsSharedWithUser(sharedElementsFolder));
-			// });
-		}
+			execQuery(getSharedFolders, user.email).then((folders) => {
+				execQuery(getSharedSimulationProjects, user.email).then((projects) => {
+					let folder = constructSharedFolderStructure(folders, projects, user);
+					dispatch(setFolderOfElementsSharedWithUser(folder));
+				})
+		})}
 	}, [user.userName]);
 
 	//MEMOIZED COMPONENTS

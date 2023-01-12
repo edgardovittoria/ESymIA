@@ -17,6 +17,7 @@ import {
 } from "../../store/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useTabs } from "../../contexts/tabsAndMenuitemsHooks";
+import { sharingInfoUser } from "../../model/Folder";
 
 interface CreateNewProjectModalProps {
   setShow: Function;
@@ -53,7 +54,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         },
         screenshot: undefined,
         owner: user,
-        sharedWith: [] as string[],
+        sharedWith: [] as sharingInfoUser[],
       };
       execQuery(createSimulationProjectInFauna, newProject).then((res: any) => {
         newProject = {
