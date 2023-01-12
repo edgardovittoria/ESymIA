@@ -75,7 +75,7 @@ export const RenameProject: React.FC<RenameProjectProps> = (
                                             className="button buttonPrimary py-1 px-2 text-sm"
                                             onClick={() => {
                                                 dispatch(renameProject({
-                                                    projectToRename: projectToRename as Project,
+                                                    projectToRename: projectToRename.faunaDocumentId as string,
                                                     name: name
                                                 }))
                                                 execQuery(updateProjectInFauna, {

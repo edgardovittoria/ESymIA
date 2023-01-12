@@ -105,7 +105,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     </Submenu>
                     <Item onClick={(p) => {
                         p.event.stopPropagation()
-                        dispatch(setProjectToRename(project))
+                        dispatch(setProjectToRename(project.faunaDocumentId))
                         setShowRename(true)
                     }}>
                         <BiRename
@@ -125,7 +125,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     </Item>
                     <Item onClick={(p) => {
                         p.event.stopPropagation()
-                        dispatch(setProjectToShare(project))
+                        dispatch(setProjectToShare(project.faunaDocumentId))
                         setShowSearchUser(true)
                     }} disabled={user.userRole !== 'Premium'}>
                         <BiShareAlt

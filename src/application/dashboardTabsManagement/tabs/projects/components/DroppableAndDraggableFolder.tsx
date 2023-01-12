@@ -144,7 +144,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                 </Submenu>
                 <Item onClick={(p) => {
                     p.event.stopPropagation()
-                    dispatch(setFolderToRename(folder))
+                    dispatch(setFolderToRename(folder.faunaDocumentId))
                     setShowRename(true)
                 }}>
                     <BiRename
