@@ -3,6 +3,10 @@ import faunadb from "faunadb";
 import { FaunaFolder, FaunaFolderDetails, FaunaProject, FaunaProjectDetails } from "../model/FaunaModels";
 import { Folder, sharingInfoUser } from "../model/Folder";
 import { Project } from "../model/Project";
+import {
+    recursiveFindFolders,
+    takeAllProjectsIn
+} from "../store/auxiliaryFunctions/managementProjectsAndFoldersFunction";
 
 
 
@@ -123,7 +127,7 @@ const recursiveSubFoldersRetrieving = (subFolders: string[], all_folders: FaunaF
                 let p: Project = {
                     ...fp.project,
                     faunaDocumentId: fp.id,
-                    sharedWith: [] as sharingInfoUser[]
+                    sharedWith: fp.project.sharedWith as sharingInfoUser[]
                 }
                 projects.push(p)
                 return projects
@@ -161,7 +165,7 @@ export const constructSharedFolderStructure = (folders: FaunaFolder[], all_proje
         let p: Project = {
             ...fp.project,
             faunaDocumentId: fp.id,
-            sharedWith: [] as sharingInfoUser[]
+            sharedWith: fp.project.sharedWith as sharingInfoUser[]
         }
         projects.push(p)
         return projects
@@ -514,4 +518,11 @@ export const getProjectByFaunaID = async (faunaClient: faunadb.Client, faunaQuer
             err.errors()[0].description,
         ));
     return {id: faunaID, project: response} as FaunaProject
+}
+
+export const recursiveUpdateSharingInfoFolderInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToUpdate: Folder) => {
+    let allFolders = recursiveFindFolders(folderToUpdate, [])
+    allFolders.forEach(f => updateFolderInFauna(faunaClient, faunaQuery, f))
+    let allProjects = takeAllProjectsIn(folderToUpdate)
+    allProjects.forEach(p => updateProjectInFauna(faunaClient, faunaQuery, p))
 }

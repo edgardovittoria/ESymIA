@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {folderToShareSelector, projectToShareSelector, setFolderToShare, setProjectToShare, shareFolder, shareProject} from "../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import {
+    recursiveUpdateSharingInfoFolderInFauna,
     updateFolderInFauna,
     updateProjectInFauna,
 } from "../../../../../../faunadb/projectsFolderAPIs";
@@ -23,6 +24,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
 ) => {
 
     const [users, setUsers] = useState<string[]>([]);
+    const [shareDone, setShareDone] = useState<boolean>(false);
     let usersList: string[] = []
 
     useEffect(() => {
@@ -49,6 +51,14 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
     const projectToShare = useSelector(projectToShareSelector)
     const folderToShare = useSelector(folderToShareSelector)
     const user = useSelector(usersStateSelector)
+
+    useEffect(() => {
+        if(shareDone){
+            console.log(folderToShare)
+            execQuery(recursiveUpdateSharingInfoFolderInFauna, folderToShare)
+            handleClose()
+        }
+    }, [folderToShare?.sharedWith])
 
     const {execQuery} = useFaunaQuery()
 
@@ -124,15 +134,14 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
                                                         type="button"
                                                         className="button buttonPrimary py-1 px-2 text-sm"
                                                         onClick={() => {
+                                                            setShareDone(true)
                                                             if(projectToShare){
                                                                 dispatch(shareProject({projectToShare: projectToShare, user: {userEmail: selected, read: true, write:true}}))
                                                                 execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...projectToShare.sharedWith as sharingInfoUser[], {userEmail: selected, read: true, write:true} as sharingInfoUser]})
                                                             }
                                                             else if(folderToShare){
                                                                 dispatch(shareFolder({folderToShare: folderToShare.faunaDocumentId as string, user: {userEmail: selected, read: true, write:true}}))
-                                                                execQuery(updateFolderInFauna, {...folderToShare, sharedWith: [...folderToShare.sharedWith as sharingInfoUser[], {userEmail: selected, read: true, write:true} as sharingInfoUser]})
                                                             }
-                                                            handleClose()
                                                         }}
                                                     >
                                                         SHARE
