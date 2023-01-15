@@ -3,7 +3,8 @@ import { Physics } from "./tabs/physics/Physics";
 import { Results } from "./tabs/results/Results";
 import { Simulator } from "./tabs/simulator/Simulator";
 import { Modeler } from "./tabs/modeler/Modeler";
-import { useMenuItems } from "../../contexts/tabsAndMenuitemsHooks";
+import { useSelector } from "react-redux";
+import { selectedMenuItemSelector } from "../../store/tabsAndMenuItemsSlice";
 
 
 
@@ -14,7 +15,7 @@ export const SimulationTabsContentFactory: React.FC<
   SimulationTabsContentFactoryProps
 > = () => {  
   const [selectedTabLeftPanel, setSelectedTabLeftPanel] = useState("Modeler");
-  const {menuItemSelected} = useMenuItems()
+  const menuItemSelected = useSelector(selectedMenuItemSelector)
 
   switch (menuItemSelected) {
     case "Modeler":

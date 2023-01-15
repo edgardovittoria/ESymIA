@@ -7,7 +7,6 @@ import { Provider } from "react-redux";
 import { Auth0Provider } from "@auth0/auth0-react";
 import * as serviceWorker from "./serviceWorker";
 import { Toaster } from "react-hot-toast";
-import { TabsAndMenuItemsContextProvider } from "./contexts/tabsAndMenuitemsProvider";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -18,12 +17,10 @@ ReactDOM.render(
       audience={process.env.REACT_APP_AUTH0_AUDIENCE as string}
     >
       <Provider store={store}>
-        <TabsAndMenuItemsContextProvider>
           <div>
             <Toaster position="top-center" />
           </div>
           <App />
-        </TabsAndMenuItemsContextProvider>
       </Provider>
     </Auth0Provider>
   </React.StrictMode>,

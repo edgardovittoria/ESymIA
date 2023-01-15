@@ -12,7 +12,7 @@ import {
   selectProject,
 } from "../../../store/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useMenuItems, useTabs } from "../../../contexts/tabsAndMenuitemsHooks";
+import { addProjectTab, projectsTabsSelector, selectMenuItem, selectTab } from "../../../store/tabsAndMenuItemsSlice";
 
 interface SimulationsProps {}
 
@@ -20,8 +20,7 @@ export const Simulations: React.FC<SimulationsProps> = () => {
   const dispatch = useDispatch();
   const mainFolder = useSelector(mainFolderSelector);
   const projects = useSelector(projectsSelector);
-  const { addProjectTab, projectsTabs, selectTab } = useTabs();
-  const { selectMenuItem } = useMenuItems();
+  const projectsTabs = useSelector(projectsTabsSelector)
 
   let simulations: Simulation[] = [];
 
@@ -124,16 +123,14 @@ export const Simulations: React.FC<SimulationsProps> = () => {
                                   p.faunaDocumentId === proj?.faunaDocumentId
                               ).length > 0
                             ) {
-                              selectTab(proj.faunaDocumentId);
+                              dispatch(selectTab(proj.faunaDocumentId as string));
                             } else {
-                              console.log("ci siamo");
-                              addProjectTab(proj);
-                              selectTab(proj?.faunaDocumentId);
+                              dispatch(addProjectTab(proj));
                             }
                             dispatch(
                               selectProject(simulation.associatedProject)
                             );
-                            selectMenuItem("Results");
+                            dispatch(selectMenuItem("Results"));
                           }
                         }}
                       />

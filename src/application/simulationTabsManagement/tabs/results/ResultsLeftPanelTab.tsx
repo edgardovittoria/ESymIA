@@ -54,7 +54,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
         </div>
       ) : (
         <div className="text-center">
-          <img src="/noResultsIcon.png" className="mx-auto mt-[50px]" />
+          <img src="/noResultsIcon.png" className="mx-auto mt-[50px]" alt="No Results"/>
           <h5>No results to view</h5>
           <p className="mt-[50px]">
             Complete a study setup with CAD, materials, and physics, then

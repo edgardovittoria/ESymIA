@@ -22,15 +22,15 @@ import {
 	getSharedSimulationProjects,
 	getSimulationProjectsByOwner,
 } from "./faunadb/projectsFolderAPIs";
-import { useTabs } from "./contexts/tabsAndMenuitemsHooks";
+import { tabSelectedSelector } from "./store/tabsAndMenuItemsSlice";
 
 function App() {
 	const dispatch = useDispatch();
 
 	//SELECTORS
 	const user = useSelector(usersStateSelector);
+	const tabSelected = useSelector(tabSelectedSelector)
 
-	const { tabSelected } = useTabs();
 	const { execQuery } = useFaunaQuery();
 
 	//USE EFFECT

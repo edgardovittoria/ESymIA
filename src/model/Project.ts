@@ -14,7 +14,8 @@ export type Project = {
     screenshot: string | undefined,
     owner: UsersState
     sharedWith: sharingInfoUser[]
-    faunaDocumentId?: string
+    faunaDocumentId?: string,
+    parentFolder?: string
 }
 
 export type MeshData = {

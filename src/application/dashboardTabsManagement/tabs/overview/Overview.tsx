@@ -1,10 +1,9 @@
 import React from 'react';
-import {Project} from "../../../../model/Project";
 import {ImportSimProjectButton} from './importSimProjectButton';
 import {Simulations} from "../Simulations";
 import {useDispatch, useSelector} from "react-redux";
-import {projectsSelector, selectProject} from "../../../../store/projectSlice";
-import { useMenuItems, useTabs } from '../../../../contexts/tabsAndMenuitemsHooks';
+import {projectsSelector} from "../../../../store/projectSlice";
+import { addProjectTab } from '../../../../store/tabsAndMenuItemsSlice';
 
 interface OverviewProps {
     setShowModal: Function
@@ -15,18 +14,9 @@ export const Overview: React.FC<OverviewProps> = (
         setShowModal
     }
 ) => {
-    const {addProjectTab, selectTab} = useTabs()
-    const {selectMenuItem} = useMenuItems()
     const dispatch = useDispatch()
     const projects = useSelector(projectsSelector)
     //const [cardMenuHovered, setCardMenuHovered] = useState(false);
-
-
-    const handleCardClick = (project: Project) => {
-        addProjectTab(project)
-        dispatch(selectProject(project.faunaDocumentId))
-        selectTab(project.faunaDocumentId)
-    }
 
 
     return (
@@ -42,7 +32,7 @@ export const Overview: React.FC<OverviewProps> = (
                     </button>
                     <ImportSimProjectButton
                         className="text-primaryColor bg-transparent border-none hover:underline hover:text-black"
-                        setMenuItem={selectMenuItem}>
+                        >
                         Import Project
                     </ImportSimProjectButton>
                 </div>
@@ -64,7 +54,7 @@ export const Overview: React.FC<OverviewProps> = (
                             return (
                                 <div key={project.name}
                                      className="w-100 rounded border-[1px] border-gray-400 mb-[15px] hover:cursor-pointer"
-                                     onClick={() => handleCardClick(project)}>
+                                     onClick={() => dispatch(addProjectTab(project))}>
                                     <div className="box">
                                         <div className="flex justify-between">
                                             <div className={`w-7/8 text-[20px] mb-[10px]`}>

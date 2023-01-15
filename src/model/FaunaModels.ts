@@ -20,6 +20,7 @@ export type FaunaProjectDetails = {
     screenshot: string | undefined,
     owner: UsersState
     sharedWith?: sharingInfoUser[],
+    parentFolder?: string
 
 }
 

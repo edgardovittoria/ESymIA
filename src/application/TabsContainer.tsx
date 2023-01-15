@@ -3,11 +3,11 @@ import {FaBell, FaPlus, FaTimes, FaUser} from "react-icons/fa";
 import {useAuth0} from "@auth0/auth0-react";
 import {SetUserInfo, UsersState} from 'cad-library';
 import {HiOutlineLogout} from "react-icons/hi";
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {selectProject} from '../store/projectSlice';
 import {GiSettingsKnobs} from "react-icons/gi";
 import { CreateNewProjectModal } from './sharedModals/CreateNewProjectModal';
-import { useTabs } from '../contexts/tabsAndMenuitemsHooks';
+import { closeProjectTab, projectsTabsSelector, selectTab, tabSelectedSelector } from '../store/tabsAndMenuItemsSlice';
 
 interface TabsContainerProps {
     user: UsersState
@@ -19,7 +19,8 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
     }
 ) => {
     
-    const {tabSelected, selectTab, projectsTabs, closeProjectTab} = useTabs()
+    const tabSelected = useSelector(tabSelectedSelector)
+    const projectsTabs = useSelector(projectsTabsSelector)
     const dispatch = useDispatch()
 
     const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
@@ -38,7 +39,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
                     <a className="text-black no-underline text-2xl mr-4 ml-4" href="/">ESimIA</a>
                     <ul className="flex pl-0 mb-0">
                         <li className={`bg-[#dadada] rounded`} onClick={() => {
-                            selectTab("DASHBOARD")
+                            dispatch(selectTab("DASHBOARD"))
                             dispatch(selectProject(undefined))
                         }}>
                             <div
@@ -54,12 +55,12 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
                                     <div
                                         className={(tabSelected === projectTab.faunaDocumentId) ? 'text-black' : 'text-gray-400 hover:cursor-pointer'}
                                         aria-current="page" onClick={() => {
-                                        selectTab(projectTab.faunaDocumentId)
+                                        dispatch(selectTab(projectTab.faunaDocumentId as string))
                                         dispatch(selectProject(projectTab.faunaDocumentId))
                                     }}>{projectTab.name}
                                     </div>
                                     <div className="ml-8" onClick={() => {
-                                        closeProjectTab(projectTab.faunaDocumentId as string)
+                                        dispatch(closeProjectTab(projectTab.faunaDocumentId as string))
                                         dispatch(selectProject(undefined))
                                     }}>
                                         <FaTimes className="w-[12px] h-[12px] text-gray-400"/>

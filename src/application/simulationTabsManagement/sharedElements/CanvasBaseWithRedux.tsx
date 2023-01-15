@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { Color, Mesh, MeshPhongMaterial } from "three";
@@ -15,13 +15,11 @@ import {
 import {
   importModel,
   selectedProjectSelector,
-  setScreenshot,
 } from "../../../store/projectSlice";
 import { updateProjectInFauna } from "../../../faunadb/projectsFolderAPIs";
 import {
   Provider,
   ReactReduxContext,
-  useDispatch,
   useSelector,
 } from "react-redux";
 import { s3 } from "../../../aws/s3Config";
@@ -42,7 +40,6 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 
   const { execQuery } = useFaunaQuery();
   const [previousColor, setPreviousColor] = useState<Color>({} as Color);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (selectedProject) {
@@ -120,9 +117,6 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                 </GizmoHelper>
                 <Screenshot
                   selectedProject={selectedProject}
-                  setScreenshot={(imageBase64: string) =>
-                    dispatch(setScreenshot(imageBase64))
-                  }
                 />
               </Provider>
             </Canvas>

@@ -119,16 +119,18 @@ const chartsDataOptionsFactory = (
       data: { datasets: [], labels: [] },
       options: {},
     };
+  let matrix_Z = eval(simulation.results.matrix_Z);
+  let matrix_Y = eval(simulation.results.matrix_Y);
+  let matrix_S = eval(simulation.results.matrix_S);
   switch (label) {
     case "R":
-      let matrix_Z_ModuleR: any = eval(simulation.results.matrix_Z);
-
+      // let matrix_Z_ModuleR: any = eval(simulation.results.matrix_Z);
       let labelsR: number[] = [];
       project?.signal?.signalValues.forEach((sv) => labelsR.push(sv.freq));
       const datasetsR: Dataset[] = [];
       let matrices_Z_RER: number[][] = [];
       let matrix_Z_RE_valueR: number[] = [];
-      matrix_Z_ModuleR.forEach((mz: any[][]) => {
+      matrix_Z.forEach((mz: any[][]) => {
         matrices_Z_RER.push(matrix_Z_RE_valueR);
         mz.forEach((mz2: any[]) => {
           matrix_Z_RE_valueR.push(mz2[0] * 1000);
@@ -169,14 +171,13 @@ const chartsDataOptionsFactory = (
       result.options = optionsR;
       break;
     case "L":
-      let matrix_ZH: any = eval(simulation.results.matrix_Z);
-
+      // let matrix_ZH: any = eval(simulation.results.matrix_Z);
       let labelsH: number[] = [];
       project?.signal?.signalValues.forEach((sv) => labelsH.push(sv.freq));
       const datasetsH: Dataset[] = [];
       let matrices_Z_IM: number[][] = [];
       let matrix_Z_IM_value: number[] = [];
-      matrix_ZH.forEach((mz: any[][]) => {
+      matrix_Z.forEach((mz: any[][]) => {
         matrices_Z_IM.push(matrix_Z_IM_value);
         mz.forEach((mz2: any[], index) => {
           matrix_Z_IM_value.push(
@@ -218,8 +219,7 @@ const chartsDataOptionsFactory = (
       result.options = optionsH;
       break;
     case "Z_Module":
-      let matrix_Z_Module: any = eval(simulation.results.matrix_Z);
-
+      // let matrix_Z_Module: any = eval(simulation.results.matrix_Z);
       let labelsZModule: number[] = [];
       project?.signal?.signalValues.forEach((sv) =>
         labelsZModule.push(sv.freq)
@@ -227,7 +227,7 @@ const chartsDataOptionsFactory = (
       const datasetsZModule: Dataset[] = [];
       let matrices_Z_Module_RE: number[][] = [];
       let matrix_Z_Module_RE_value: number[] = [];
-      matrix_Z_Module.forEach((mz: any[][]) => {
+      matrix_Z.forEach((mz: any[][]) => {
         matrices_Z_Module_RE.push(matrix_Z_Module_RE_value);
         mz.forEach((mz2: any[]) => {
           matrix_Z_Module_RE_value.push(
@@ -270,14 +270,13 @@ const chartsDataOptionsFactory = (
       result.options = optionsZModule;
       break;
     case "Z_Phase":
-      let matrix_Z_Phase: any = eval(simulation.results.matrix_Z);
-
+      // let matrix_Z_Phase: any = eval(simulation.results.matrix_Z);
       let labelsZPhase: number[] = [];
       project?.signal?.signalValues.forEach((sv) => labelsZPhase.push(sv.freq));
       const datasetsZPhase: Dataset[] = [];
       let matrices_Z_Phase_RE: number[][] = [];
       let matrix_Z_Phase_RE_value: number[] = [];
-      matrix_Z_Phase.forEach((mz: any[][]) => {
+      matrix_Z.forEach((mz: any[][]) => {
         matrices_Z_Phase_RE.push(matrix_Z_Phase_RE_value);
         mz.forEach((mz2: any[]) => {
           matrix_Z_Phase_RE_value.push(Math.atan2(mz2[1], mz2[0]));
@@ -318,14 +317,13 @@ const chartsDataOptionsFactory = (
       result.options = optionsZPhase;
       break;
     case "G":
-      let matrix_YG: any = eval(simulation.results.matrix_Y);
-
+      // let matrix_YG: any = eval(simulation.results.matrix_Y);
       let labelsG: number[] = [];
       project?.signal?.signalValues.forEach((sv) => labelsG.push(sv.freq));
       const datasetsG: Dataset[] = [];
       let matrices_YG_RE: number[][] = [];
       let matrix_YG_RE_value: number[] = [];
-      matrix_YG.forEach((mz: any[][]) => {
+      matrix_Y.forEach((mz: any[][]) => {
         matrices_YG_RE.push(matrix_YG_RE_value);
         mz.forEach((mz2: any[]) => {
           matrix_YG_RE_value.push(mz2[0] as number);
@@ -366,14 +364,13 @@ const chartsDataOptionsFactory = (
       result.options = optionsG;
       break;
     case "C":
-      let matrix_YC: any = eval(simulation.results.matrix_Y);
-
+      // let matrix_YC: any = eval(simulation.results.matrix_Y);
       let labelsC: number[] = [];
       project?.signal?.signalValues.forEach((sv) => labelsC.push(sv.freq));
       const datasetsC: Dataset[] = [];
       let matrices_YC_RE: number[][] = [];
       let matrix_YC_RE_value: number[] = [];
-      matrix_YC.forEach((mz: any[][]) => {
+      matrix_Y.forEach((mz: any[][]) => {
         matrices_YC_RE.push(matrix_YC_RE_value);
         mz.forEach((mz2: any[], index) => {
           matrix_YC_RE_value.push(mz2[1] / (2 * Math.PI * labelsC[index]));
@@ -414,8 +411,7 @@ const chartsDataOptionsFactory = (
       result.options = optionsC;
       break;
     case "Y_Module":
-      let matrix_Y_Module: any = eval(simulation.results.matrix_Y);
-
+      // let matrix_Y_Module: any = eval(simulation.results.matrix_Y);
       let labelsYModule: number[] = [];
       project?.signal?.signalValues.forEach((sv) =>
         labelsYModule.push(sv.freq)
@@ -423,7 +419,7 @@ const chartsDataOptionsFactory = (
       const datasetsYModule: Dataset[] = [];
       let matrices_Y_Module_RE: number[][] = [];
       let matrix_Y_Module_RE_value: number[] = [];
-      matrix_Y_Module.forEach((mz: any[][]) => {
+      matrix_Y.forEach((mz: any[][]) => {
         matrices_Y_Module_RE.push(matrix_Y_Module_RE_value);
         mz.forEach((mz2: any[], index) => {
           matrix_Y_Module_RE_value.push(
@@ -466,14 +462,13 @@ const chartsDataOptionsFactory = (
       result.options = optionsYModule;
       break;
     case "Y_Phase":
-      let matrix_Y_Phase: any = eval(simulation.results.matrix_Y);
-
+      // let matrix_Y_Phase: any = eval(simulation.results.matrix_Y);
       let labelsYPhase: number[] = [];
       project?.signal?.signalValues.forEach((sv) => labelsYPhase.push(sv.freq));
       const datasetsYPhase: Dataset[] = [];
       let matrices_Y_Phase_RE: number[][] = [];
       let matrix_Y_Phase_RE_value: number[] = [];
-      matrix_Y_Phase.forEach((mz: any[][]) => {
+      matrix_Y.forEach((mz: any[][]) => {
         matrices_Y_Phase_RE.push(matrix_Y_Phase_RE_value);
         mz.forEach((mz2: any[], index) => {
           matrix_Y_Phase_RE_value.push(Math.atan2(mz2[1], mz2[0]));
@@ -514,8 +509,7 @@ const chartsDataOptionsFactory = (
       result.options = optionsYPhase;
       break;
     case "S_Module":
-      let matrix_S_Module: any = eval(simulation.results.matrix_S);
-
+      // let matrix_S_Module: any = eval(simulation.results.matrix_S);
       let labelsSModule: number[] = [];
       project?.signal?.signalValues.forEach((sv) =>
         labelsSModule.push(sv.freq)
@@ -523,7 +517,7 @@ const chartsDataOptionsFactory = (
       const datasetsSModule: Dataset[] = [];
       let matrices_S_Module_RE: number[][] = [];
       let matrix_S_Module_RE_value: number[] = [];
-      matrix_S_Module.forEach((mz: any[][]) => {
+      matrix_S.forEach((mz: any[][]) => {
         matrices_S_Module_RE.push(matrix_S_Module_RE_value);
         mz.forEach((mz2: any[], index) => {
           matrix_S_Module_RE_value.push(
@@ -566,14 +560,13 @@ const chartsDataOptionsFactory = (
       result.options = optionsSModule;
       break;
     case "S_Phase":
-      let matrix_S_Phase: any = eval(simulation.results.matrix_S);
-
+      // let matrix_S_Phase: any = eval(simulation.results.matrix_S);
       let labelsSPhase: number[] = [];
       project?.signal?.signalValues.forEach((sv) => labelsSPhase.push(sv.freq));
       const datasetsSPhase: Dataset[] = [];
       let matrices_S_Phase_RE: number[][] = [];
       let matrix_S_Phase_RE_value: number[] = [];
-      matrix_S_Phase.forEach((mz: any[][]) => {
+      matrix_S.forEach((mz: any[][]) => {
         matrices_S_Phase_RE.push(matrix_S_Phase_RE_value);
         mz.forEach((mz2: any[], index) => {
           matrix_S_Phase_RE_value.push(Math.atan2(mz2[1], mz2[0]));
@@ -614,14 +607,13 @@ const chartsDataOptionsFactory = (
       result.options = optionsSPhase;
       break;
     case "S_dB":
-      let matrix_S_dB: any = eval(simulation.results.matrix_S);
-
+      // let matrix_S_dB: any = eval(simulation.results.matrix_S);
       let labelsSdB: number[] = [];
       project?.signal?.signalValues.forEach((sv) => labelsSdB.push(sv.freq));
       const datasetsSdB: Dataset[] = [];
       let matrices_S_dB_RE: number[][] = [];
       let matrix_S_dB_RE_value: number[] = [];
-      matrix_S_dB.forEach((mz: any[][]) => {
+      matrix_S.forEach((mz: any[][]) => {
         matrices_S_dB_RE.push(matrix_S_dB_RE_value);
         mz.forEach((mz2: any[], index) => {
           matrix_S_dB_RE_value.push(

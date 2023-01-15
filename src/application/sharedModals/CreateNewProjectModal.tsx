@@ -13,11 +13,10 @@ import {
 import {
   addProject,
   SelectedFolderSelector,
-  selectProject,
 } from "../../store/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useTabs } from "../../contexts/tabsAndMenuitemsHooks";
 import { sharingInfoUser } from "../../model/Folder";
+import { addProjectTab } from "../../store/tabsAndMenuItemsSlice";
 
 interface CreateNewProjectModalProps {
   setShow: Function;
@@ -26,7 +25,6 @@ interface CreateNewProjectModalProps {
 export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
   setShow,
 }) => {
-  const { addProjectTab, selectTab } = useTabs();
   const dispatch = useDispatch();
 
   const user = useSelector(usersStateSelector);
@@ -37,7 +35,6 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
 
-  const handleClose = () => setShow(false);
   const handleCreate = () => {
     if (projectName.length > 0) {
       let newProject: Project = {
@@ -55,6 +52,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         screenshot: undefined,
         owner: user,
         sharedWith: [] as sharingInfoUser[],
+        parentFolder: selectedFolder?.faunaDocumentId
       };
       execQuery(createSimulationProjectInFauna, newProject).then((res: any) => {
         newProject = {
@@ -67,9 +65,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
           selectedFolder
         );
         dispatch(addProject(newProject));
-        dispatch(selectProject(newProject.faunaDocumentId));
-        addProjectTab(newProject);
-        selectTab(newProject.faunaDocumentId);
+        dispatch(addProjectTab(newProject));
       });
 
       setShow(false);
@@ -82,7 +78,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
     <>
       {/* eslint-disable-next-line react/jsx-no-undef */}
       <Transition appear show={true} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={handleClose}>
+        <Dialog as="div" className="relative z-10" onClose={() => setShow(false)}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -140,7 +136,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                     <button
                       type="button"
                       className="button bg-red-500 text-white"
-                      onClick={handleClose}
+                      onClick={() => setShow(false)}
                     >
                       CANCEL
                     </button>

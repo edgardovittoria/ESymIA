@@ -3,17 +3,13 @@ import {HTML5Backend} from "react-dnd-html5-backend";
 import {
     mainFolderSelector,
     SelectedFolderSelector,
-    selectFolder,
-    selectProject
-} from "../../../../../../store/projectSlice";
+    selectFolder} from "../../../../../../store/projectSlice";
 import {DroppableAndDraggableFolder} from "../droppableDraggableFolderProject/DroppableAndDraggableFolder";
 import {DraggableProjectCard} from "../droppableDraggableFolderProject/DraggableProjectCard";
 import {SearchUserAndShare} from "../droppableDraggableFolderProject/searchUserAndShare/searchUserAndShare";
 import {CreateNewFolderModal} from "../CreateNewFolderModal";
 import {DndProvider} from "react-dnd";
 import {useDispatch, useSelector} from "react-redux";
-import {Project} from "../../../../../../model/Project";
-import {useTabs} from "../../../../../../contexts/tabsAndMenuitemsHooks";
 import {usersStateSelector} from "cad-library";
 
 export interface MyFilesProps{
@@ -40,14 +36,6 @@ const MyFiles: React.FC<MyFilesProps> = (
     let folders = selectedFolder?.subFolders;
 
     const [path, setPath] = useState([mainFolder]);
-
-    const {addProjectTab, selectTab} = useTabs();
-
-    const handleCardClick = (project: Project) => {
-        addProjectTab(project);
-        dispatch(selectProject(project.faunaDocumentId));
-        selectTab(project.faunaDocumentId);
-    };
 
     return(
         <>
@@ -122,7 +110,6 @@ const MyFiles: React.FC<MyFilesProps> = (
                                             return (
                                                 <DraggableProjectCard
                                                     project={project}
-                                                    handleCardClick={handleCardClick}
                                                     key={project.faunaDocumentId}
                                                 />
                                             );

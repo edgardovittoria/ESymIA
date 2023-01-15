@@ -24,7 +24,7 @@ import { Port, TempLumped } from "../../../../model/Port";
 import axios from "axios";
 import { MesherOutput } from "../../../../model/MesherInputOutput";
 import { uploadFileS3 } from "../../../../aws/mesherAPIs";
-import { useMenuItems } from "../../../../contexts/tabsAndMenuitemsHooks";
+import { selectMenuItem } from "../../../../store/tabsAndMenuItemsSlice";
 
 interface GenerateMeshProps {
   selectedProject: Project;
@@ -41,7 +41,6 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
     SolverDownloadPercentageSelector
   );
   const simulationStatus = useSelector(SimulationStatusSelector);
-  const {selectMenuItem} = useMenuItems()
 
   const dispatch = useDispatch();
   let quantumDimensions = selectedProject.meshData.quantum;
@@ -392,7 +391,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
                 onClick={() => {
                   dispatch(setSimulationStatus("notStarted"));
                   dispatch(setSolverDownloadPercentage(0));
-                  selectMenuItem("Results");
+                  dispatch(selectMenuItem("Results"));
                 }}
               >
                 Results

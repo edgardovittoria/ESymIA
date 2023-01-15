@@ -3,53 +3,54 @@ import { Overview } from "./tabs/overview/Overview";
 import { Simulations } from "./tabs/Simulations";
 import { CreateNewProjectModal } from "../sharedModals/CreateNewProjectModal";
 import { Projects } from "./tabs/projects/Projects";
-import { useMenuItems } from "../../contexts/tabsAndMenuitemsHooks";
+import { useSelector } from "react-redux";
+import { selectedMenuItemSelector } from "../../store/tabsAndMenuItemsSlice";
 
 interface DashboardTabsContentFactoryProps {}
 
 export const DashboardTabsContentFactory: React.FC<
-  DashboardTabsContentFactoryProps
+	DashboardTabsContentFactoryProps
 > = () => {
-  const [showCreateNewProjectModal, setShowCreateNewProjectModal] =
-    useState(false);
-  const { menuItemSelected } = useMenuItems();
+	const [showCreateNewProjectModal, setShowCreateNewProjectModal] =
+		useState(false);
+	const menuItemSelected = useSelector(selectedMenuItemSelector);
 
-  switch (menuItemSelected) {
-    case "Overview":
-      return (
-        <div className="container flex mx-auto pt-8">
-          <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
-            <Overview setShowModal={setShowCreateNewProjectModal} />
-          </div>
-          {/* <RightPanel /> */}
-          {showCreateNewProjectModal && (
-            <CreateNewProjectModal setShow={setShowCreateNewProjectModal} />
-          )}
-        </div>
-      );
+	switch (menuItemSelected) {
+		case "Overview":
+			return (
+				<div className="container flex mx-auto pt-8">
+					<div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
+						<Overview setShowModal={setShowCreateNewProjectModal} />
+					</div>
+					{/* <RightPanel /> */}
+					{showCreateNewProjectModal && (
+						<CreateNewProjectModal setShow={setShowCreateNewProjectModal} />
+					)}
+				</div>
+			);
 
-    case "Projects":
-      return (
-        <div className="container flex mx-auto pt-8">
-          <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
-            <Projects setShowModal={setShowCreateNewProjectModal} />
-          </div>
-          {/* <RightPanel /> */}
-          {showCreateNewProjectModal && (
-            <CreateNewProjectModal setShow={setShowCreateNewProjectModal} />
-          )}
-        </div>
-      );
-    case "Simulations":
-      return (
-        <div className="container flex mx-auto pt-8">
-          <div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
-            <Simulations />
-          </div>
-          {/* <RightPanel /> */}
-        </div>
-      );
-    default:
-      return <></>;
-  }
+		case "Projects":
+			return (
+				<div className="container flex mx-auto pt-8">
+					<div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
+						<Projects setShowModal={setShowCreateNewProjectModal} />
+					</div>
+					{/* <RightPanel /> */}
+					{showCreateNewProjectModal && (
+						<CreateNewProjectModal setShow={setShowCreateNewProjectModal} />
+					)}
+				</div>
+			);
+		case "Simulations":
+			return (
+				<div className="container flex mx-auto pt-8">
+					<div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
+						<Simulations />
+					</div>
+					{/* <RightPanel /> */}
+				</div>
+			);
+		default:
+			return <></>;
+	}
 };

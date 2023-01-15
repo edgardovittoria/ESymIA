@@ -17,7 +17,7 @@ export const Models: React.FC<ModelsProps> = ({children}) => {
                     {children}
                 </div>
                 : <div className="text-center ">
-                    <img src="/noModelsIcon.png" className="mt-[50px] mx-auto"/>
+                    <img src="/noModelsIcon.png" className="mt-[50px] mx-auto" alt='No Models'/>
                     <h5>No Model</h5>
                     <p className="mt-[50px]">Use the icon from the Tool Bar <br/> to import a 3D CAD File.
                     </p>

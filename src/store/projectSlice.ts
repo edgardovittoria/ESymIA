@@ -10,10 +10,10 @@ import {
     addProjectToStore,
     moveFolder,
     moveProject,
-
     recursiveFindFolders, removeFolderFromStore, removeProjectFromStore,
     takeAllProjectsIn
 } from "./auxiliaryFunctions/managementProjectsAndFoldersFunction";
+import { addProjectTab, closeProjectTab, selectMenuItem, selectTab } from './tabsAndMenuItemsSlice';
 
 
 export type ProjectState = {
@@ -81,7 +81,7 @@ export const ProjectSlice = createSlice({
         },
         renameProject(state: ProjectState, action: PayloadAction<{ projectToRename: string, name: string }>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToRename);
-            let selectedFolder = folderByID(state, state.selectedFolder)
+            let selectedFolder = folderByID(state, project?.parentFolder)
             if (project && selectedFolder) {
                 project.name = action.payload.name
                 selectedFolder.projectList = selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId)
@@ -112,7 +112,6 @@ export const ProjectSlice = createSlice({
         importModel(state: ProjectState, action: PayloadAction<ImportActionParamsObject>) {
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             if (selectedProject) {
-                console.log("load model")
                 selectedProject.model = action.payload.canvas
             }
         },
@@ -196,9 +195,22 @@ export const ProjectSlice = createSlice({
             if (project) project.meshData.meshApproved = action.payload
         },
     },
-    extraReducers:
-    {
-        //qui inseriamo i metodi : PENDING, FULLFILLED, REJECT utili per la gestione delle richieste asincrone
+    extraReducers: (builder) => {
+        builder
+            .addCase(selectTab, (state, action) => {
+                selectTabEffects(state, action.payload)
+            })
+            .addCase(closeProjectTab, (state) => {
+                selectTabEffects(state, "DASHBOARD")
+            })
+            .addCase(addProjectTab, (state, action) => {
+                selectTabEffects(state, action.payload.faunaDocumentId as string)
+            })
+            .addCase(selectMenuItem, (state, action) => {
+                if(action.payload === 'Projects'){
+                    state.selectedFolder = state.projects.faunaDocumentId
+                }
+            })
     }
 })
 
@@ -211,7 +223,15 @@ export const {
     renameFolder, shareFolder, setQuantum, setMesh, setDownloadPercentage, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser
 } = ProjectSlice.actions
 
-
+const selectTabEffects = (state: ProjectState, tab: string) => {
+    if (tab === "DASHBOARD") {
+        state.selectedFolder = state.projects.faunaDocumentId
+        state.selectedProject = undefined
+    }
+    else {
+        state.selectedProject = tab
+    }
+}
 export const projectsSelector = (state: { projects: ProjectState }) => takeAllProjectsIn(state.projects.projects)
 export const folderByIDSelector = (state: { projects: ProjectState }, id: string) => {
     return recursiveFindFolders(state.projects.projects, [] as Folder[]).filter(f => f.faunaDocumentId === id)[0]

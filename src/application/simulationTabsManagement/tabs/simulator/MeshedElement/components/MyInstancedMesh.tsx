@@ -22,7 +22,6 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = (
     let meshGenerated = selectedProject.meshData.meshGenerated
 
     const meshRef = useRef<InstancedMesh[]>([]);
-    const tempObject = new Object3D();
 
     function getNumberOfCells(output: MesherOutput|undefined){
         let numberOfCells: number[] = []
@@ -53,6 +52,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = (
 
 
     useEffect(() => {
+        let tempObject = new Object3D();
         mesherMatrices.forEach((matrix, index) => {
             if (mesherOutput && meshRef.current[index]) {
                 let y = 0
@@ -76,7 +76,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = (
             }
 
         })
-    }, [meshGenerated, materialsList]);
+    }, [meshGenerated, materialsList, mesherMatrices, mesherOutput]);
 
 
     return(

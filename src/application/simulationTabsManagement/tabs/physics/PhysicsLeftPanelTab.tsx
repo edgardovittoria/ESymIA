@@ -53,7 +53,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                     </ul>
                 </div>
                 : <div className="text-center">
-                    <img src="/noPhysicsIcon.png" className="mx-auto mt-[50px]"/>
+                    <img src="/noPhysicsIcon.png" className="mx-auto mt-[50px]" alt='No Physics'/>
                     <h5>No Physics applied</h5>
                     <p className="mt-[50px]">Select a tool from the Physics Toolbar and apply it to
                         geometry in the 3D View.</p>

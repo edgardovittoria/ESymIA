@@ -8,7 +8,7 @@ interface ModelOutlinerProps {
 
 }
 
-export const ModelOutliner: React.FC<ModelOutlinerProps> = ({}) => {
+export const ModelOutliner: React.FC<ModelOutlinerProps> = () => {
     
     const selectedProject = useSelector(selectedProjectSelector)
 

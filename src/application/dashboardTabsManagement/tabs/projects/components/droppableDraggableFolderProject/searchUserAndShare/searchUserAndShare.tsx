@@ -27,9 +27,9 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
 
     const [users, setUsers] = useState<string[]>([]);
     const [shareDone, setShareDone] = useState<boolean>(false);
-    let usersList: string[] = []
 
     useEffect(() => {
+        let usersList: string[] = []
         setSpinner(true)
         axios.get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles`, {
             headers: {authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`}

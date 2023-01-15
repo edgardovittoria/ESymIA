@@ -16,24 +16,21 @@ import {
     SelectedFolderSelector} from "../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import { Project } from '../../../../../../model/Project';
-import { useTabs } from '../../../../../../contexts/tabsAndMenuitemsHooks';
 import { Folder } from '../../../../../../model/Folder';
 import { RenameProject } from './RenameProject';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
+import { addProjectTab, closeProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 interface DraggableProjectCardProps {
     project: Project,
-    handleCardClick: Function,
 }
 
 export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     {
-        project, handleCardClick
+        project
     }
 ) => {
-
     const dispatch = useDispatch()
-    const {closeProjectTab} = useTabs()
     const {execQuery} = useFaunaQuery()
     const selectedFolder = useSelector(SelectedFolderSelector) as Folder
     const allProjectFolders = useSelector(allProjectFoldersSelector)
@@ -56,7 +53,6 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
 
     function handleContextMenu(event: any) {
         event.preventDefault();
-        // dispatch(setFolderToRename(undefined))
         show(event)
     }
 
@@ -65,7 +61,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
             <div
                 className="w-[20%] p-[15px] flex flex-col justify-between h-[250px] border-2 border-green-200 mr-6 mt-4 rounded-lg hover:cursor-pointer hover:border-secondaryColor"
                 key={project.name} ref={drag}
-                onClick={() => handleCardClick(project)}
+                onClick={() => dispatch(addProjectTab(project))}
                 style={{opacity: isDragging ? 0.5 : 1}} onContextMenu={handleContextMenu}>
                 <h5 className="text-center" role="Handle" ref={dragPreview}>
                     {(project.name.length > 11) ? project.name.substr(0, 11) + '...' : project.name}
@@ -141,7 +137,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     <Item onClick={(p) => {
                         p.event.stopPropagation()
                         dispatch(removeProject(project.faunaDocumentId as string))
-                        closeProjectTab(project)
+                        dispatch(closeProjectTab(project.faunaDocumentId as string))
                         execQuery(deleteSimulationProjectFromFauna, project.faunaDocumentId)
                         execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
                         hideAll()

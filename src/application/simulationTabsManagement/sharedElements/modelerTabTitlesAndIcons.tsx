@@ -1,6 +1,5 @@
-import {GiAtom, GiAtomicSlashes, GiCubeforce, GiPowerButton} from "react-icons/gi";
+import {GiAtom, GiAtomicSlashes, GiCubeforce} from "react-icons/gi";
 import {AiOutlineBarChart} from "react-icons/ai";
-import React from "react";
 
 const modelerTabTitle = <div className="flex">
     <div className="w-[25%]"><GiCubeforce color={'#00ae52'} style={{width: "25px", height: "25px"}}/></div>

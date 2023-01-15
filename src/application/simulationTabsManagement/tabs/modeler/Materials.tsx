@@ -6,7 +6,7 @@ import {selectedProjectSelector} from "../../../../store/projectSlice";
 interface MaterialsProps {
 }
 
-export const Materials: React.FC<MaterialsProps> = ({}) => {
+export const Materials: React.FC<MaterialsProps> = () => {
 
     const selectedProject = useSelector(selectedProjectSelector)
 
@@ -34,7 +34,7 @@ export const Materials: React.FC<MaterialsProps> = ({}) => {
                 </div>
                 :
                 <div className="text-center">
-                    <img src="/noMaterialsIcon.png" className="mx-auto mt-[50px]"/>
+                    <img src="/noMaterialsIcon.png" className="mx-auto mt-[50px]" alt='No Materials'/>
                     <h5>No Materials</h5>
                     <p className="mt-[50px]">apply the materials on the model directly in the CAD</p>
                 </div>
