@@ -26,22 +26,11 @@ export const removeProjectFromStore = (state: ProjectState, projectToRemove: str
     if (selectedFolder){
         selectedFolder.projectList = selectedFolder.projectList.filter(p => p.faunaDocumentId !== projectToRemove)
     }
-    // if (selectedFolder?.name === "My Files") {
-    //     state.projects.projectList = state.projects.projectList.filter(p => p.faunaDocumentId !== projectToRemove)
-    // } else {
-    //     recursiveProjectRemove(state.projects.subFolders, state.selectedFolder.faunaDocumentId as string, projectToRemove)
-    // }
 }
 
 export const addFolderToStore = (state: ProjectState, folderToAdd: Folder) => {
     let selectedFolder = folderByID(state, state.selectedFolder)
     selectedFolder?.subFolders.push(folderToAdd)
-    // if (state.selectedFolder.name === "My Files") {
-    //     state.projects.subFolders.push(folderToAdd)
-    // } else {
-    //     recursiveFoldersAdd(state.projects.subFolders, (state.selectedFolder?.faunaDocumentId) as string, folderToAdd)
-    // }
-    // state.selectedFolder.subFolders.push(folderToAdd)
 }
 
 export const removeFolderFromStore = (state: ProjectState, folderToRemove: Folder) => {
@@ -49,12 +38,6 @@ export const removeFolderFromStore = (state: ProjectState, folderToRemove: Folde
     if (selectedFolder){
         selectedFolder.subFolders = selectedFolder.subFolders.filter(f => f.faunaDocumentId !== folderToRemove.faunaDocumentId)
     }
-    // if (state.selectedFolder.name === "My Files") {
-    //     state.projects.subFolders = state.projects.subFolders.filter(sf => sf.name !== folderToRemove.name)
-    // } else {
-    //     recursiveFolderRemove(state.projects.subFolders, state.selectedFolder.faunaDocumentId as string, folderToRemove)
-    // }
-    // state.selectedFolder.subFolders = state.selectedFolder.subFolders.filter(sf => sf.name !== folderToRemove.name)
 }
 
 export const moveProject = (state: ProjectState, projectToMove: Project, targetFolder: string) => {

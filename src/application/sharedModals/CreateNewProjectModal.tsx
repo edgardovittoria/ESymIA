@@ -44,7 +44,6 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         ports: [],
         signal: undefined,
         meshData: {
-          downloadPercentage: 0,
           meshApproved: false,
           meshGenerated: "Not Generated",
           quantum: [0.0, 0.0, 0.0],

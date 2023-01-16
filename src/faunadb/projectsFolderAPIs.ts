@@ -7,6 +7,7 @@ import {
     recursiveFindFolders,
     takeAllProjectsIn
 } from "../store/auxiliaryFunctions/managementProjectsAndFoldersFunction";
+import {deleteFileS3} from "../aws/mesherAPIs";
 
 
 

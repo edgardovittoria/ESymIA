@@ -22,6 +22,5 @@ export type MeshData = {
     mesh?: string,
     meshGenerated: "Not Generated" | "Generated" | "Generating",
     meshApproved: boolean,
-    downloadPercentage: number,
     quantum: [number, number, number]
 }

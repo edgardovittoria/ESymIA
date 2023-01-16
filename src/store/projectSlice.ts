@@ -14,6 +14,7 @@ import {
     takeAllProjectsIn
 } from "./auxiliaryFunctions/managementProjectsAndFoldersFunction";
 import { addProjectTab, closeProjectTab, selectMenuItem, selectTab } from './tabsAndMenuItemsSlice';
+import {deleteFileS3} from "../aws/mesherAPIs";
 
 
 export type ProjectState = {
@@ -56,6 +57,8 @@ export const ProjectSlice = createSlice({
             state.sharedElements = action.payload
         },
         removeProject(state: ProjectState, action: PayloadAction<string>) {
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload)
+            deleteFileS3(project?.meshData.mesh as string).catch((err) => console.log(err))
             removeProjectFromStore(state, action.payload)
         },
         moveObject(state: ProjectState, action: PayloadAction<{
@@ -182,9 +185,9 @@ export const ProjectSlice = createSlice({
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.mesh = action.payload
         },
-        setDownloadPercentage(state: ProjectState, action: PayloadAction<number>) {
+        unsetMesh(state: ProjectState) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
-            if (project) project.meshData.downloadPercentage = action.payload
+            if (project) project.meshData.mesh = undefined
         },
         setMeshGenerated(state: ProjectState, action: PayloadAction<"Not Generated" | "Generated" | "Generating">) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
@@ -220,7 +223,8 @@ export const {
     addProject, removeProject, importModel, selectProject, updateSimulation, addPorts,
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
     setProjectsFolderToUser, moveObject, removeFolder, shareProject, renameProject,
-    renameFolder, shareFolder, setQuantum, setMesh, setDownloadPercentage, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser
+    renameFolder, shareFolder, setQuantum, setMesh, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser,
+    unsetMesh
 } = ProjectSlice.actions
 
 const selectTabEffects = (state: ProjectState, tab: string) => {

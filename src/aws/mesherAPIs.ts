@@ -11,3 +11,12 @@ export const uploadFileS3 = async (file: File) => {
     }
 }
 
+export const deleteFileS3 = async (key: string) => {
+    const s3 = new ReactS3Client(s3Config);
+    try {
+        return await s3.deleteFile(key)
+    } catch (exception) {
+        console.log(exception);
+    }
+}
+
