@@ -37,7 +37,7 @@ export const TabsAndMenuItemsSlice = createSlice({
         },
         closeProjectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
             state.projectsTabs = state.projectsTabs.filter((projectTab) => projectTab.faunaDocumentId !== action.payload)
-            setTab(state, "DASHBOARD")
+            if (state.menuItemSelected !== 'Projects') setTab(state, "DASHBOARD")
         },
         selectMenuItem(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
             state.menuItemSelected = action.payload

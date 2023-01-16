@@ -243,7 +243,13 @@ export const folderByIDSelector = (state: { projects: ProjectState }, id: string
 export const mainFolderSelector = (state: { projects: ProjectState }) => state.projects.projects
 export const sharedElementsFolderSelector = (state: { projects: ProjectState }) => state.projects.sharedElements
 export const SelectedFolderSelector = (state: { projects: ProjectState }) => folderByID(state.projects, state.projects.selectedFolder);
-export const selectedProjectSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
+export const selectedProjectSelector = (state: { projects: ProjectState }) => {
+    let project = findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
+    if (project === undefined) {
+        project = findProjectByFaunaID(takeAllProjectsIn(state.projects.sharedElements), state.projects.selectedProject);
+    }
+    return project
+}
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
     let allFolders: Folder[] = []
