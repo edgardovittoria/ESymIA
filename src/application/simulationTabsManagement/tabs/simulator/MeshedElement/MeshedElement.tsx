@@ -22,26 +22,29 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 	const [mesherMatrices, setMesherMatrices] = useState<boolean[][][][]>([]);
 	const [modelMaterials, setModelMaterials] = useState<Material[]>([]);
 
+
 	useEffect(() => {
-		let entries = mesherOutput && Object.entries(mesherOutput.mesher_matrices);
-		let matrices: boolean[][][][] = [];
-		let materials: Material[] = [];
+		let matrices: boolean[][][][] = []
+		let entries = (mesherOutput) && Object.entries(mesherOutput.mesher_matrices)
+		let selectedEntries: [string, any][] = []
+		let materials: Material[] = []
+		let finalMaterialList: Material[] = []
 		if (mesherOutput) {
-			selectedMaterials.forEach((sm) => {
-				if (entries)
-					matrices = [
-						...matrices,
-						...entries.filter((e) => e[0] === sm)[1],
-					];
-				materials = [
-					...materials,
-					...materialsList.filter((m) => m.name === sm),
-				];
-			});
-			setModelMaterials(materials);
-			setMesherMatrices(matrices);
+
+			selectedMaterials.forEach(sm => {
+				if (entries) selectedEntries = [...selectedEntries, ...entries.filter(e => e[0] === sm)]
+				materials = [...materials, ...materialsList.filter(m => m.name === sm)]
+			})
+
+
+			selectedEntries.forEach(e => matrices.push(e[1]))
+			materials.forEach(m => finalMaterialList.push(m))
+
+			setModelMaterials(finalMaterialList)
+			setMesherMatrices(matrices)
+
 		}
-	}, [mesherOutput, meshGenerated, selectedMaterials, materialsList]);
+	}, [mesherOutput, meshGenerated, selectedMaterials]);
 
 	if (meshGenerated === "Generated") {
 		return (

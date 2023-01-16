@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {useDrag} from "react-dnd";
 import {Item, Menu, Separator, Submenu, useContextMenu} from "react-contexify";
 import {
     addIDInFolderProjectsList,
     deleteSimulationProjectFromFauna,
-    removeIDInFolderProjectsList
+    removeIDInFolderProjectsList, updateProjectInFauna
 } from "../../../../../../faunadb/projectsFolderAPIs";
 import {BiExport, BiRename, BiShareAlt, BiTrash} from "react-icons/bi";
 import {BsFillFolderSymlinkFill} from "react-icons/bs";
@@ -13,13 +13,14 @@ import {
     allProjectFoldersSelector,
     moveObject,
     removeProject,
-    SelectedFolderSelector} from "../../../../../../store/projectSlice";
+    SelectedFolderSelector
+} from "../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
-import { Project } from '../../../../../../model/Project';
-import { Folder } from '../../../../../../model/Folder';
-import { RenameProject } from './RenameProject';
-import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
-import { addProjectTab, closeProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
+import {Project} from '../../../../../../model/Project';
+import {Folder} from '../../../../../../model/Folder';
+import {RenameProject} from './RenameProject';
+import {SearchUserAndShare} from './searchUserAndShare/searchUserAndShare';
+import {addProjectTab, closeProjectTab} from '../../../../../../store/tabsAndMenuItemsSlice';
 
 interface DraggableProjectCardProps {
     project: Project,
@@ -76,78 +77,81 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     <hr className="mb-3"/>
                     {(project.description.length > 20) ? project.description.substr(0, 20) + '...' : project.description}
                 </div>
-                <Menu id={project.name}>
-                    <Submenu label={
-                        <>
-                            <BsFillFolderSymlinkFill
+                {project.owner.email === user.email &&
+                    <Menu id={project.name}>
+                        <Submenu label={
+                            <>
+                                <BsFillFolderSymlinkFill
+                                    className="mr-4 text-primaryColor w-[20px] h-[20px]"
+                                />
+                                Move
+                            </>
+                        }>
+                            {allProjectFolders.filter(n => n.faunaDocumentId !== selectedFolder.faunaDocumentId).map(f => {
+                                return (
+                                    <div key={f.faunaDocumentId}>
+                                        <Item onClick={(p) => {
+                                            p.event.stopPropagation()
+                                            dispatch(moveObject({
+                                                objectToMove: project,
+                                                targetFolder: f.faunaDocumentId as string
+                                            }))
+                                            execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
+                                            execQuery(updateProjectInFauna, {...project, parentFolder: f.faunaDocumentId} as Project)
+                                            execQuery(addIDInFolderProjectsList, project.faunaDocumentId, f)
+                                            hideAll()
+                                        }}>{f.name}</Item>
+                                    </div>
+                                )
+                            })}
+                        </Submenu>
+                        <Item onClick={(p) => {
+                            p.event.stopPropagation()
+                            setShowRename(true)
+                            hideAll()
+                        }}>
+                            <BiRename
                                 className="mr-4 text-primaryColor w-[20px] h-[20px]"
                             />
-                            Move
-                        </>
-                    }>
-                        {allProjectFolders.filter(n => n.faunaDocumentId !== selectedFolder.faunaDocumentId).map(f => {
-                            return (
-                                <div key={f.faunaDocumentId}>
-                                    <Item onClick={(p) => {
-                                        p.event.stopPropagation()
-                                        dispatch(moveObject({
-                                            objectToMove: project,
-                                            targetFolder: f.faunaDocumentId as string
-                                        }))
-                                        execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
-                                        execQuery(addIDInFolderProjectsList, project.faunaDocumentId, f)
-                                        hideAll()
-                                    }}>{f.name}</Item>
-                                </div>
-                            )
-                        })}
-                    </Submenu>
-                    <Item onClick={(p) => {
-                        p.event.stopPropagation()
-                        setShowRename(true)
-                        hideAll()
-                    }}>
-                        <BiRename
-                            className="mr-4 text-primaryColor w-[20px] h-[20px]"
-                        />
-                        Rename
-                    </Item>
-                    <Separator/>
-                    <Item onClick={(p) => {
-                        p.event.stopPropagation()
-                        exportSimulationProject(project)
-                        hideAll()
-                    }}>
-                        <BiExport
-                            className="mr-4 text-primaryColor w-[20px] h-[20px]"
-                        />
-                        Export
-                    </Item>
-                    <Item onClick={(p) => {
-                        p.event.stopPropagation()
-                        setShowSearchUser(true)
-                        hideAll()
-                    }} disabled={user.userRole !== 'Premium'}>
-                        <BiShareAlt
-                            className="mr-4 text-primaryColor w-[20px] h-[20px]"
-                        />
-                        Share
-                    </Item>
-                    <Separator/>
-                    <Item onClick={(p) => {
-                        p.event.stopPropagation()
-                        dispatch(removeProject(project.faunaDocumentId as string))
-                        dispatch(closeProjectTab(project.faunaDocumentId as string))
-                        execQuery(deleteSimulationProjectFromFauna, project.faunaDocumentId)
-                        execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
-                        hideAll()
-                    }}>
-                        <BiTrash
-                            className="mr-4 text-primaryColor w-[20px] h-[20px]"
-                        />
-                        Delete
-                    </Item>
-                </Menu>
+                            Rename
+                        </Item>
+                        <Separator/>
+                        <Item onClick={(p) => {
+                            p.event.stopPropagation()
+                            exportSimulationProject(project)
+                            hideAll()
+                        }}>
+                            <BiExport
+                                className="mr-4 text-primaryColor w-[20px] h-[20px]"
+                            />
+                            Export
+                        </Item>
+                        <Item onClick={(p) => {
+                            p.event.stopPropagation()
+                            setShowSearchUser(true)
+                            hideAll()
+                        }} disabled={user.userRole !== 'Premium'}>
+                            <BiShareAlt
+                                className="mr-4 text-primaryColor w-[20px] h-[20px]"
+                            />
+                            Share
+                        </Item>
+                        <Separator/>
+                        <Item onClick={(p) => {
+                            p.event.stopPropagation()
+                            dispatch(removeProject(project.faunaDocumentId as string))
+                            dispatch(closeProjectTab(project.faunaDocumentId as string))
+                            execQuery(deleteSimulationProjectFromFauna, project.faunaDocumentId)
+                            execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
+                            hideAll()
+                        }}>
+                            <BiTrash
+                                className="mr-4 text-primaryColor w-[20px] h-[20px]"
+                            />
+                            Delete
+                        </Item>
+                    </Menu>
+                }
             </div>
             {showRename && <RenameProject projectToRename={project} handleClose={() => setShowRename(false)}/>}
             {showSearchUser && <SearchUserAndShare setShowSearchUser={setShowSearchUser} projectToShare={project}/>}

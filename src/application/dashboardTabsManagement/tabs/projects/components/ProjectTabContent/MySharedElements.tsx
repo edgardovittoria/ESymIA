@@ -124,21 +124,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 						) : (
 							<>
 								<div className="text-center p-[20px]">
-									<img
-										src="/noProjectsIcon2.png"
-										className="my-[50px] mx-auto"
-										alt="No Projects Icon"
-									/>
-									<p>No projects for now.</p>
-									<button
-										className="button buttonPrimary"
-										data-toggle="modal"
-										data-target="#createNewProjectModal"
-										onClick={() => {
-											setShowModal(true);
-										}}>
-										CREATE YOUR FIRST PROJECT
-									</button>
+									No Shared Projects
 								</div>
 							</>
 						)}

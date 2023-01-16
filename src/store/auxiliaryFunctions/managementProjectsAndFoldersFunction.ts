@@ -60,36 +60,13 @@ export const removeFolderFromStore = (state: ProjectState, folderToRemove: Folde
 export const moveProject = (state: ProjectState, projectToMove: Project, targetFolder: string) => {
     removeProjectFromStore(state, projectToMove.faunaDocumentId as string)
     let targetF = folderByID(state, targetFolder)
-    targetF?.projectList.push(projectToMove)
-    // if (state.selectedFolder.name === "My Files") {
-    //     state.projects.projectList = state.projects.projectList.filter(p => p.faunaDocumentId !== projectToMove.faunaDocumentId)
-    // } else {
-    //     recursiveProjectRemove(state.projects.subFolders, state.selectedFolder.faunaDocumentId as string, projectToMove.faunaDocumentId as string)
-    // }
-    // state.selectedFolder.projectList = state.selectedFolder.projectList.filter(p => p.faunaDocumentId !== projectToMove.faunaDocumentId)
-    // if (targetFolder === state.projects.faunaDocumentId) {
-    //     state.projects.projectList.push(projectToMove)
-    // } else {
-    //     recursiveProjectAdd(state.projects.subFolders, targetFolder, projectToMove)
-    // }
+    targetF?.projectList.push({...projectToMove, parentFolder: targetF.faunaDocumentId} as Project)
 }
 
 export const moveFolder = (state: ProjectState, folderToMove: Folder, targetFolder: string) => {
     removeFolderFromStore(state, folderToMove)
     let targetF = folderByID(state, targetFolder)
-    targetF?.subFolders.push(folderToMove)
-    // if (state.selectedFolder.name === "My Files") {
-    //     state.projects.subFolders = state.projects.subFolders.filter(sf => sf.faunaDocumentId !== folderToMove.faunaDocumentId)
-    // } else {
-    //     recursiveFolderRemove(state.projects.subFolders, state.selectedFolder.faunaDocumentId as string, folderToMove)
-    // }
-    // state.selectedFolder.subFolders = state.selectedFolder.subFolders.filter(sf => sf.faunaDocumentId !== folderToMove.faunaDocumentId)
-    // let updatedFolder = { ...folderToMove, parent: targetFolder }
-    // if (targetFolder === state.projects.faunaDocumentId) {
-    //     state.projects.subFolders.push(updatedFolder)
-    // } else {
-    //     recursiveFoldersAdd(state.projects.subFolders, targetFolder, updatedFolder)
-    // }
+    targetF?.subFolders.push({...folderToMove, parent: targetF.faunaDocumentId} as Folder)
 }
 
 export const recursiveFindFolders = (folder: Folder, allFolders: Folder[]): Folder[] => {
