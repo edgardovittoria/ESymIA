@@ -56,8 +56,11 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     "S_Phase",
     "S_dB",
   ];
+  const matrix_Z = JSON.parse(simulation.results.matrix_Z);
+  const matrix_Y = JSON.parse(simulation.results.matrix_Y);
+  const matrix_S = JSON.parse(simulation.results.matrix_S);
   const chartsDataOptionsList = chartsOrderedIDs.map((id) =>
-    chartsDataOptionsFactory(simulation, project, id)
+    chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S)
   );
 
   const optionsWithScaleMode = (options: any, scaleMode: string) => {
@@ -103,7 +106,10 @@ export const ChartsList: React.FC<ChartsListProps> = ({
 const chartsDataOptionsFactory = (
   simulation: Simulation,
   project: Project | undefined,
-  label: string
+  label: string, 
+  matrix_Z: any,
+  matrix_Y: any,
+  matrix_S: any
 ) => {
   const colorArray = [
     "red",
@@ -119,9 +125,9 @@ const chartsDataOptionsFactory = (
       data: { datasets: [], labels: [] },
       options: {},
     };
-  let matrix_Z = eval(simulation.results.matrix_Z);
-  let matrix_Y = eval(simulation.results.matrix_Y);
-  let matrix_S = eval(simulation.results.matrix_S);
+  // let matrix_Z = eval(simulation.results.matrix_Z);
+  // let matrix_Y = eval(simulation.results.matrix_Y);
+  // let matrix_S = eval(simulation.results.matrix_S);
   switch (label) {
     case "R":
       // let matrix_Z_ModuleR: any = eval(simulation.results.matrix_Z);
