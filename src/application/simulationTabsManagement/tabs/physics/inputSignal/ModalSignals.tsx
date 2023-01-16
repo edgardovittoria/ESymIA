@@ -1,9 +1,9 @@
 import React, {Fragment, useState} from 'react';
-import {Signal, SignalValues} from "../../../../../model/Port";
 import {saveSignal} from "../../../../../faunadb/signalsAPIs";
 import { useFaunaQuery } from 'cad-library';
 import {useGetAvailableSignals} from "./useGetAvailableSignals"
 import {Dialog, Transition} from "@headlessui/react";
+import { Signal, SignalValues } from '../../../../../model/esymiaModels';
 
 interface ModalSignalsProps {
     showModalSignal: boolean,

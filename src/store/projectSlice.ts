@@ -1,20 +1,12 @@
 import { ImportActionParamsObject, UsersState } from 'cad-library';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Project } from "../model/Project";
-import { Port, Probe, RLCParams } from "../model/Port";
-import { Simulation } from "../model/Simulation";
-import { Signal } from "../model/Port";
-import { Folder, sharingInfoUser } from "../model/Folder";
 import {
-    addFolderToStore,
-    addProjectToStore,
-    moveFolder,
-    moveProject,
     recursiveFindFolders, removeFolderFromStore, removeProjectFromStore,
     takeAllProjectsIn
 } from "./auxiliaryFunctions/managementProjectsAndFoldersFunction";
 import { addProjectTab, closeProjectTab, selectMenuItem, selectTab } from './tabsAndMenuItemsSlice';
-import {deleteFileS3} from "../aws/mesherAPIs";
+import { deleteFileS3 } from "../aws/mesherAPIs";
+import { Folder, Port, Probe, Project, RLCParams, sharingInfoUser, Signal, Simulation } from '../model/esymiaModels';
 
 
 export type ProjectState = {
@@ -48,7 +40,8 @@ export const ProjectSlice = createSlice({
     } as ProjectState,
     reducers: {
         addProject(state: ProjectState, action: PayloadAction<Project>) {
-            addProjectToStore(state, action.payload)
+            let selectedFolder = folderByID(state, state.selectedFolder)
+            selectedFolder?.projectList.push(action.payload)
         },
         setProjectsFolderToUser(state: ProjectState, action: PayloadAction<Folder>) {
             state.projects = action.payload
@@ -61,15 +54,21 @@ export const ProjectSlice = createSlice({
             deleteFileS3(project?.meshData.mesh as string).catch((err) => console.log(err))
             removeProjectFromStore(state, action.payload)
         },
-        moveObject(state: ProjectState, action: PayloadAction<{
-            objectToMove: Project | Folder,
+        moveFolder(state: ProjectState, action: PayloadAction<{
+            objectToMove: Folder,
             targetFolder: string
         }>) {
-            if ("model" in action.payload.objectToMove) {
-                moveProject(state, action.payload.objectToMove, action.payload.targetFolder)
-            } else {
-                moveFolder(state, action.payload.objectToMove, action.payload.targetFolder)
-            }
+            removeFolderFromStore(state, action.payload.objectToMove)
+            let targetF = folderByID(state, action.payload.targetFolder)
+            targetF?.subFolders.push({ ...action.payload.objectToMove, parent: targetF.faunaDocumentId } as Folder)
+        },
+        moveProject(state: ProjectState, action: PayloadAction<{
+            objectToMove: Project,
+            targetFolder: string
+        }>) {
+            removeProjectFromStore(state, action.payload.objectToMove.faunaDocumentId as string)
+            let targetF = folderByID(state, action.payload.targetFolder)
+            targetF?.projectList.push({ ...action.payload.objectToMove, parentFolder: targetF.faunaDocumentId } as Project)
         },
         shareProject(state: ProjectState, action: PayloadAction<{ projectToShare: Project, user: sharingInfoUser }>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToShare.faunaDocumentId);
@@ -92,11 +91,8 @@ export const ProjectSlice = createSlice({
             }
         },
         renameFolder(state: ProjectState, action: PayloadAction<{ folderToRename: Folder, name: string }>) {
-            removeFolderFromStore(state, action.payload.folderToRename)
-            addFolderToStore(state, {
-                ...action.payload.folderToRename,
-                name: action.payload.name
-            })
+            let selectedFolder = folderByID(state, action.payload.folderToRename.faunaDocumentId)
+            if (selectedFolder) selectedFolder.name = action.payload.name
         },
         selectProject(state: ProjectState, action: PayloadAction<string | undefined>) {
             if (action.payload !== undefined) {
@@ -104,7 +100,8 @@ export const ProjectSlice = createSlice({
             }
         },
         addFolder(state: ProjectState, action: PayloadAction<Folder>) {
-            addFolderToStore(state, action.payload)
+            let selectedFolder = folderByID(state, state.selectedFolder)
+            selectedFolder?.subFolders.push(action.payload)
         },
         removeFolder(state: ProjectState, action: PayloadAction<Folder>) {
             removeFolderFromStore(state, action.payload)
@@ -210,7 +207,7 @@ export const ProjectSlice = createSlice({
                 selectTabEffects(state, action.payload.faunaDocumentId as string)
             })
             .addCase(selectMenuItem, (state, action) => {
-                if(action.payload === 'Projects'){
+                if (action.payload === 'Projects') {
                     state.selectedFolder = state.projects.faunaDocumentId
                 }
             })
@@ -222,7 +219,7 @@ export const {
     //qui vanno inserite tutte le azioni che vogliamo esporatare
     addProject, removeProject, importModel, selectProject, updateSimulation, addPorts,
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
-    setProjectsFolderToUser, moveObject, removeFolder, shareProject, renameProject,
+    setProjectsFolderToUser, removeFolder, shareProject, renameProject, moveFolder, moveProject,
     renameFolder, shareFolder, setQuantum, setMesh, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser,
     unsetMesh
 } = ProjectSlice.actions

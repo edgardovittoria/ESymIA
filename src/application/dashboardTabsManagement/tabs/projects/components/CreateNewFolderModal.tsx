@@ -1,10 +1,10 @@
 import React, {Fragment, useState} from 'react';
 import {useFaunaQuery, usersStateSelector} from "cad-library";
-import {Folder} from "../../../../../model/Folder";
 import {createFolderInFauna, addIDInSubFoldersList} from "../../../../../faunadb/projectsFolderAPIs";
 import {useDispatch, useSelector} from "react-redux";
 import {addFolder, SelectedFolderSelector} from "../../../../../store/projectSlice";
 import {Dialog, Transition} from "@headlessui/react";
+import { Folder } from '../../../../../model/esymiaModels';
 
 interface CreateNewFolderModalProps {
     setShowNewFolderModal: Function,

@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {SolverOutput} from "../model/SolverInputOutput";
+import { SolverOutput } from '../model/esymiaModels';
 
 export type SolverState = {
     output: SolverOutput | undefined,

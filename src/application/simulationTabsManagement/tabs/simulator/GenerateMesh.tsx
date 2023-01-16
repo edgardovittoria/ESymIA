@@ -2,7 +2,6 @@ import { ComponentEntity, exportToSTL, Material } from "cad-library";
 import React, { useEffect } from "react";
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import { useDispatch } from "react-redux";
-import { Project } from "../../../../model/Project";
 import {setSolverOutput} from "../../../../store/solverSlice";
 import {
   updateSimulation,
@@ -11,13 +10,12 @@ import {
   setMeshGenerated,
   setMeshApproved, unsetMesh,
 } from "../../../../store/projectSlice";
-import { Simulation } from "../../../../model/Simulation";
-import { SolverOutput } from "../../../../model/SolverInputOutput";
 import axios from "axios";
-import { MesherOutput } from "../../../../model/MesherInputOutput";
+import { MesherOutput } from "./MesherInputOutput";
 import {deleteFileS3, uploadFileS3} from "../../../../aws/mesherAPIs";
 import { selectMenuItem } from "../../../../store/tabsAndMenuItemsSlice";
 import {ImSpinner} from "react-icons/im";
+import { Project, Simulation, SolverOutput } from "../../../../model/esymiaModels";
 
 interface GenerateMeshProps {
   selectedProject: Project;
@@ -74,8 +72,6 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
 
   useEffect(() => {
     if (meshApproved && !selectedProject.simulation) {
-      // TODO: setSimulationStatus may be removed.
-      //dispatch(setSimulationStatus("started"));
       let simulation: Simulation = {
         name: selectedProject?.name + " - sim",
         started: Date.now().toString(),

@@ -1,13 +1,11 @@
 import { UsersState } from "cad-library";
 import faunadb from "faunadb";
+import { Folder, Project, sharingInfoUser } from "../model/esymiaModels";
 import { FaunaFolder, FaunaFolderDetails, FaunaProject, FaunaProjectDetails } from "../model/FaunaModels";
-import { Folder, sharingInfoUser } from "../model/Folder";
-import { Project } from "../model/Project";
 import {
     recursiveFindFolders,
     takeAllProjectsIn
 } from "../store/auxiliaryFunctions/managementProjectsAndFoldersFunction";
-import {deleteFileS3} from "../aws/mesherAPIs";
 
 
 

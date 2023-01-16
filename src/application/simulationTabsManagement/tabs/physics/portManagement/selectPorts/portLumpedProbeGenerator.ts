@@ -1,5 +1,5 @@
 import {CircleGeometryAttributes, ComponentEntity, TransformationParams} from "cad-library";
-import { Port, Probe, RLCParams } from "../../../../../../model/Port";
+import { Port, Probe, RLCParams } from "../../../../../../model/esymiaModels";
 
 export function getDefaultPort(key: number){
     let port: Port = {

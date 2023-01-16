@@ -1,5 +1,5 @@
 import faunadb from "faunadb"
-import { Simulation } from "../model/Simulation";
+import { Simulation } from "../model/esymiaModels";
 
 export const getSimulationByName = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, name: string) => {
     const response = await faunaClient.query(

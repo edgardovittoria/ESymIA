@@ -10,7 +10,7 @@ import {
 } from "chart.js";
 import React from "react";
 import {Line} from "react-chartjs-2";
-import { Signal } from "../../../../../../model/Port";
+import { Signal } from "../../../../../../model/esymiaModels";
 
 ChartJS.register(
     CategoryScale,

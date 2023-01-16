@@ -1,5 +1,5 @@
-import { Signal } from "../model/Port";
 import faunadb from "faunadb"
+import { Signal } from "../model/esymiaModels";
 
 export async function getSignals(faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query) {
     const response = await faunaClient.query(

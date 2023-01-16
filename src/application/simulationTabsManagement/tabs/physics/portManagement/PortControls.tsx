@@ -1,8 +1,8 @@
-import {Port} from "../../../../../model/Port";
-import React, {FC, useEffect, useRef} from "react";
+import {FC, useEffect, useRef} from "react";
 import {Object3DNode, useThree} from "@react-three/fiber";
 import * as THREE from "three";
 import {TransformControls} from "@react-three/drei";
+import { Port } from "../../../../../model/esymiaModels";
 
 interface PortControlsProps {
     selectedPort: Port,

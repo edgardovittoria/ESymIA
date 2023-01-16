@@ -1,8 +1,8 @@
 import React, {useEffect, useRef} from 'react';
-import {Probe} from "../../../../../model/Port";
 import {Object3DNode, useThree} from "@react-three/fiber";
 import * as THREE from "three";
 import {TransformControls} from "@react-three/drei";
+import { Probe } from '../../../../../model/esymiaModels';
 
 interface ProbeControlsProps {
     selectedProbe: Probe,

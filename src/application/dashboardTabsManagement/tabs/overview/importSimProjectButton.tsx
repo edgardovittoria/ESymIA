@@ -1,6 +1,6 @@
 import { FC, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { Project } from "../../../../model/Project";
+import { Project } from "../../../../model/esymiaModels";
 import { addProject } from "../../../../store/projectSlice";
 import { selectMenuItem } from "../../../../store/tabsAndMenuItemsSlice";
 

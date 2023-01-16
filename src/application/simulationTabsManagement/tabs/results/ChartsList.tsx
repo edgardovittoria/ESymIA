@@ -1,5 +1,4 @@
 import React from "react";
-import { Simulation } from "../../../../model/Simulation";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,8 +10,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Project } from "../../../../model/Project";
 import { Line } from "react-chartjs-2";
+import { Project, Simulation } from "../../../../model/esymiaModels";
 
 ChartJS.register(
   CategoryScale,

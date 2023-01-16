@@ -1,8 +1,7 @@
 import React, {Fragment} from 'react';
 import {SignalChart} from "./components/SignalChart";
-import {Signal} from "../../../../../model/Port";
-import {Project} from "../../../../../model/Project";
 import {Dialog, Transition} from "@headlessui/react";
+import { Project, Signal } from '../../../../../model/esymiaModels';
 
 interface ModalInputSignalProps {
     show: boolean,

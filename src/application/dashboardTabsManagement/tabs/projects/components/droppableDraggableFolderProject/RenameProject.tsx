@@ -3,8 +3,8 @@ import {Dialog, Transition} from "@headlessui/react";
 import {useDispatch} from "react-redux";
 import {useFaunaQuery} from "cad-library";
 import { renameProject } from '../../../../../../store/projectSlice';
-import { Project } from '../../../../../../model/Project';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
+import { Project } from '../../../../../../model/esymiaModels';
 
 
 interface RenameProjectProps {

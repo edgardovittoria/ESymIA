@@ -4,8 +4,8 @@ import {Menu, Transition} from "@headlessui/react";
 import {FiChevronDown} from "react-icons/fi";
 import {AiOutlineThunderbolt} from "react-icons/ai";
 import {getDefaultLumped, getDefaultPort, getDefaultProbe} from "./portLumpedProbeGenerator";
-import { Project } from '../../../../../../model/Project';
 import { addPorts } from '../../../../../../store/projectSlice';
+import { Project } from '../../../../../../model/esymiaModels';
 
 interface SelectPortsProps {
     selectedProject: Project,
@@ -22,9 +22,10 @@ export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
     }
     return (
         <>
-            < div className="absolute left-[20%] top-[160px]">
+            < div className={`${(selectedProject.simulation?.status === 'Completed') && 'opacity-40'} absolute left-[20%] top-[160px]`}>
                 <Menu as="div" className="relative inline-block text-left">
                     <Menu.Button
+                        disabled = {selectedProject.simulation?.status === 'Completed'}
                         className="inline-flex w-full justify-center rounded-md bg-white px-2 py-2 text-sm font-medium text-black hover:bg-opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
                         <AiOutlineThunderbolt
                             className="ml-0 mr-2 h-5 w-5 text-green-300"

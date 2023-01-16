@@ -10,8 +10,7 @@ import {
     updateProjectInFauna,
 } from "../../../../../../../faunadb/projectsFolderAPIs";
 import axios from "axios";
-import { Folder, sharingInfoUser } from '../../../../../../../model/Folder';
-import { Project } from '../../../../../../../model/Project';
+import { Folder, Project, sharingInfoUser } from '../../../../../../../model/esymiaModels';
 
 interface SearchUserAndShareProps {
     setShowSearchUser: (v: boolean) => void,

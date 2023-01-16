@@ -11,16 +11,15 @@ import {BsFillFolderSymlinkFill} from "react-icons/bs";
 import {useDispatch, useSelector} from "react-redux";
 import {
     allProjectFoldersSelector,
-    moveObject,
+    moveProject,
     removeProject,
     SelectedFolderSelector
 } from "../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
-import {Project} from '../../../../../../model/Project';
-import {Folder} from '../../../../../../model/Folder';
 import {RenameProject} from './RenameProject';
 import {SearchUserAndShare} from './searchUserAndShare/searchUserAndShare';
 import {addProjectTab, closeProjectTab} from '../../../../../../store/tabsAndMenuItemsSlice';
+import { Folder, Project } from '../../../../../../model/esymiaModels';
 
 interface DraggableProjectCardProps {
     project: Project,
@@ -92,7 +91,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                                     <div key={f.faunaDocumentId}>
                                         <Item onClick={(p) => {
                                             p.event.stopPropagation()
-                                            dispatch(moveObject({
+                                            dispatch(moveProject({
                                                 objectToMove: project,
                                                 targetFolder: f.faunaDocumentId as string
                                             }))

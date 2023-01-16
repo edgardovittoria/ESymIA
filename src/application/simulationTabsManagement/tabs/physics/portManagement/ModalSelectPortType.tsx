@@ -1,9 +1,8 @@
 import React, {Fragment} from 'react';
-import {Port, Probe} from "../../../../../model/Port";
-
 import {useDispatch} from "react-redux";
 import {setPortType} from "../../../../../store/projectSlice";
 import {Dialog, Transition} from "@headlessui/react";
+import { Port, Probe } from '../../../../../model/esymiaModels';
 
 interface ModalSelectPortTypeProps {
     show: boolean,

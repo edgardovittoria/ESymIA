@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from "react";
-import { Project } from "../../model/Project";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   CanvasState,
@@ -15,8 +14,8 @@ import {
   SelectedFolderSelector,
 } from "../../store/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { sharingInfoUser } from "../../model/Folder";
 import { addProjectTab } from "../../store/tabsAndMenuItemsSlice";
+import { Project, sharingInfoUser } from "../../model/esymiaModels";
 
 interface CreateNewProjectModalProps {
   setShow: Function;

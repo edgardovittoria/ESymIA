@@ -9,9 +9,9 @@ import { ComponentEntity, Material } from "cad-library";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
-import { Project } from "../../../../model/Project";
-import { MesherOutput } from "../../../../model/MesherInputOutput";
+import { MesherOutput } from "./MesherInputOutput";
 import { s3 } from "../../../../aws/s3Config";
+import { Project } from "../../../../model/esymiaModels";
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;

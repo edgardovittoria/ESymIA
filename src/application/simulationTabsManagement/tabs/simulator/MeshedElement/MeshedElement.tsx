@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { TransformControls } from "@react-three/drei";
 import { Material } from "cad-library";
-import { MesherOutput } from "../../../../../model/MesherInputOutput";
+import { MesherOutput } from "../MesherInputOutput";
 import { MyInstancedMesh } from "./components/MyInstancedMesh";
-import { Project } from "../../../../../model/Project";
+import { Project } from "../../../../../model/esymiaModels";
 
 interface PanelContentProps {
 	selectedMaterials: string[];

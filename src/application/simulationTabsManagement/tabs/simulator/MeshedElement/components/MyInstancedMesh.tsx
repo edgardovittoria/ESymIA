@@ -1,8 +1,8 @@
 import React, {useEffect, useRef} from 'react';
 import {InstancedMesh, Object3D} from "three";
 import {Material} from "cad-library";
-import { MesherOutput } from '../../../../../../model/MesherInputOutput';
-import { Project } from '../../../../../../model/Project';
+import { MesherOutput } from '../../MesherInputOutput';
+import { Project } from '../../../../../../model/esymiaModels';
 
 
 interface InstancedMeshProps {

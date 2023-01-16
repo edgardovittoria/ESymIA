@@ -1,10 +1,8 @@
 import React from "react";
 import { FaCheck, FaPauseCircle } from "react-icons/fa";
-import { Simulation } from "../../../model/Simulation";
 import { TiDelete } from "react-icons/ti";
 import { MdWatchLater } from "react-icons/md";
 import { AiOutlineBarChart } from "react-icons/ai";
-import { Folder } from "../../../model/Folder";
 import {
   findProjectByFaunaID,
   mainFolderSelector,
@@ -13,6 +11,7 @@ import {
 } from "../../../store/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { addProjectTab, projectsTabsSelector, selectMenuItem, selectTab } from "../../../store/tabsAndMenuItemsSlice";
+import { Folder, Simulation } from "../../../model/esymiaModels";
 
 interface SimulationsProps {}
 

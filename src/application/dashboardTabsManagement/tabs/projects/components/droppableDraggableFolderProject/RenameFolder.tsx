@@ -3,8 +3,8 @@ import {useDispatch} from "react-redux";
 import {useFaunaQuery} from "cad-library";
 import {Dialog, Transition} from "@headlessui/react";
 import {updateFolderInFauna} from "../../../../../../faunadb/projectsFolderAPIs";
-import { Folder } from '../../../../../../model/Folder';
 import { renameFolder } from '../../../../../../store/projectSlice';
+import { Folder } from '../../../../../../model/esymiaModels';
 
 interface RenameFolderProps {
     folderToRename: Folder,

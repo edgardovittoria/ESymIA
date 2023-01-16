@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Project } from '../model/Project';
+import { Project } from '../model/esymiaModels';
 
 const getMenuItemsArrayBasedOnTabType = (tabType: string) => {
     switch (tabType) {

@@ -16,15 +16,13 @@ import {BiRename, BiShareAlt, BiTrash} from "react-icons/bi";
 import {BsFillFolderSymlinkFill} from "react-icons/bs"
 import {useDispatch, useSelector} from "react-redux";
 import {
-    allProjectFoldersSelector,
-    moveObject, removeFolder, SelectedFolderSelector,
+    allProjectFoldersSelector, moveFolder, moveProject, removeFolder, SelectedFolderSelector,
     selectFolder
 } from "../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
-import {Folder} from '../../../../../../model/Folder';
-import {Project} from '../../../../../../model/Project';
 import {RenameFolder} from './RenameFolder';
 import {SearchUserAndShare} from './searchUserAndShare/searchUserAndShare';
+import { Folder, Project } from '../../../../../../model/esymiaModels';
 
 interface DroppableAndDraggableFolderProps {
     folder: Folder,
@@ -74,15 +72,19 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
         if (dragDone) {
             let objectToMove: Project | Folder = dragAndDropManager.getMonitor().getItem()
             if (objectToMove.faunaDocumentId !== dropTargetFolder.faunaDocumentId) {
-                dispatch(moveObject({
-                    objectToMove: objectToMove,
-                    targetFolder: dropTargetFolder.faunaDocumentId as string
-                }))
                 if ("model" in objectToMove) {
+                    dispatch(moveProject({
+                        objectToMove: objectToMove,
+                        targetFolder: dropTargetFolder.faunaDocumentId as string
+                    }))
                     execQuery(removeIDInFolderProjectsList, objectToMove.faunaDocumentId, selectedFolder)
                     execQuery(updateProjectInFauna, {...objectToMove, parentFolder: dropTargetFolder.faunaDocumentId} as Project)
                     execQuery(addIDInFolderProjectsList, objectToMove.faunaDocumentId, dropTargetFolder)
                 } else {
+                    dispatch(moveFolder({
+                        objectToMove: objectToMove,
+                        targetFolder: dropTargetFolder.faunaDocumentId as string
+                    }))
                     execQuery(removeIDInSubFoldersList, objectToMove.faunaDocumentId, selectedFolder)
                     execQuery(updateFolderInFauna, {...objectToMove, parent: dropTargetFolder.faunaDocumentId} as Folder)
                     execQuery(addIDInSubFoldersList, objectToMove.faunaDocumentId, dropTargetFolder)
@@ -136,7 +138,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                                         <Item
                                             onClick={(p) => {
                                                 p.event.stopPropagation()
-                                                dispatch(moveObject({
+                                                dispatch(moveFolder({
                                                     objectToMove: folder,
                                                     targetFolder: f.faunaDocumentId as string
                                                 }))
