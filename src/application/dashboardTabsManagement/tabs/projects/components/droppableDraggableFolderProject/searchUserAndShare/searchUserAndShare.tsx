@@ -131,6 +131,8 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
                                                             if(projectToShare){
                                                                 dispatch(shareProject({projectToShare: projectToShare, user: {userEmail: selected, read: true, write:true}}))
                                                                 execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...projectToShare.sharedWith as sharingInfoUser[], {userEmail: selected, read: true, write:true} as sharingInfoUser]})
+                                                                setShowSearchUser(false)
+                                                                window.alert("Sharing Successful!!")
                                                             }
                                                             else if(folderToShare){
                                                                 dispatch(shareFolder({folderToShare: folderToShare.faunaDocumentId as string, user: {userEmail: selected, read: true, write:true}}))
