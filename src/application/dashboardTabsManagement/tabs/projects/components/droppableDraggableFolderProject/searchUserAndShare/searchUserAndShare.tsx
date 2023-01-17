@@ -53,8 +53,13 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
 
     useEffect(() => {
         if(shareDone){
-            execQuery(recursiveUpdateSharingInfoFolderInFauna, folderToShare)
-            setShowSearchUser(false)
+            execQuery(recursiveUpdateSharingInfoFolderInFauna, folderToShare).then(() => {
+                setShowSearchUser(false)
+                window.alert("Sharing Successful!!")
+            }).catch((err) => {
+                setShowSearchUser(false)
+                window.alert("Sharing Failed!! Please try again!")
+            })
         }
     }, [folderToShare?.sharedWith])
 
@@ -130,9 +135,14 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
                                                             setShareDone(true)
                                                             if(projectToShare){
                                                                 dispatch(shareProject({projectToShare: projectToShare, user: {userEmail: selected, read: true, write:true}}))
-                                                                execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...projectToShare.sharedWith as sharingInfoUser[], {userEmail: selected, read: true, write:true} as sharingInfoUser]})
-                                                                setShowSearchUser(false)
-                                                                window.alert("Sharing Successful!!")
+                                                                execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...projectToShare.sharedWith as sharingInfoUser[], {userEmail: selected, read: true, write:true} as sharingInfoUser]}).then(() => {
+                                                                    setShowSearchUser(false)
+                                                                    window.alert("Sharing Successful!!")
+                                                                }).catch((err) => {
+                                                                    setShowSearchUser(false)
+                                                                    window.alert("Sharing Failed!! Please try again!")
+                                                                })
+
                                                             }
                                                             else if(folderToShare){
                                                                 dispatch(shareFolder({folderToShare: folderToShare.faunaDocumentId as string, user: {userEmail: selected, read: true, write:true}}))
