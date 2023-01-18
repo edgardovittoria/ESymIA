@@ -8,6 +8,7 @@ import {
     deleteSimulationProjectFromFauna,
     getAllProjectsWithinThisFolder,
     getAllSubFoldersOfThisOne,
+    moveFolderInFauna,
     removeIDInFolderProjectsList,
     removeIDInSubFoldersList, updateFolderInFauna, updateProjectInFauna
 } from "../../../../../../faunadb/projectsFolderAPIs";
@@ -85,9 +86,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                         objectToMove: objectToMove,
                         targetFolder: dropTargetFolder.faunaDocumentId as string
                     }))
-                    execQuery(removeIDInSubFoldersList, objectToMove.faunaDocumentId, selectedFolder)
-                    execQuery(updateFolderInFauna, {...objectToMove, parent: dropTargetFolder.faunaDocumentId} as Folder)
-                    execQuery(addIDInSubFoldersList, objectToMove.faunaDocumentId, dropTargetFolder)
+                    execQuery(moveFolderInFauna, {...objectToMove, parent: dropTargetFolder.faunaDocumentId} as Folder, objectToMove.parent)
                 }
             }
         }
@@ -137,14 +136,12 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                                     <div key={f.faunaDocumentId}>
                                         <Item
                                             onClick={(p) => {
-                                                p.event.stopPropagation()
+                                                p.event.stopPropagation()                                              
                                                 dispatch(moveFolder({
                                                     objectToMove: folder,
                                                     targetFolder: f.faunaDocumentId as string
                                                 }))
-                                                execQuery(removeIDInSubFoldersList, folder.faunaDocumentId, selectedFolder)
-                                                execQuery(updateFolderInFauna, {...folder, parent: f.faunaDocumentId} as Folder)
-                                                execQuery(addIDInSubFoldersList, folder.faunaDocumentId, f)
+                                                execQuery(moveFolderInFauna, {...folder, parent: f.faunaDocumentId} as Folder, folder.parent)
                                                 hideAll()
                                             }}>{f.name}</Item>
                                     </div>
@@ -176,11 +173,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                         <Separator/>
                         <Item onClick={(p) => {
                             p.event.stopPropagation()
-                            let folderIDsToDelete = [folder.faunaDocumentId, ...getAllSubFoldersOfThisOne(folder)]
-                            let projectsIDsToDelete = getAllProjectsWithinThisFolder(folder)
-                            folderIDsToDelete.forEach(f => execQuery(deleteFolderFromFauna, f))
-                            projectsIDsToDelete.forEach(p => execQuery(deleteSimulationProjectFromFauna, p))
-                            execQuery(removeIDInSubFoldersList, folder.faunaDocumentId, selectedFolder)
+                            execQuery(deleteFolderFromFauna, folder.faunaDocumentId, folder.parent)
                             dispatch(removeFolder(folder))
                             hideAll()
                         }}>

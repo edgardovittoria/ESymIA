@@ -200,18 +200,15 @@ export const createFolderInFauna = async (faunaClient: faunadb.Client, faunaQuer
 
 }
 
-export const deleteFolderFromFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToDelete: string) => {
-    const response = await faunaClient.query(
-        faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderToDelete))
-    )
-        .catch((err) => console.error(
-            'Error: [%s] %s: %s',
-            err.name,
-            err.message,
-            err.errors()[0].description,
-        ));
-    return response
-
+export const deleteFolderFromFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToDelete: string, oldParent: string) => {
+    faunaClient.query(faunaQuery.Call('get_all_subfolders_of_folder', folderToDelete)).then(subFolders => {
+        faunaClient.query(faunaQuery.Call('get_all_projects_recursively_of_folder', folderToDelete)).then(projects => {
+            faunaClient.query( faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderToDelete)));
+            (subFolders as string[]).forEach(sb => faunaClient.query( faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('Folders'), sb))));
+            (projects as string[]).forEach(p => faunaClient.query( faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('SimulationProjects'), p))))
+            faunaClient.query(faunaQuery.Call('remove_subfolder_from_folder', folderToDelete, oldParent))
+        })
+    })
 }
 
 export const addIDInSubFoldersList = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderFaunaID: string, selectedFolder: Folder) => {
@@ -410,6 +407,18 @@ export const updateFolderInFauna = async (faunaClient: faunadb.Client, faunaQuer
             err.errors()[0].description,
         ));
     return response
+
+}
+
+export const moveFolderInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToUpdate: Folder, oldParent: string) => {
+    faunaClient.query(
+        faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderToUpdate.faunaDocumentId), {
+            data: convertFolderInFaunaFolderDetails(folderToUpdate)
+        })
+    ).then(() => {
+        faunaClient.query(faunaQuery.Call('remove_subfolder_from_folder', folderToUpdate.faunaDocumentId as string, oldParent))
+        faunaClient.query(faunaQuery.Call('add_subfolder_to_folder', folderToUpdate.faunaDocumentId as string, folderToUpdate.parent))
+    })
 
 }
 
