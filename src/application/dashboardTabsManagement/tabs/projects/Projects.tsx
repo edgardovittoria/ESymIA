@@ -63,7 +63,7 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 									: "text-blue-100 hover:bg-white/[0.12] hover:text-white"
 							)
 						}>
-						My Shared Elements
+						Shared With Me
 					</Tab>
 				</Tab.List>
 				<Tab.Panels>
