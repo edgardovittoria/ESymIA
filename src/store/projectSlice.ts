@@ -50,8 +50,8 @@ export const ProjectSlice = createSlice({
             state.sharedElements = action.payload
         },
         removeProject(state: ProjectState, action: PayloadAction<string>) {
-            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload)
-            deleteFileS3(project?.meshData.mesh as string).catch((err) => console.log(err))
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload);
+            (project?.meshData.mesh) && deleteFileS3(project?.meshData.mesh as string).catch((err) => console.log(err))
             removeProjectFromStore(state, action.payload)
         },
         moveFolder(state: ProjectState, action: PayloadAction<{
@@ -226,7 +226,6 @@ export const {
 
 const selectTabEffects = (state: ProjectState, tab: string) => {
     if (tab === "DASHBOARD") {
-        state.selectedFolder = state.projects.faunaDocumentId
         state.selectedProject = undefined
     }
     else {

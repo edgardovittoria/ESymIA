@@ -2,16 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {IoMdFolder} from "react-icons/io";
 import {useDrag, useDragDropManager, useDrop} from "react-dnd";
 import {
-    addIDInFolderProjectsList,
-    addIDInSubFoldersList,
     deleteFolderFromFauna,
-    deleteSimulationProjectFromFauna,
-    getAllProjectsWithinThisFolder,
-    getAllSubFoldersOfThisOne,
     moveFolderInFauna,
-    removeIDInFolderProjectsList,
-    removeIDInSubFoldersList, updateFolderInFauna, updateProjectInFauna
-} from "../../../../../../faunadb/projectsFolderAPIs";
+    moveProjectInFauna} from "../../../../../../faunadb/projectsFolderAPIs";
 import {Menu, Item, Separator, useContextMenu, Submenu} from 'react-contexify';
 import {BiRename, BiShareAlt, BiTrash} from "react-icons/bi";
 import {BsFillFolderSymlinkFill} from "react-icons/bs"
@@ -78,9 +71,7 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                         objectToMove: objectToMove,
                         targetFolder: dropTargetFolder.faunaDocumentId as string
                     }))
-                    execQuery(removeIDInFolderProjectsList, objectToMove.faunaDocumentId, selectedFolder)
-                    execQuery(updateProjectInFauna, {...objectToMove, parentFolder: dropTargetFolder.faunaDocumentId} as Project)
-                    execQuery(addIDInFolderProjectsList, objectToMove.faunaDocumentId, dropTargetFolder)
+                    execQuery(moveProjectInFauna, {...objectToMove, parentFolder: dropTargetFolder.faunaDocumentId} as Project, objectToMove.parentFolder)
                 } else {
                     dispatch(moveFolder({
                         objectToMove: objectToMove,

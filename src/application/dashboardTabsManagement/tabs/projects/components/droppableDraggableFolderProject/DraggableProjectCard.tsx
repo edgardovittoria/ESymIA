@@ -2,10 +2,9 @@ import React, {useState} from 'react';
 import {useDrag} from "react-dnd";
 import {Item, Menu, Separator, Submenu, useContextMenu} from "react-contexify";
 import {
-    addIDInFolderProjectsList,
     deleteSimulationProjectFromFauna,
-    removeIDInFolderProjectsList, updateProjectInFauna
-} from "../../../../../../faunadb/projectsFolderAPIs";
+    moveProjectInFauna,
+    removeIDInFolderProjectsList} from "../../../../../../faunadb/projectsFolderAPIs";
 import {BiExport, BiRename, BiShareAlt, BiTrash} from "react-icons/bi";
 import {BsFillFolderSymlinkFill} from "react-icons/bs";
 import {useDispatch, useSelector} from "react-redux";
@@ -95,9 +94,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                                                 objectToMove: project,
                                                 targetFolder: f.faunaDocumentId as string
                                             }))
-                                            execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
-                                            execQuery(updateProjectInFauna, {...project, parentFolder: f.faunaDocumentId} as Project)
-                                            execQuery(addIDInFolderProjectsList, project.faunaDocumentId, f)
+                                            execQuery(moveProjectInFauna, {...project, parentFolder: f.faunaDocumentId} as Project, project.parentFolder)
                                             hideAll()
                                         }}>{f.name}</Item>
                                     </div>
@@ -141,7 +138,6 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                             dispatch(removeProject(project.faunaDocumentId as string))
                             dispatch(closeProjectTab(project.faunaDocumentId as string))
                             execQuery(deleteSimulationProjectFromFauna, project.faunaDocumentId)
-                            execQuery(removeIDInFolderProjectsList, project.faunaDocumentId, selectedFolder)
                             hideAll()
                         }}>
                             <BiTrash

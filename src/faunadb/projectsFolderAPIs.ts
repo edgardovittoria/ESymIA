@@ -203,9 +203,9 @@ export const createFolderInFauna = async (faunaClient: faunadb.Client, faunaQuer
 export const deleteFolderFromFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToDelete: string, oldParent: string) => {
     faunaClient.query(faunaQuery.Call('get_all_subfolders_of_folder', folderToDelete)).then(subFolders => {
         faunaClient.query(faunaQuery.Call('get_all_projects_recursively_of_folder', folderToDelete)).then(projects => {
-            faunaClient.query( faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderToDelete)));
-            (subFolders as string[]).forEach(sb => faunaClient.query( faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('Folders'), sb))));
-            (projects as string[]).forEach(p => faunaClient.query( faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('SimulationProjects'), p))))
+            faunaClient.query(faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderToDelete)));
+            (subFolders as string[]).forEach(sb => faunaClient.query(faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('Folders'), sb))));
+            (projects as string[]).forEach(p => faunaClient.query(faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('SimulationProjects'), p))))
             faunaClient.query(faunaQuery.Call('remove_subfolder_from_folder', folderToDelete, oldParent))
         })
     })
@@ -253,18 +253,11 @@ export const removeIDInSubFoldersList = async (faunaClient: faunadb.Client, faun
 }
 
 
-export const deleteSimulationProjectFromFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, projectToDelete: string) => {
-    const response = await faunaClient.query(
-        faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('SimulationProjects'), projectToDelete))
+export const deleteSimulationProjectFromFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, projectToDelete: string, parentFolder: string) => {
+    faunaClient.query(faunaQuery.Delete(faunaQuery.Ref(faunaQuery.Collection('SimulationProjects'), projectToDelete))).then(() => {
+        (parentFolder) && faunaClient.query(faunaQuery.Call('remove_project_from_folder', projectToDelete, parentFolder))
+    }
     )
-        .catch((err) => console.error(
-            'Error: [%s] %s: %s',
-            err.name,
-            err.message,
-            err.errors()[0].description,
-        ));
-    return response
-
 }
 
 
@@ -410,14 +403,28 @@ export const updateFolderInFauna = async (faunaClient: faunadb.Client, faunaQuer
 
 }
 
-export const moveFolderInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToUpdate: Folder, oldParent: string) => {
+export const moveFolderInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToMove: Folder, oldParent: string) => {
     faunaClient.query(
-        faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderToUpdate.faunaDocumentId), {
-            data: convertFolderInFaunaFolderDetails(folderToUpdate)
+        faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('Folders'), folderToMove.faunaDocumentId), {
+            data: convertFolderInFaunaFolderDetails(folderToMove)
         })
     ).then(() => {
-        faunaClient.query(faunaQuery.Call('remove_subfolder_from_folder', folderToUpdate.faunaDocumentId as string, oldParent))
-        faunaClient.query(faunaQuery.Call('add_subfolder_to_folder', folderToUpdate.faunaDocumentId as string, folderToUpdate.parent))
+        faunaClient.query(faunaQuery.Call('remove_subfolder_from_folder', folderToMove.faunaDocumentId as string, oldParent))
+        faunaClient.query(faunaQuery.Call('add_subfolder_to_folder', folderToMove.faunaDocumentId as string, folderToMove.parent))
+    })
+
+}
+
+export const moveProjectInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, projectToUpdate: Project, oldParent: string) => {
+    faunaClient.query(
+        faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('SimulationProjects'), projectToUpdate.faunaDocumentId), {
+            data: {
+                ...projectToUpdate
+            } as FaunaProjectDetails
+        })
+    ).then(() => {
+        faunaClient.query(faunaQuery.Call('remove_project_from_folder', projectToUpdate.faunaDocumentId as string, oldParent))
+        faunaClient.query(faunaQuery.Call('add_project_to_folder', projectToUpdate.faunaDocumentId as string, projectToUpdate.parentFolder as string))
     })
 
 }
@@ -504,28 +511,28 @@ export const getSharedFolders = async (
 
 export const getFolderByFaunaID = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, faunaID: string) => {
     const response = await faunaClient.query(
-        faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("get_folder_by_id"), faunaID))),   
-            )
+        faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("get_folder_by_id"), faunaID))),
+    )
         .catch((err) => console.error(
             'Error: [%s] %s: %s',
             err.name,
             err.message,
             err.errors()[0].description,
         ));
-    return {id: faunaID, folder: response} as FaunaFolder
+    return { id: faunaID, folder: response } as FaunaFolder
 }
 
 export const getProjectByFaunaID = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, faunaID: string) => {
     const response = await faunaClient.query(
-        faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("get_project_by_id"), faunaID))),   
-            )
+        faunaQuery.Select(["data"], faunaQuery.Get(faunaQuery.Match(faunaQuery.Index("get_project_by_id"), faunaID))),
+    )
         .catch((err) => console.error(
             'Error: [%s] %s: %s',
             err.name,
             err.message,
             err.errors()[0].description,
         ));
-    return {id: faunaID, project: response} as FaunaProject
+    return { id: faunaID, project: response } as FaunaProject
 }
 
 export const recursiveUpdateSharingInfoFolderInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, folderToUpdate: Folder) => {
