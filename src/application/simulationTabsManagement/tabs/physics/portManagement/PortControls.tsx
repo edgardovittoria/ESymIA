@@ -7,11 +7,12 @@ import { Port } from "../../../../../model/esymiaModels";
 interface PortControlsProps {
     selectedPort: Port,
     updatePortPosition: Function
+    setSavedPortParameters: Function
 }
 
 export const PortControls: FC<PortControlsProps> = (
     {
-        selectedPort, updatePortPosition
+        selectedPort, updatePortPosition, setSavedPortParameters
     }
 ) => {
 
@@ -38,6 +39,7 @@ export const PortControls: FC<PortControlsProps> = (
 
 
     function onChangeFirstPositionHandler(event: THREE.Event) {
+        setSavedPortParameters(false)
         if (!event.value && transformationFirst.current) {
             const controls: Object3DNode<any, any> = transformationFirst.current as unknown as Object3DNode<any, any>
             let transformationParmas = {
@@ -45,10 +47,12 @@ export const PortControls: FC<PortControlsProps> = (
                 position: [controls.worldPosition.x, controls.worldPosition.y, controls.worldPosition.z],
             }
             updatePortPosition(transformationParmas)
+            setSavedPortParameters(true)
         }
     }
 
     function onChangeLastPositionHandler(event: THREE.Event) {
+        setSavedPortParameters(false)
         if (!event.value && transformationLast.current) {
             const controls: Object3DNode<any, any> = transformationLast.current as unknown as Object3DNode<any, any>
             let transformationParmas = {
@@ -56,6 +60,7 @@ export const PortControls: FC<PortControlsProps> = (
                 position: [controls.worldPosition.x, controls.worldPosition.y, controls.worldPosition.z],
             }
             updatePortPosition(transformationParmas)
+            setSavedPortParameters(true)
         }
     }
 

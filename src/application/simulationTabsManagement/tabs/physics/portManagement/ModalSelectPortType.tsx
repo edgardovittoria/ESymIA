@@ -8,11 +8,12 @@ interface ModalSelectPortTypeProps {
     show: boolean,
     setShow: Function,
     selectedPort: Port | Probe,
+    setSavedPortParameters: Function
 }
 
 export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = (
     {
-        show, setShow, selectedPort
+        show, setShow, selectedPort, setSavedPortParameters
     }
 ) => {
 
@@ -58,6 +59,7 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = (
                                         className="w-1/3 text-center hover:bg-green-100"
                                         onClick={() => {
                                             dispatch(setPortType({name: selectedPort.name, type: 1}))
+                                            setSavedPortParameters(false)
                                             setShow(false)
                                         }}
                                     >
@@ -68,6 +70,7 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = (
                                         className="w-1/3 text-center hover:bg-green-100"
                                         onClick={() => {
                                             dispatch(setPortType({name: selectedPort.name, type: 2}))
+                                            setSavedPortParameters(false)
                                             setShow(false)
                                         }}
                                     >
@@ -78,6 +81,7 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = (
                                         className="w-1/3 text-center hover:bg-green-100"
                                         onClick={() => {
                                             dispatch(setPortType({name: selectedPort.name, type: 3}))
+                                            setSavedPortParameters(false)
                                             setShow(false)
                                         }}
                                     >
@@ -90,6 +94,7 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = (
                                         className="w-1/2 text-center hover:bg-green-100"
                                         onClick={() => {
                                             dispatch(setPortType({name: selectedPort.name, type: 4}))
+                                            setSavedPortParameters(false)
                                             setShow(false)
                                         }}
                                     >
@@ -100,6 +105,7 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = (
                                         className="w-1/2 text-center hover:bg-green-100"
                                         onClick={() => {
                                             dispatch(setPortType({name: selectedPort.name, type: 5}))
+                                            setSavedPortParameters(false)
                                             setShow(false)
                                         }}
                                     >

@@ -6,11 +6,13 @@ import { updatePortPosition } from "../../../../../../store/projectSlice";
 interface PortPositionProps {
 	selectedPort: Port | Probe;
 	disabled: boolean;
+	setSavedPortParameters: Function
 }
 
 export const PortPosition: React.FC<PortPositionProps> = ({
 	selectedPort,
 	disabled,
+	setSavedPortParameters
 }) => {
 	const dispatch = useDispatch();
 
@@ -47,7 +49,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 												position: newPosition as [number, number, number],
 											})
 										);
+										setSavedPortParameters(false)
 									}}
+									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
 							<div className="w-[30%]">
@@ -73,7 +77,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 												position: newPosition as [number, number, number],
 											})
 										);
+										setSavedPortParameters(false)
 									}}
+									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
 							<div className="w-[30%]">
@@ -99,7 +105,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 												position: newPosition as [number, number, number],
 											})
 										);
+										setSavedPortParameters(false)
 									}}
+									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
 						</div>
@@ -130,7 +138,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 												position: newPosition as [number, number, number],
 											})
 										);
+										setSavedPortParameters(false)
 									}}
+									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
 							<div className="w-[30%]">
@@ -156,7 +166,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 												position: newPosition as [number, number, number],
 											})
 										);
+										setSavedPortParameters(false)
 									}}
+									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
 							<div className="w-[30%]">
@@ -182,7 +194,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 												position: newPosition as [number, number, number],
 											})
 										);
+										setSavedPortParameters(false)
 									}}
+									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
 						</div>
@@ -214,7 +228,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 												position: newPosition as [number, number, number],
 											})
 										);
+										setSavedPortParameters(false)
 									}}
+									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
 							<div className="w-[30%]">
@@ -236,7 +252,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 												position: newPosition as [number, number, number],
 											})
 										);
+										setSavedPortParameters(false)
 									}}
+									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
 							<div className="w-[30%]">
@@ -258,7 +276,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 												position: newPosition as [number, number, number],
 											})
 										);
+										setSavedPortParameters(false)
 									}}
+									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
 						</div>

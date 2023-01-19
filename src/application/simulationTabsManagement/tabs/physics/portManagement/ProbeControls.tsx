@@ -6,11 +6,12 @@ import { Probe } from '../../../../../model/esymiaModels';
 
 interface ProbeControlsProps {
     selectedProbe: Probe,
-    updateProbePosition: Function
+    updateProbePosition: Function,
+    setSavedPortParameters: Function
 }
 
 export const ProbeControls: React.FC<ProbeControlsProps> = (
-    {selectedProbe, updateProbePosition}
+    {selectedProbe, updateProbePosition, setSavedPortParameters}
 ) => {
     const transformation = useRef(null);
     const { scene } = useThree()
@@ -25,6 +26,7 @@ export const ProbeControls: React.FC<ProbeControlsProps> = (
 
 
     function onChangePositionHandler(event: THREE.Event) {
+        setSavedPortParameters(false)
         if (!event.value && transformation.current) {
             const controls: Object3DNode<any, any> = transformation.current as unknown as Object3DNode<any, any>
             let transformationParmas = {
@@ -32,6 +34,7 @@ export const ProbeControls: React.FC<ProbeControlsProps> = (
                 position: [controls.worldPosition.x, controls.worldPosition.y, controls.worldPosition.z],
             }
             updateProbePosition(transformationParmas)
+            setSavedPortParameters(true)
         }
     }
 

@@ -28,10 +28,12 @@ import { Screenshot } from "./Screenshot";
 interface CanvasBaseWithReduxProps {
   section: string;
   portClickAction?: Function;
+  savedPortParameters?: boolean
 }
 
 export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
   section,
+  savedPortParameters,
   children,
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
@@ -42,11 +44,12 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
   const [previousColor, setPreviousColor] = useState<Color>({} as Color);
 
   useEffect(() => {
-    if (selectedProject) {
+    if (selectedProject && savedPortParameters === true) {
       execQuery(updateProjectInFauna, selectedProject);
     }
   }, [
     selectedProject?.model,
+    savedPortParameters,
     selectedProject?.ports,
     selectedProject?.signal,
     selectedProject?.simulation,
