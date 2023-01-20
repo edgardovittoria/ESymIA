@@ -50,14 +50,14 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         screenshot: undefined,
         owner: user,
         sharedWith: [] as sharingInfoUser[],
-        parentFolder: selectedFolder?.faunaDocumentId
+        parentFolder: selectedFolder?.faunaDocumentId as string,
       };
       execQuery(createSimulationProjectInFauna, newProject).then((res: any) => {
         newProject = {
           ...newProject,
           faunaDocumentId: res.ref.value.id,
         } as Project;
-        execQuery(
+        (selectedFolder?.faunaDocumentId !== 'root') && execQuery(
           addIDInFolderProjectsList,
           newProject.faunaDocumentId,
           selectedFolder

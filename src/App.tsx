@@ -15,8 +15,6 @@ import {SimulationTabsContentFactory} from "./application/simulationTabsManageme
 import {usersStateSelector, useFaunaQuery} from "cad-library";
 import {selectFolder} from "./store/projectSlice";
 import {
-    constructFolderStructure,
-    constructSharedFolderStructure,
     getFoldersByOwner,
     getSharedFolders,
     getSharedSimulationProjects,
@@ -24,6 +22,8 @@ import {
 } from "./faunadb/projectsFolderAPIs";
 import {tabSelectedSelector} from "./store/tabsAndMenuItemsSlice";
 import {ImSpinner} from "react-icons/im";
+import { constructFolderStructure, constructSharedFolderStructure } from "./faunadb/apiAuxiliaryFunctions";
+import { FaunaFolder, FaunaProject } from "./model/FaunaModels";
 
 function App() {
     const dispatch = useDispatch();
@@ -39,9 +39,20 @@ function App() {
     useEffect(() => {
         if (user.userName) {
             setLoginSpinner(true)
-            execQuery(getFoldersByOwner, user.email).then((folders) => {
-                execQuery(getSimulationProjectsByOwner, user.email).then((projects) => {
-                    let folder = constructFolderStructure(folders, projects);
+            execQuery(getFoldersByOwner, user.email).then((folders: FaunaFolder[]) => {
+                execQuery(getSimulationProjectsByOwner, user.email).then((projects: FaunaProject[]) => {
+                    let rootFaunaFolder = {
+                        id: 'root',
+                        folder: {
+                            name: "My Files",
+                            owner: user,
+                            sharedWith: [],
+                            subFolders: folders.filter(f => f.folder.parent === 'root').map(sb => sb.id),
+                            projectList: projects.filter(p => p.project.parentFolder === 'root').map(pr => pr.id),
+                            parent: 'nobody'
+                        }
+                    } as FaunaFolder
+                    let folder = constructFolderStructure('root', [rootFaunaFolder, ...folders], projects);
                     dispatch(setProjectsFolderToUser(folder));
                     dispatch(selectFolder(folder.faunaDocumentId as string));
                     setLoginSpinner(false)
