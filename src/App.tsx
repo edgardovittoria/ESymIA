@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import "./App.css";
 import "./GlobalColors.css";
 import "font-awesome/css/font-awesome.min.css";
@@ -22,7 +22,7 @@ import {
 } from "./faunadb/projectsFolderAPIs";
 import {tabSelectedSelector} from "./store/tabsAndMenuItemsSlice";
 import {ImSpinner} from "react-icons/im";
-import { constructFolderStructure, constructSharedFolderStructure } from "./faunadb/apiAuxiliaryFunctions";
+import { constructFolderStructure, faunaFolderHaveParentInList, faunaProjectHaveParentInFolderList } from "./faunadb/apiAuxiliaryFunctions";
 import { FaunaFolder, FaunaProject } from "./model/FaunaModels";
 
 function App() {
@@ -58,9 +58,20 @@ function App() {
                     setLoginSpinner(false)
                 });
             });
-            execQuery(getSharedFolders, user.email).then((folders) => {
-                execQuery(getSharedSimulationProjects, user.email).then((projects) => {
-                    let folder = constructSharedFolderStructure(folders, projects, user);
+            execQuery(getSharedFolders, user.email).then((folders: FaunaFolder[]) => {
+                execQuery(getSharedSimulationProjects, user.email).then((projects: FaunaProject[]) => {
+                    let sharedElementsRootFolder = {
+                        id: 'shared_root',
+                        folder: {
+                            name: "My Shared Elements",
+                            owner: user,
+                            sharedWith: [],
+                            subFolders: folders.filter(faunaFolder => !faunaFolderHaveParentInList(faunaFolder, folders)).map((folder) => folder.id),
+                            projectList: projects.filter(p => !faunaProjectHaveParentInFolderList(p, folders)).map(p => p.id),
+                            parent: "nobody"
+                        }
+                    } as FaunaFolder
+                    let folder = constructFolderStructure('shared_root', [sharedElementsRootFolder, ...folders], projects);
                     dispatch(setFolderOfElementsSharedWithUser(folder));
                 })
             })
