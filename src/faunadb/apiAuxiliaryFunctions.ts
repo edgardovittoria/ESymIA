@@ -1,4 +1,3 @@
-import { UsersState } from "cad-library"
 import { Folder, Project, sharingInfoUser } from "../model/esymiaModels"
 import { FaunaFolder, FaunaFolderDetails, FaunaProject } from "../model/FaunaModels"
 
@@ -17,69 +16,23 @@ export const constructFolderStructure = (folderID: string, all_folders: FaunaFol
     return root
 }
 
-const recursiveSubFoldersRetrieving = (subFolders: string[], all_folders: FaunaFolder[], all_projects: FaunaProject[]) => {
-    let sfs: Folder[] = []
-    if (subFolders.length > 0) {
-        sfs = subFolders.reduce((subFs, sfRef) => {
-            let sb = all_folders.filter(ff => ff.id === sfRef)[0].folder
-            let remainingFolders = all_folders.filter(ff => ff.id !== sfRef)
-            let sbFaunaProjects = all_projects.filter(fp => sb.projectList.includes(fp.id))
-            let remainingFaunaProjects = all_projects.filter(fp => !faunaProjectInList(fp, sbFaunaProjects))
-            let sbProjects = sbFaunaProjects.map(fp => convertInProjectThis(fp))
-            let sbFolder = {
-                ...sb,
-                faunaDocumentId: sfRef,
-                subFolders: recursiveSubFoldersRetrieving(sb.subFolders, remainingFolders, remainingFaunaProjects),
-                projectList: sbProjects
-            } as Folder
-            subFs.push(sbFolder)
-            return subFs
-        }, [] as Folder[])
-    }
-    return sfs
-}
-
-export const constructSharedFolderStructure = (folders: FaunaFolder[], all_projects: FaunaProject[], user: UsersState) => {
-    let rootFolder = {
-        name: "My Shared Elements",
-        owner: user,
-        sharedWith: [],
-        subFolders: [],
-        projectList: [],
-        parent: "root"
-    }
-    let rootSubFoldersIDs = folders.filter(faunaFolder => !faunaFolderHaveParentInList(faunaFolder, folders)).map((folder) => folder.id)
-    let rootProjects = all_projects.filter(p => !faunaProjectHaveParentInFolderList(p, folders))
-    let remainingProjects = all_projects.filter(p => !faunaProjectInList(p, rootProjects))
-    let projs = rootProjects.map(p => convertInProjectThis(p))
-    let root = {
-        ...rootFolder,
-        faunaDocumentId: "my_shared_elements",
-        subFolders: recursiveSubFoldersRetrieving(rootSubFoldersIDs, folders, remainingProjects),
-        projectList: projs
-    } as Folder
-    return root
-}
-
-
-
-const faunaProjectInList = (project: FaunaProject, projectsList: FaunaProject[]) => {
+export const faunaProjectInList = (project: FaunaProject, projectsList: FaunaProject[]) => {
     return projectsList.filter(p => p.id === project.id).length > 0
 }
 
-const faunaFolderInList = (folder: FaunaFolder, folderList: FaunaFolder[]) => {
+export const faunaFolderInList = (folder: FaunaFolder, folderList: FaunaFolder[]) => {
     return folderList.filter(f => f.id === folder.id).length > 0
 }
 
-const faunaFolderHaveParentInList = (folder: FaunaFolder, folderList: FaunaFolder[]) => {
-    return folderList.filter(f => folderList.filter(fo => fo.id === f.folder.parent).length > 0)
+export const faunaFolderHaveParentInList = (folder: FaunaFolder, folderList: FaunaFolder[]) => {
+    return folderList.filter(f => folder.folder.parent === f.id).length > 0
 }
 
-const faunaProjectHaveParentInFolderList = (project: FaunaProject, folderList: FaunaFolder[]) => {
+export const faunaProjectHaveParentInFolderList = (project: FaunaProject, folderList: FaunaFolder[]) => {
     return folderList.filter(f => f.id === project.project.parentFolder).length > 0
 }
 
-const convertInProjectThis = (faunaProject: FaunaProject) => {
+export const convertInProjectThis = (faunaProject: FaunaProject) => {
     let project: Project = {
         ...faunaProject.project,
         faunaDocumentId: faunaProject.id,

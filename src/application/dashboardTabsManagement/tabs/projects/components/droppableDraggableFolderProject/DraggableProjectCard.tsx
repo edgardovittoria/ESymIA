@@ -137,7 +137,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                             p.event.stopPropagation()
                             dispatch(removeProject(project.faunaDocumentId as string))
                             dispatch(closeProjectTab(project.faunaDocumentId as string))
-                            execQuery(deleteSimulationProjectFromFauna, project.faunaDocumentId)
+                            execQuery(deleteSimulationProjectFromFauna, project.faunaDocumentId, project.parentFolder)
                             hideAll()
                         }}>
                             <BiTrash
