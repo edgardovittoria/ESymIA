@@ -28,18 +28,6 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
   const selectedProject = useSelector(selectedProjectSelector);
 
-  function getMaterialListFrom(components: ComponentEntity[]) {
-    let materialList: Material[] = [];
-    components?.forEach((c) => {
-      if (
-        c.material?.name &&
-        materialList.filter((m) => m.name === c.material?.name).length === 0
-      ) {
-        materialList.push(c.material);
-      }
-    });
-    return materialList;
-  }
 
   useEffect(() => {
     if (selectedProject?.meshData.mesh) {
@@ -113,3 +101,16 @@ export const Simulator: React.FC<SimulatorProps> = ({
     </>
   );
 };
+
+export function getMaterialListFrom(components: ComponentEntity[]) {
+  let materialList: Material[] = [];
+  components?.forEach((c) => {
+    if (
+        c.material?.name &&
+        materialList.filter((m) => m.name === c.material?.name).length === 0
+    ) {
+      materialList.push(c.material);
+    }
+  });
+  return materialList;
+}

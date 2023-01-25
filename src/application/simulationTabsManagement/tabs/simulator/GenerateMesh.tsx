@@ -8,7 +8,7 @@ import {
   setQuantum,
   setMesh,
   setMeshGenerated,
-  setMeshApproved, unsetMesh,
+  setMeshApproved, unsetMesh, deleteSimulation,
 } from "../../../../store/projectSlice";
 import axios from "axios";
 import { MesherOutput } from "./MesherInputOutput";
@@ -16,6 +16,9 @@ import {deleteFileS3, uploadFileS3} from "../../../../aws/mesherAPIs";
 import { selectMenuItem } from "../../../../store/tabsAndMenuItemsSlice";
 import {ImSpinner} from "react-icons/im";
 import { Project, Simulation, SolverOutput } from "../../../../model/esymiaModels";
+import {getMaterialListFrom} from "./Simulator";
+import {lambdaClient} from "../../../../aws/s3Config";
+import {InvocationRequest} from "aws-sdk/clients/lambda";
 
 interface GenerateMeshProps {
   selectedProject: Project;
@@ -101,7 +104,41 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
        *   save results on the store to visualize relative charts
        * })
        * */
-      axios.get("http://localhost:3001/solverOutput").then((res) => {
+      let dataToSendToSolver = {
+        mesherOutput: mesherOutput,
+        solverInput: {
+          ports: selectedProject.ports.filter(p => p.category === 'port'),
+          lumped_elements: selectedProject.ports.filter(p => p.category === 'lumped'),
+          materials: getMaterialListFrom(selectedProject?.model.components as ComponentEntity[]),
+          frequencies: frequencyArray,
+          signals: signalsValuesArray,
+          powerPort: (selectedProject) && selectedProject.signal?.powerPort
+        }
+      }
+      lambdaClient.invoke({
+        FunctionName: "meshing-solving-dev-solving",
+        Payload: JSON.stringify(dataToSendToSolver),
+      } as InvocationRequest, (err, data) => {
+        if(err){
+          window.alert("Error while solving, please try again")
+          dispatch(deleteSimulation());
+          dispatch(setMeshApproved(false));
+        }else{
+          if(data.Payload){
+            dispatch(setSolverOutput(JSON.parse(data.Payload.toString())));
+            let simulationUpdated: Simulation = {
+              ...simulation,
+              results: JSON.parse(data.Payload.toString()),
+              ended: Date.now().toString(),
+              status: "Completed",
+            };
+            setTimeout(() => {
+              dispatch(updateSimulation(simulationUpdated));
+            }, 5000);
+          }
+        }
+      })
+      /*axios.post("https://a7epiwqbpj.execute-api.us-east-1.amazonaws.com/solving", dataToSendToSolver).then((res) => {
         dispatch(setSolverOutput(res.data));
         let simulationUpdated: Simulation = {
           ...simulation,
@@ -112,7 +149,11 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
         setTimeout(() => {
           dispatch(updateSimulation(simulationUpdated));
         }, 5000);
-      });
+      }).catch(err => {
+        window.alert("Error while solving, please try again")
+        dispatch(deleteSimulation());
+        dispatch(setMeshApproved(false));
+      })*/
     }
   }, [meshApproved]);
 
@@ -154,21 +195,23 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           ),
         quantum: quantumDimensions,
       };
-      axios
-        .post(
-          "https://64wwc8684a.execute-api.us-east-1.amazonaws.com/meshing",
-          objToSendToMesher
-        )
-        .then((res) => {
-          saveMeshToS3(res.data).then(() => {
-            dispatch(setMeshGenerated("Generated"))
-          });
-        })
-        .catch((err) => {
+      lambdaClient.invoke({
+        FunctionName: "meshing-solving-dev-meshing",
+        Payload: JSON.stringify(objToSendToMesher),
+      } as InvocationRequest, (err, data) => {
+        if(err){
           window.alert("Error while generating mesh, please try again")
           dispatch(setMeshGenerated("Not Generated"))
           dispatch(unsetMesh())
-        });
+          console.log(err)
+        }else{
+          if(data.Payload){
+            saveMeshToS3(JSON.parse(data.Payload.toString())).then(() => {
+              dispatch(setMeshGenerated("Generated"))
+            });
+          }
+        }
+      })
     }
   }, [meshGenerated]);
 
@@ -276,7 +319,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
                 </button>
               </div>
             )}
-            {meshGenerated === "Generated" && !meshApproved && (
+            {((meshGenerated === "Generated" && !meshApproved) || selectedProject.simulation?.status === "Failed") && (
               <div className={`flex justify-between`}>
                 <button
                   className="button buttonPrimary w-[48%]"

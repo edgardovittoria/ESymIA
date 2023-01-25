@@ -119,6 +119,10 @@ export const ProjectSlice = createSlice({
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             if (selectedProject) selectedProject.simulation = action.payload;
         },
+        deleteSimulation(state: ProjectState) {
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
+            if (selectedProject) selectedProject.simulation = undefined;
+        },
         addPorts(state: ProjectState, action: PayloadAction<Port | Probe>) {
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             selectedProject?.ports.push(action.payload)
@@ -219,7 +223,7 @@ export const {
     //qui vanno inserite tutte le azioni che vogliamo esporatare
     addProject, removeProject, importModel, selectProject, updateSimulation, addPorts,
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
-    setProjectsFolderToUser, removeFolder, shareProject, renameProject, moveFolder, moveProject,
+    setProjectsFolderToUser, removeFolder, shareProject, renameProject, moveFolder, moveProject, deleteSimulation,
     renameFolder, shareFolder, setQuantum, setMesh, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser,
     unsetMesh
 } = ProjectSlice.actions
