@@ -97,13 +97,6 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           signalsValuesArray.push(sv.signal)
         );
 
-
-      //TODO: add http request to execute the simulation
-      /*
-       * axios.post("url", dataToSendToSolver).then((res) => {
-       *   save results on the store to visualize relative charts
-       * })
-       * */
       let dataToSendToSolver = {
         mesherOutput: mesherOutput,
         solverInput: {
@@ -115,28 +108,28 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           powerPort: (selectedProject) && selectedProject.signal?.powerPort
         }
       }
-      lambdaClient.invoke({
-        FunctionName: "meshing-solving-dev-solving",
-        Payload: JSON.stringify(dataToSendToSolver),
-      } as InvocationRequest, (err, data) => {
-        if(err){
-          window.alert("Error while solving, please try again")
-          dispatch(deleteSimulation());
-          dispatch(setMeshApproved(false));
-        }else{
-          if(data.Payload){
-            dispatch(setSolverOutput(JSON.parse(data.Payload.toString())));
-            let simulationUpdated: Simulation = {
-              ...simulation,
-              results: JSON.parse(data.Payload.toString()),
-              ended: Date.now().toString(),
-              status: "Completed",
-            };
-            dispatch(updateSimulation(simulationUpdated));
-          }
-        }
-      })
-      /*axios.post("https://a7epiwqbpj.execute-api.us-east-1.amazonaws.com/solving", dataToSendToSolver).then((res) => {
+      // lambdaClient.invoke({
+      //   FunctionName: "meshing-solving-dev-solving",
+      //   Payload: JSON.stringify(dataToSendToSolver),
+      // } as InvocationRequest, (err, data) => {
+      //   if(err){
+      //     window.alert("Error while solving, please try again")
+      //     dispatch(deleteSimulation());
+      //     dispatch(setMeshApproved(false));
+      //   }else{
+      //     if(data.Payload){
+      //       dispatch(setSolverOutput(JSON.parse(data.Payload.toString())));
+      //       let simulationUpdated: Simulation = {
+      //         ...simulation,
+      //         results: JSON.parse(data.Payload.toString()),
+      //         ended: Date.now().toString(),
+      //         status: "Completed",
+      //       };
+      //       dispatch(updateSimulation(simulationUpdated));
+      //     }
+      //   }
+      // })
+      axios.post("https://hvsbvljha3bz6bqajqizgax5qe0qjwph.lambda-url.eu-west-2.on.aws/", dataToSendToSolver).then((res) => {
         dispatch(setSolverOutput(res.data));
         let simulationUpdated: Simulation = {
           ...simulation,
@@ -144,14 +137,12 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           ended: Date.now().toString(),
           status: "Completed",
         };
-        setTimeout(() => {
-          dispatch(updateSimulation(simulationUpdated));
-        }, 5000);
+        dispatch(updateSimulation(simulationUpdated));
       }).catch(err => {
         window.alert("Error while solving, please try again")
         dispatch(deleteSimulation());
         dispatch(setMeshApproved(false));
-      })*/
+      })
     }
   }, [meshApproved]);
 
@@ -193,23 +184,35 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           ),
         quantum: quantumDimensions,
       };
-      lambdaClient.invoke({
-        FunctionName: "meshing-solving-dev-meshing",
-        Payload: JSON.stringify(objToSendToMesher),
-      } as InvocationRequest, (err, data) => {
+      axios.post('https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/', objToSendToMesher).then((res) => {
+        saveMeshToS3((res.data)).then(() => {
+          dispatch(setMeshGenerated("Generated"))
+        });
+      }).catch((err) =>{
         if(err){
           window.alert("Error while generating mesh, please try again")
           dispatch(setMeshGenerated("Not Generated"))
           dispatch(unsetMesh())
           console.log(err)
-        }else{
-          if(data.Payload){
-            saveMeshToS3(JSON.parse(data.Payload.toString())).then(() => {
-              dispatch(setMeshGenerated("Generated"))
-            });
-          }
         }
       })
+      // lambdaClient.invoke({
+      //   FunctionName: "meshing-solving-dev-meshing",
+      //   Payload: JSON.stringify(objToSendToMesher),
+      // } as InvocationRequest, (err, data) => {
+      //   if(err){
+      //     window.alert("Error while generating mesh, please try again")
+      //     dispatch(setMeshGenerated("Not Generated"))
+      //     dispatch(unsetMesh())
+      //     console.log(err)
+      //   }else{
+      //     if(data.Payload){
+      //       saveMeshToS3(JSON.parse(data.Payload.toString())).then(() => {
+      //         dispatch(setMeshGenerated("Generated"))
+      //       });
+      //     }
+      //   }
+      // })
     }
   }, [meshGenerated]);
 
