@@ -12,8 +12,8 @@ AWS.config.update({
     accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY,
     secretAccessKey: process.env.REACT_APP_AWS_SECRET_KEY,
     httpOptions:{
-        timeout: 300*1000,
-        connectTimeout: 300*1000
+        timeout: 900*1000,
+        connectTimeout: 900*1000
     }
 })
 
