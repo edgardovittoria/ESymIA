@@ -16,6 +16,7 @@ export const SimulationTabsContentFactory: React.FC<
 > = () => {  
   const [selectedTabLeftPanel, setSelectedTabLeftPanel] = useState("Modeler");
   const menuItemSelected = useSelector(selectedMenuItemSelector)
+  const [savedPortParameters, setSavedPortParameters] = useState(true)
 
   switch (menuItemSelected) {
     case "Modeler":
@@ -30,6 +31,8 @@ export const SimulationTabsContentFactory: React.FC<
         <Physics
           selectedTabLeftPanel={selectedTabLeftPanel}
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
+          savedPortParameters={savedPortParameters}
+          setSavedPortParameters={setSavedPortParameters}
         />
       );
     case "Simulator":
@@ -37,6 +40,7 @@ export const SimulationTabsContentFactory: React.FC<
         <Simulator
           selectedTabLeftPanel={selectedTabLeftPanel}
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
+          savedPortParameters={savedPortParameters}
         />
       );
     case "Results":

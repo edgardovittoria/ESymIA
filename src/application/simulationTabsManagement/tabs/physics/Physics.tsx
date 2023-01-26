@@ -30,21 +30,24 @@ import { Probe, Project } from "../../../../model/esymiaModels";
 interface PhysicsProps {
 	selectedTabLeftPanel: string;
 	setSelectedTabLeftPanel: Function;
+	savedPortParameters: boolean;
+	setSavedPortParameters: Function
 }
 
 export const Physics: React.FC<PhysicsProps> = ({
 	selectedTabLeftPanel,
 	setSelectedTabLeftPanel,
+	savedPortParameters,
+	setSavedPortParameters
 }) => {
 	const selectedProject = useSelector(selectedProjectSelector);
 	let selectedPort = findSelectedPort(selectedProject);
 	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
 	const [showModalSignal, setShowModalSignal] = useState(false);
-	const [savedPortParemeters, setSavedPortParameters] = useState(true)
 	const dispatch = useDispatch();
 	return (
 		<>
-			<CanvasBaseWithRedux section="Physics" savedPortParameters={savedPortParemeters}>
+			<CanvasBaseWithRedux section="Physics" savedPortParameters={savedPortParameters}>
 				{selectedProject?.ports.map((port, index) => {
 					if (port.category === "port" || port.category === "lumped") {
 						return (
@@ -150,7 +153,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 			(selectedPort?.category === "port" ||
 				selectedPort?.category === "lumped") ? (
 				<>
-					<PortManagement selectedPort={selectedPort} savedPortParameters={savedPortParemeters} setSavedPortParameters={setSavedPortParameters}>
+					<PortManagement selectedPort={selectedPort} savedPortParameters={savedPortParameters} setSavedPortParameters={setSavedPortParameters}>
 						<PortType
 							disabled={selectedProject?.simulation?.status === "Completed"}
 							setShow={setShowModalSelectPortType}
@@ -188,7 +191,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 					</InputSignalManagement>
 				</>
 			) : (
-				<PortManagement selectedPort={selectedPort} savedPortParameters={savedPortParemeters} setSavedPortParameters={setSavedPortParameters}>
+				<PortManagement selectedPort={selectedPort} savedPortParameters={savedPortParameters} setSavedPortParameters={setSavedPortParameters}>
 					<PortPosition
 						selectedPort={selectedPort ?? ({} as Probe)}
 						disabled={selectedProject?.simulation?.status === "Completed"}
@@ -196,7 +199,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 					/>
 				</PortManagement>
 			)}
-			{/* </RightPanelSimulation> */}
+			{/* </RightPanelSimulation> */}s
 		</>
 	);
 };

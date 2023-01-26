@@ -44,9 +44,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
   const [previousColor, setPreviousColor] = useState<Color>({} as Color);
 
   useEffect(() => {
-    console.log(savedPortParameters)
     if (selectedProject && savedPortParameters === true) {
-      console.log('update fauna project')
       execQuery(updateProjectInFauna, selectedProject);
     }
   }, [
