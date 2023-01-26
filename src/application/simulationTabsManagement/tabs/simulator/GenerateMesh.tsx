@@ -132,9 +132,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
               ended: Date.now().toString(),
               status: "Completed",
             };
-            setTimeout(() => {
-              dispatch(updateSimulation(simulationUpdated));
-            }, 5000);
+            dispatch(updateSimulation(simulationUpdated));
           }
         }
       })
