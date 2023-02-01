@@ -142,7 +142,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       //   }
       // })
       //https://teema-flask-api-4rys7fymga-uc.a.run.app
-      axios.post("https://hvsbvljha3bz6bqajqizgax5qe0qjwph.lambda-url.eu-west-2.on.aws/", dataToSendToSolver).then((res) => {
+      axios.post("https://teema-flask-api-4rys7fymga-uc.a.run.app/", dataToSendToSolver).then((res) => {
         dispatch(setSolverOutput(res.data));
         let simulationUpdated: Simulation = {
           ...simulation,
