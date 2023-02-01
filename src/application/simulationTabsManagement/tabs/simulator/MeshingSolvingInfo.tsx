@@ -19,13 +19,13 @@ import { Project, Simulation, SolverOutput } from "../../../../model/esymiaModel
 import {getMaterialListFrom} from "./Simulator";
 
 
-interface GenerateMeshProps {
+interface MeshingSolvingInfoProps {
   selectedProject: Project;
   mesherOutput?: MesherOutput;
   allMaterials?: Material[]
 }
 
-export const GenerateMesh: React.FC<GenerateMeshProps> = ({
+export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   selectedProject,
   mesherOutput,
   allMaterials
@@ -238,7 +238,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
       <div className={`${(meshGenerated === "Generating" || selectedProject.simulation?.status === "Queued") && 'opacity-40'} flex-col absolute right-[2%] top-[160px] w-[22%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor`}>
         <div className="flex">
           <AiOutlineThunderbolt style={{ width: "25px", height: "25px" }} />
-          <h5 className="ml-2">Mesh Generation</h5>
+          <h5 className="ml-2">Meshing and Solving Info</h5>
         </div>
         <hr className="mt-1" />
         <div

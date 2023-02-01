@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
 import { SimulatorLeftPanelTab } from "./SimulatorLeftPanelTab";
-import { GenerateMesh } from "./GenerateMesh";
+import { MeshingSolvingInfo } from "./MeshingSolvingInfo";
 import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
 import { MeshedElement } from "./MeshedElement/MeshedElement";
 import { ComponentEntity, Material } from "cad-library";
@@ -94,7 +94,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
         )}
       </LeftPanel>
       {/* <RightPanelSimulation> */}
-      <GenerateMesh
+      <MeshingSolvingInfo
         selectedProject={selectedProject as Project}
         mesherOutput={mesherOutput}
         allMaterials={allMaterials}
