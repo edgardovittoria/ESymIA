@@ -1,5 +1,5 @@
 import { ComponentEntity, exportToSTL, Material } from "cad-library";
-import React, { useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import {setSolverOutput} from "../../../../store/solverSlice";
@@ -17,8 +17,7 @@ import { selectMenuItem } from "../../../../store/tabsAndMenuItemsSlice";
 import {ImSpinner} from "react-icons/im";
 import { Project, Simulation, SolverOutput } from "../../../../model/esymiaModels";
 import {getMaterialListFrom} from "./Simulator";
-import {lambdaClient} from "../../../../aws/s3Config";
-import {InvocationRequest} from "aws-sdk/clients/lambda";
+
 
 interface GenerateMeshProps {
   selectedProject: Project;
@@ -36,6 +35,9 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
   let quantumDimensions = selectedProject.meshData.quantum;
   let meshApproved = selectedProject.meshData.meshApproved;
   let meshGenerated = selectedProject.meshData.meshGenerated;
+
+  const [solverIterations, setSolverIterations] = useState<[number, number]>([100, 1])
+  const [convergenceThreshold, setConvergenceThreshold] = useState(0.0001)
 
   function generateSTLListFromComponents(
     materialList: Material[],
@@ -82,6 +84,11 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
         results: {} as SolverOutput,
         status: "Queued",
         associatedProject: selectedProject?.faunaDocumentId as string,
+        solverAlgoParams: {
+          innerIteration: solverIterations[0],
+          outerIteration: solverIterations[1],
+          convergenceThreshold: convergenceThreshold
+        }
       };
       dispatch(updateSimulation(simulation));
 
@@ -106,6 +113,11 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           frequencies: frequencyArray,
           signals: signalsValuesArray,
           powerPort: (selectedProject) && selectedProject.signal?.powerPort
+        },
+        solverAlgoParams: {
+          innerIteration: solverIterations[0],
+          outerIteration: solverIterations[1],
+          convergenceThreshold: convergenceThreshold
         }
       }
       // lambdaClient.invoke({
@@ -129,6 +141,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
       //     }
       //   }
       // })
+      //https://teema-flask-api-4rys7fymga-uc.a.run.app
       axios.post("https://hvsbvljha3bz6bqajqizgax5qe0qjwph.lambda-url.eu-west-2.on.aws/", dataToSendToSolver).then((res) => {
         dispatch(setSolverOutput(res.data));
         let simulationUpdated: Simulation = {
@@ -139,6 +152,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
         };
         dispatch(updateSimulation(simulationUpdated));
       }).catch(err => {
+        console.log(err)
         window.alert("Error while solving, please try again")
         dispatch(deleteSimulation());
         dispatch(setMeshApproved(false));
@@ -184,7 +198,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
           ),
         quantum: quantumDimensions,
       };
-      axios.post('https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/', objToSendToMesher).then((res) => {
+      axios.post('http://ec2-13-40-215-115.eu-west-2.compute.amazonaws.com/meshing', objToSendToMesher).then((res) => {
         saveMeshToS3((res.data)).then(() => {
           dispatch(setMeshGenerated("Generated"))
         });
@@ -323,7 +337,7 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
             {((meshGenerated === "Generated" && !meshApproved) || selectedProject.simulation?.status === "Failed") && (
               <div className={`flex justify-between`}>
                 <button
-                  className="button buttonPrimary w-[48%]"
+                  className="button buttonPrimary w-full"
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
                     dispatch(setMeshGenerated("Generating"));
@@ -334,29 +348,94 @@ export const GenerateMesh: React.FC<GenerateMeshProps> = ({
                 >
                   Regenerate
                 </button>
-                <button
-                  className="button buttonPrimary w-[48%]"
-                  onClick={() => {
-                    dispatch(setMeshApproved(true));
-                  }}
-                >
-                  Start Simulation
-                </button>
               </div>
             )}
-            {selectedProject.simulation?.status === "Completed" && (
-              <button
-                className="button buttonPrimary w-[100%]"
+          </div>
+        </div>
+        <div
+            className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
+        >
+            <h6>Solver Iterations</h6>
+          <div className="mt-2">
+            <span>Inner, Outer</span>
+            <div className="flex justify-between mt-2">
+              <div className="w-[45%]">
+                <input
+                    disabled={
+                        selectedProject.simulation?.status === "Completed" ||
+                        meshGenerated !== "Generated"
+                    }
+                    min={1}
+                    className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+                    type="number"
+                    step={1}
+                    value={selectedProject.simulation ? selectedProject.simulation.solverAlgoParams.innerIteration : solverIterations[0]}
+                    onChange={(event) => {setSolverIterations([parseInt(event.target.value), solverIterations[1]])} }
+                />
+              </div>
+              <div className="w-[45%]">
+                <input
+                    disabled={
+                        selectedProject.simulation?.status === "Completed" ||
+                        meshGenerated !== "Generated"
+                    }
+                    min={1}
+                    className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+                    type="number"
+                    step={1}
+                    value={selectedProject.simulation ? selectedProject.simulation.solverAlgoParams.outerIteration : solverIterations[1]}
+                    onChange={(event) =>{setSolverIterations([solverIterations[0], parseInt(event.target.value)])}}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+            className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
+        >
+          <h6>Convergence Threshold</h6>
+          <div className="mt-2">
+            <div className="flex justify-between mt-2">
+              <div className="w-full">
+                <input
+                    disabled={
+                        selectedProject.simulation?.status === "Completed" ||
+                        meshGenerated !== "Generated"
+                    }
+                    min={0.0000000001}
+                    max={0.1}
+                    className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+                    type="number"
+                    step={0.0000000001}
+                    value={selectedProject.simulation ? selectedProject.simulation.solverAlgoParams.convergenceThreshold : convergenceThreshold}
+                    onChange={(event) => {setConvergenceThreshold(parseFloat(event.target.value))} }
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        {selectedProject.simulation?.status === "Completed" ? (
+            <button
+                className="button buttonPrimary w-[100%] mt-3"
                 onClick={() => {
                   //dispatch(setSimulationStatus("notStarted"));
                   dispatch(selectMenuItem("Results"));
                 }}
-              >
-                Results
-              </button>
-            )}
-          </div>
-        </div>
+            >
+              Results
+            </button>
+        ) :
+            <button
+                className={`w-full mt-3 button
+              ${(meshGenerated !== "Generated") ? 'bg-gray-300 text-gray-600 opacity-70': 'buttonPrimary'}`}
+                disabled={meshGenerated !== "Generated"}
+                onClick={() => {
+                  dispatch(setMeshApproved(true));
+                }}
+            >
+              Start Simulation
+            </button>
+        }
       </div>
     </>
   );

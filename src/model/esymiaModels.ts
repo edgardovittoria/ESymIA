@@ -91,7 +91,12 @@ export type Simulation = {
     ended: string,
     status: 'Queued' | 'Paused' | 'Completed' | 'Failed'
     results: SolverOutput,
-    associatedProject: string
+    associatedProject: string,
+    solverAlgoParams: {
+        innerIteration: number,
+        outerIteration: number,
+        convergenceThreshold: number
+    }
 }
 
 export type SolverOutput = {
