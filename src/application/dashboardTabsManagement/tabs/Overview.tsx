@@ -1,9 +1,8 @@
 import React from 'react';
-import {ImportSimProjectButton} from './importSimProjectButton';
-import {Simulations} from "../Simulations";
+import {Simulations} from "./Simulations";
 import {useDispatch, useSelector} from "react-redux";
-import {projectsSelector} from "../../../../store/projectSlice";
-import { addProjectTab } from '../../../../store/tabsAndMenuItemsSlice';
+import {projectsSelector} from "../../../store/projectSlice";
+import { addProjectTab } from '../../../store/tabsAndMenuItemsSlice';
 
 interface OverviewProps {
     setShowModal: Function
@@ -30,16 +29,11 @@ export const Overview: React.FC<OverviewProps> = (
                             }}>
                         + New Project
                     </button>
-                    <ImportSimProjectButton
-                        className="text-primaryColor bg-transparent border-none hover:underline hover:text-black"
-                        >
-                        Import Project
-                    </ImportSimProjectButton>
                 </div>
 
                 {projects.length === 0 ?
                     <div className="text-center p-[20px]">
-                        <img src="/noProjectsIcon2.png" className="m-auto" alt="No Projects Icon"/>
+                        <img src="/public/noProjectsIcon2.png" className="m-auto" alt="No Projects Icon"/>
                         <p>No projects for now.</p>
                         <button className="button buttonPrimary" data-toggle="modal"
                                 data-target="#createNewProjectModal"

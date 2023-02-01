@@ -4,8 +4,8 @@ import {Item, Menu, Separator, Submenu, useContextMenu} from "react-contexify";
 import {
     deleteSimulationProjectFromFauna,
     moveProjectInFauna,
-    removeIDInFolderProjectsList} from "../../../../../../faunadb/projectsFolderAPIs";
-import {BiExport, BiRename, BiShareAlt, BiTrash} from "react-icons/bi";
+} from "../../../../../../faunadb/projectsFolderAPIs";
+import {BiRename, BiShareAlt, BiTrash} from "react-icons/bi";
 import {BsFillFolderSymlinkFill} from "react-icons/bs";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -114,16 +114,6 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                         <Separator/>
                         <Item onClick={(p) => {
                             p.event.stopPropagation()
-                            exportSimulationProject(project)
-                            hideAll()
-                        }}>
-                            <BiExport
-                                className="mr-4 text-primaryColor w-[20px] h-[20px]"
-                            />
-                            Export
-                        </Item>
-                        <Item onClick={(p) => {
-                            p.event.stopPropagation()
                             setShowSearchUser(true)
                             hideAll()
                         }} disabled={user.userRole !== 'Premium'}>
@@ -153,15 +143,4 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
         </>
     )
 
-}
-
-export const exportSimulationProject = (project: Project) => {
-    const link = document.createElement('a');
-    link.href = `data:application/json;charset=utf-8,${encodeURIComponent(
-        JSON.stringify(project)
-    )}`
-    link.download = project.name + ".json"
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }

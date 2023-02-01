@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Overview } from "./tabs/overview/Overview";
+import { Overview } from "./tabs/Overview";
 import { Simulations } from "./tabs/Simulations";
 import { CreateNewProjectModal } from "../sharedModals/CreateNewProjectModal";
 import { Projects } from "./tabs/projects/Projects";
