@@ -198,7 +198,9 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
           ),
         quantum: quantumDimensions,
       };
-      axios.post('http://ec2-13-40-215-115.eu-west-2.compute.amazonaws.com/meshing', objToSendToMesher).then((res) => {
+      //ec2 meshing: http://ec2-13-40-215-115.eu-west-2.compute.amazonaws.com/meshing
+      //lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
+      axios.post('https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/', objToSendToMesher).then((res) => {
         saveMeshToS3((res.data)).then(() => {
           dispatch(setMeshGenerated("Generated"))
         });

@@ -33,7 +33,7 @@ export const Overview: React.FC<OverviewProps> = (
 
                 {projects.length === 0 ?
                     <div className="text-center p-[20px]">
-                        <img src="/public/noProjectsIcon2.png" className="m-auto" alt="No Projects Icon"/>
+                        <img src="/noProjectsIcon2.png" className="m-auto" alt="No Projects Icon"/>
                         <p>No projects for now.</p>
                         <button className="button buttonPrimary" data-toggle="modal"
                                 data-target="#createNewProjectModal"
