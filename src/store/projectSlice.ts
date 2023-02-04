@@ -6,7 +6,17 @@ import {
 } from "./auxiliaryFunctions/managementProjectsAndFoldersFunction";
 import { addProjectTab, closeProjectTab, selectMenuItem, selectTab } from './tabsAndMenuItemsSlice';
 import { deleteFileS3 } from "../aws/mesherAPIs";
-import { Folder, Port, Probe, Project, RLCParams, sharingInfoUser, Signal, Simulation } from '../model/esymiaModels';
+import {
+    Folder,
+    Port,
+    Probe,
+    Project,
+    RLCParams,
+    sharingInfoUser,
+    Signal,
+    Simulation,
+    TempLumped
+} from '../model/esymiaModels';
 
 
 export type ProjectState = {
@@ -165,6 +175,9 @@ export const ProjectSlice = createSlice({
             if (selectedPort) {
                 if (selectedPort.category === 'port' || selectedPort.category === 'lumped') {
                     selectedPort.rlcParams = action.payload
+                }
+                if(selectedPort.category === 'lumped'){
+                    (selectedPort as TempLumped).value = action.payload.resistance as number
                 }
             }
         },

@@ -1,5 +1,5 @@
 import {CircleGeometryAttributes, ComponentEntity, TransformationParams} from "cad-library";
-import { Port, Probe, RLCParams } from "../../../../../../model/esymiaModels";
+import {Port, Probe, RLCParams, TempLumped} from "../../../../../../model/esymiaModels";
 
 export function getDefaultPort(key: number){
     let port: Port = {
@@ -57,7 +57,7 @@ export function getDefaultPort(key: number){
 }
 
 export function getDefaultLumped(key: number){
-    let lumped: Port = {
+    let lumped: TempLumped = {
         name: "Lumped" + key,
         category: 'lumped',
         type: 0,
@@ -107,6 +107,7 @@ export function getDefaultLumped(key: number){
         } as ComponentEntity,
         isSelected: false,
         rlcParams: {} as RLCParams,
+        value: 0
     }
     return lumped
 }
