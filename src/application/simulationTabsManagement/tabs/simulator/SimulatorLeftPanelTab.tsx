@@ -38,7 +38,7 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
                                         <div className="w-[30%] text-left flex items-center">
                                             <Switch
                                                 checked={selectedMaterials.filter(m => m === material?.name).length > 0}
-                                                onChange={(e) => {
+                                                onChange={() => {
                                                     if (selectedMaterials.filter(sm => sm === material?.name)[0]) {
                                                         setSelectedMaterials(selectedMaterials.filter(sm => sm !== material?.name))
                                                     } else {

@@ -174,6 +174,7 @@ export const ModalSignals: React.FC<ModalSignalsProps> = (
                                                             <td>{index}</td>
                                                             <td>{row.freq}</td>
                                                             <td>{row.signal.Re} + {row.signal.Im}i</td>
+                                                            <td><button className='button bg-gray-300' onClick={() => {setSignalValuesArray(signalValuesArray.filter((s, indx) => indx !== index))}}>Delete</button></td>
                                                         </tr>
                                                     )
                                                 })}
