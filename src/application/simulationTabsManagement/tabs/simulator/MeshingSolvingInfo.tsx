@@ -62,6 +62,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       });
     });
 
+    console.log(STLList)
     return STLList;
   }
 
@@ -141,8 +142,9 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       //     }
       //   }
       // })
-      //https://teema-flask-api-4rys7fymga-uc.a.run.app
-      axios.post("https://teema-flask-api-4rys7fymga-uc.a.run.app/", dataToSendToSolver).then((res) => {
+      //https://teema-flask-api-4rys7fymga-uc.a.run.app -> 4GB
+      //https://flask-app-16gb-4rys7fymga-uc.a.run.app -> 16GB
+      axios.post("https://flask-app-16gb-4rys7fymga-uc.a.run.app", dataToSendToSolver).then((res) => {
         dispatch(setSolverOutput(res.data));
         let simulationUpdated: Simulation = {
           ...simulation,
@@ -200,7 +202,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       };
       //ec2 meshing: http://ec2-13-40-215-115.eu-west-2.compute.amazonaws.com/meshing
       //lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
-      axios.post('https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/', objToSendToMesher).then((res) => {
+      axios.post('http://ec2-13-40-215-115.eu-west-2.compute.amazonaws.com/meshing', objToSendToMesher).then((res) => {
         saveMeshToS3((res.data)).then(() => {
           dispatch(setMeshGenerated("Generated"))
         });

@@ -31,10 +31,8 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
 									type="number"
-									step={0.1}
-									value={selectedPort.inputElement.transformationParams.position[0].toFixed(
-										6
-									)}
+									step={0.000001}
+									value={selectedPort.inputElement.transformationParams.position[0]}
 									onChange={(event) => {
 										let newPosition = [
 											parseFloat(event.currentTarget.value),
@@ -59,10 +57,8 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
 									type="number"
-									step={0.1}
-									value={selectedPort.inputElement.transformationParams.position[1].toFixed(
-										6
-									)}
+									step={0.000001}
+									value={selectedPort.inputElement.transformationParams.position[1]}
 									onChange={(event) => {
 										let newPosition = [
 											selectedPort.inputElement.transformationParams
@@ -87,10 +83,8 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
 									type="number"
-									step={0.1}
-									value={selectedPort.inputElement.transformationParams.position[2].toFixed(
-										6
-									)}
+									step={0.000001}
+									value={selectedPort.inputElement.transformationParams.position[2]}
 									onChange={(event) => {
 										let newPosition = [
 											selectedPort.inputElement.transformationParams
@@ -120,10 +114,8 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
 									type="number"
-									step={0.1}
-									value={selectedPort.outputElement.transformationParams.position[0].toFixed(
-										6
-									)}
+									step={0.000001}
+									value={selectedPort.outputElement.transformationParams.position[0]}
 									onChange={(event) => {
 										let newPosition = [
 											parseFloat(event.currentTarget.value),
@@ -148,10 +140,8 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
 									type="number"
-									step={0.1}
-									value={selectedPort.outputElement.transformationParams.position[1].toFixed(
-										6
-									)}
+									step={0.000001}
+									value={selectedPort.outputElement.transformationParams.position[1]}
 									onChange={(event) => {
 										let newPosition = [
 											selectedPort.outputElement.transformationParams
@@ -176,10 +166,8 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
 									type="number"
-									step={0.1}
-									value={selectedPort.outputElement.transformationParams.position[2].toFixed(
-										6
-									)}
+									step={0.000001}
+									value={selectedPort.outputElement.transformationParams.position[2]}
 									onChange={(event) => {
 										let newPosition = [
 											selectedPort.outputElement.transformationParams
@@ -214,7 +202,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
 									type="number"
-									step={0.1}
+									step={0.000001}
 									value={(selectedPort as Probe).groupPosition[0].toFixed(6)}
 									onChange={(event) => {
 										let newPosition = [
@@ -238,7 +226,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
 									type="number"
-									step={0.1}
+									step={0.000001}
 									value={(selectedPort as Probe).groupPosition[1].toFixed(6)}
 									onChange={(event) => {
 										let newPosition = [
@@ -262,7 +250,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
 									type="number"
-									step={0.1}
+									step={0.000001}
 									value={(selectedPort as Probe).groupPosition[2].toFixed(6)}
 									onChange={(event) => {
 										let newPosition = [

@@ -62,9 +62,9 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = (
                             if (matrix[i][j][k]) {
                                 const id = y++
                                 tempObject.position.set(
-                                    (i!==0) ? ((i-1) * mesherOutput.cell_size.cell_size_x + mesherOutput.cell_size.cell_size_x)*1000 : mesherOutput.origin.origin_x,
-                                    (j!==0) ? ((j-1) * mesherOutput.cell_size.cell_size_y + mesherOutput.cell_size.cell_size_y)*1000: mesherOutput.origin.origin_y,
-                                    (k!==0) ? ((k-1) * mesherOutput.cell_size.cell_size_z + mesherOutput.cell_size.cell_size_z)*1000: mesherOutput.origin.origin_z
+                                    (i!==0) ? ((i-1) * mesherOutput.cell_size.cell_size_x + mesherOutput.cell_size.cell_size_x)*2000 : mesherOutput.origin.origin_x,
+                                    (j!==0) ? ((j-1) * mesherOutput.cell_size.cell_size_y + mesherOutput.cell_size.cell_size_y)*2000: mesherOutput.origin.origin_y,
+                                    (k!==0) ? ((k-1) * mesherOutput.cell_size.cell_size_z + mesherOutput.cell_size.cell_size_z)*2000: mesherOutput.origin.origin_z
                                 )
                                 tempObject.updateMatrix();
                                 meshRef.current[index].setMatrixAt(id, tempObject.matrix)
@@ -88,7 +88,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = (
             }}
             key={index}
             args={[null as any, null as any, numberOfCells[index]]}>
-            <boxGeometry args={[.08,.08,.08]}/>
+            <boxGeometry args={[(mesherOutput?.cell_size.cell_size_x as number)*1000, (mesherOutput?.cell_size.cell_size_y as number)*1000, (mesherOutput?.cell_size.cell_size_z as number)*1000]}/>
             <meshPhongMaterial color={(materialsList[index]) && materialsList[index].color}/>
         </instancedMesh>
     )

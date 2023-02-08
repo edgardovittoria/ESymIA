@@ -26,6 +26,7 @@ export const RLCParamsComponent: React.FC<RLCParamsProps> = ({
                     className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
                     type="number"
                     disabled={disabled}
+                    step={0.000001}
                     value={
                         selectedPort.rlcParams.resistance
                             ? selectedPort.rlcParams.resistance.toString()
