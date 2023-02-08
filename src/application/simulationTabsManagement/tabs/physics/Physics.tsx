@@ -4,10 +4,7 @@ import {
 	findSelectedPort,
 	selectedProjectSelector,
 	selectPort,
-	updatePortPosition,
-	addPorts,
-	setAssociatedSignal
-} from "../../../../store/projectSlice";
+	updatePortPosition} from "../../../../store/projectSlice";
 import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
 import * as THREE from "three";
 import { Line } from "@react-three/drei";
@@ -22,12 +19,13 @@ import { RLCParamsComponent } from "./portManagement/components/RLCParamsCompone
 import { ModalSelectPortType } from "./portManagement/ModalSelectPortType";
 import { InputSignal } from "./inputSignal/InputSignal";
 import { ModalSignals } from "./inputSignal/ModalSignals";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { InputSignalManagement } from "./inputSignal/InputSignalManagement";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
-import { Port, Probe, Project, Signal, TempLumped } from "../../../../model/esymiaModels";
+import { Probe, Project } from "../../../../model/esymiaModels";
+import { ImportExportPhysicsSetup } from "./ImportExportPhysicsSetup";
 
 interface PhysicsProps {
 	selectedTabLeftPanel: string;
@@ -47,26 +45,6 @@ export const Physics: React.FC<PhysicsProps> = ({
 	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
 	const [showModalSignal, setShowModalSignal] = useState(false);
 	const dispatch = useDispatch();
-	const inputRefPhysics = useRef(null);
-
-	const onImportPhysicsClick = () => {
-		let input = inputRefPhysics.current;
-		if (input) {
-			(input as HTMLInputElement).click();
-		}
-	};
-
-	const exportDataToJsonFile = (data: any) => {
-		const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
-			JSON.stringify(data)
-		)}`;
-		const link = document.createElement("a");
-		link.href = jsonString;
-		link.download = selectedProject?.name + "_physics.json";
-
-		link.click();
-	};
-
 	return (
 		<>
 			<CanvasBaseWithRedux
@@ -172,44 +150,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 			{selectedProject?.model.components && (
 				<SelectPorts selectedProject={selectedProject} />
 			)}
-			<button
-			disabled={selectedProject?.simulation?.status === 'Completed'}
-				className="absolute left-[30%] top-[160px] text-primaryColor bg-transparent border-none hover:underline hover:text-black"
-				onClick={onImportPhysicsClick}>
-				Import Physics Setup
-				<input
-					type="file"
-					ref={inputRefPhysics}
-					style={{ display: "none" }}
-					accept="application/json"
-					onChange={(e) => {
-						let files = e.target.files;
-						files &&
-						files[0].text().then((value) => {
-							let physics : {ports: (Port | Probe | TempLumped)[], signal: Signal | undefined} = JSON.parse(value);
-							(physics.ports.length > 0) && physics.ports.forEach(p => dispatch(addPorts(p)));
-							(physics.signal) && dispatch(setAssociatedSignal(physics.signal))
-						})
-					}}
-				/>
-			</button>
-			<button
-				disabled={
-					selectedProject &&
-					(selectedProject.ports.length > 0 || selectedProject.signal)
-						? false
-						: true
-				}
-				className="absolute left-[40%] top-[160px] text-primaryColor bg-transparent border-none hover:underline hover:text-black"
-				onClick={() => {
-					let physics = {
-						ports: selectedProject?.ports,
-						signal: selectedProject?.signal,
-					};
-					exportDataToJsonFile(physics);
-				}}>
-				Export Physics Setup
-			</button>
+			<ImportExportPhysicsSetup />
 			{/* <RightPanelSimulation> */}
 			{selectedPort &&
 			(selectedPort?.category === "port" ||
