@@ -173,6 +173,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 				<SelectPorts selectedProject={selectedProject} />
 			)}
 			<button
+			disabled={selectedProject?.simulation?.status === 'Completed'}
 				className="absolute left-[30%] top-[160px] text-primaryColor bg-transparent border-none hover:underline hover:text-black"
 				onClick={onImportPhysicsClick}>
 				Import Physics Setup
