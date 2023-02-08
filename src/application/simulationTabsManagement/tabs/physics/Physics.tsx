@@ -5,6 +5,8 @@ import {
 	selectedProjectSelector,
 	selectPort,
 	updatePortPosition,
+	addPorts,
+	setAssociatedSignal
 } from "../../../../store/projectSlice";
 import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
 import * as THREE from "three";
@@ -20,34 +22,56 @@ import { RLCParamsComponent } from "./portManagement/components/RLCParamsCompone
 import { ModalSelectPortType } from "./portManagement/ModalSelectPortType";
 import { InputSignal } from "./inputSignal/InputSignal";
 import { ModalSignals } from "./inputSignal/ModalSignals";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { InputSignalManagement } from "./inputSignal/InputSignalManagement";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
-import { Probe, Project } from "../../../../model/esymiaModels";
+import { Port, Probe, Project, Signal, TempLumped } from "../../../../model/esymiaModels";
 
 interface PhysicsProps {
 	selectedTabLeftPanel: string;
 	setSelectedTabLeftPanel: Function;
 	savedPortParameters: boolean;
-	setSavedPortParameters: Function
+	setSavedPortParameters: Function;
 }
 
 export const Physics: React.FC<PhysicsProps> = ({
 	selectedTabLeftPanel,
 	setSelectedTabLeftPanel,
 	savedPortParameters,
-	setSavedPortParameters
+	setSavedPortParameters,
 }) => {
 	const selectedProject = useSelector(selectedProjectSelector);
 	let selectedPort = findSelectedPort(selectedProject);
 	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
 	const [showModalSignal, setShowModalSignal] = useState(false);
 	const dispatch = useDispatch();
+	const inputRefPhysics = useRef(null);
+
+	const onImportPhysicsClick = () => {
+		let input = inputRefPhysics.current;
+		if (input) {
+			(input as HTMLInputElement).click();
+		}
+	};
+
+	const exportDataToJsonFile = (data: any) => {
+		const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+			JSON.stringify(data)
+		)}`;
+		const link = document.createElement("a");
+		link.href = jsonString;
+		link.download = selectedProject?.name + "_physics.json";
+
+		link.click();
+	};
+
 	return (
 		<>
-			<CanvasBaseWithRedux section="Physics" savedPortParameters={savedPortParameters}>
+			<CanvasBaseWithRedux
+				section="Physics"
+				savedPortParameters={savedPortParameters}>
 				{selectedProject?.ports.map((port, index) => {
 					if (port.category === "port" || port.category === "lumped") {
 						return (
@@ -148,12 +172,52 @@ export const Physics: React.FC<PhysicsProps> = ({
 			{selectedProject?.model.components && (
 				<SelectPorts selectedProject={selectedProject} />
 			)}
+			<button
+				className="absolute left-[30%] top-[160px] text-primaryColor bg-transparent border-none hover:underline hover:text-black"
+				onClick={onImportPhysicsClick}>
+				Import Physics Setup
+				<input
+					type="file"
+					ref={inputRefPhysics}
+					style={{ display: "none" }}
+					accept="application/json"
+					onChange={(e) => {
+						let files = e.target.files;
+						files &&
+						files[0].text().then((value) => {
+							let physics : {ports: (Port | Probe | TempLumped)[], signal: Signal | undefined} = JSON.parse(value);
+							(physics.ports.length > 0) && physics.ports.forEach(p => dispatch(addPorts(p)));
+							(physics.signal) && dispatch(setAssociatedSignal(physics.signal))
+						})
+					}}
+				/>
+			</button>
+			<button
+				disabled={
+					selectedProject &&
+					(selectedProject.ports.length > 0 || selectedProject.signal)
+						? false
+						: true
+				}
+				className="absolute left-[40%] top-[160px] text-primaryColor bg-transparent border-none hover:underline hover:text-black"
+				onClick={() => {
+					let physics = {
+						ports: selectedProject?.ports,
+						signal: selectedProject?.signal,
+					};
+					exportDataToJsonFile(physics);
+				}}>
+				Export Physics Setup
+			</button>
 			{/* <RightPanelSimulation> */}
 			{selectedPort &&
 			(selectedPort?.category === "port" ||
 				selectedPort?.category === "lumped") ? (
 				<>
-					<PortManagement selectedPort={selectedPort} savedPortParameters={savedPortParameters} setSavedPortParameters={setSavedPortParameters}>
+					<PortManagement
+						selectedPort={selectedPort}
+						savedPortParameters={savedPortParameters}
+						setSavedPortParameters={setSavedPortParameters}>
 						<PortType
 							disabled={selectedProject?.simulation?.status === "Completed"}
 							setShow={setShowModalSelectPortType}
@@ -191,7 +255,10 @@ export const Physics: React.FC<PhysicsProps> = ({
 					</InputSignalManagement>
 				</>
 			) : (
-				<PortManagement selectedPort={selectedPort} savedPortParameters={savedPortParameters} setSavedPortParameters={setSavedPortParameters}>
+				<PortManagement
+					selectedPort={selectedPort}
+					savedPortParameters={savedPortParameters}
+					setSavedPortParameters={setSavedPortParameters}>
 					<PortPosition
 						selectedPort={selectedPort ?? ({} as Probe)}
 						disabled={selectedProject?.simulation?.status === "Completed"}

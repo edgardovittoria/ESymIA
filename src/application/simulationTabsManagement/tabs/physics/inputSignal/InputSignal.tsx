@@ -27,9 +27,6 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 	const { availableSignals, setAvailableSignals } = useGetAvailableSignals();
 	const [show, setShow] = useState(false);
 	const { execQuery } = useFaunaQuery();
-	const [selectedSignal, setSelectedSignal] = useState(
-		selectedProject.signal?.name as string
-	);
 
 	function getSignalByName(name: string) {
 		return availableSignals.filter((signal) => signal.name === name)[0];
@@ -89,9 +86,8 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 						<select
 							className=" bg-transparent pt-[3px] pb-[3px] border-[1px] border-[#a3a3a3] rounded-xl text-[12px] font-[500]"
 							disabled={disabled}
-							value={selectedSignal}
+							value={selectedProject.signal?.name as string}
 							onChange={(event) => {
-								setSelectedSignal(event.currentTarget.value);
 								dispatch(
 									setAssociatedSignal(
 										getSignalByName(event.currentTarget.value)
@@ -142,7 +138,7 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 								onChange={(event) => {
 									let port = getPortByName(event.currentTarget.value) as Port;
 									let signal: Signal = {
-										...getSignalByName(selectedSignal),
+										...getSignalByName(selectedProject.signal?.name as string),
 										powerPort: port.name,
 									};
 									dispatch(setAssociatedSignal(signal));
@@ -172,7 +168,7 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 							<span
 								className="hover:cursor-pointer hover:underline"
 								onClick={() => setShow(true)}>
-								{selectedSignal}
+								{selectedProject.signal.name}
 							</span>
 						</div>
 					)}
