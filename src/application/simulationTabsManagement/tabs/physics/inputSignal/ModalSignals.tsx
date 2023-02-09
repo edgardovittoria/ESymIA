@@ -1,18 +1,19 @@
 import React, {Fragment, useState} from 'react';
 import {saveSignal} from "../../../../../faunadb/signalsAPIs";
 import { useFaunaQuery } from 'cad-library';
-import {useGetAvailableSignals} from "./useGetAvailableSignals"
 import {Dialog, Transition} from "@headlessui/react";
 import { Signal, SignalValues } from '../../../../../model/esymiaModels';
 
 interface ModalSignalsProps {
     showModalSignal: boolean,
     setShowModalSignal: Function,
+    availableSignals: Signal[],
+    setAvailableSignals: Function
 }
 
 export const ModalSignals: React.FC<ModalSignalsProps> = (
     {
-        showModalSignal, setShowModalSignal
+        showModalSignal, setShowModalSignal, availableSignals, setAvailableSignals
     }
 ) => {
 
@@ -23,7 +24,6 @@ export const ModalSignals: React.FC<ModalSignalsProps> = (
     const [signalRe, setSignalRe] = useState<number | string>('');
     const [signalIm, setSignalIm] = useState<number | string>('');
     const [signalValuesArray, setSignalValuesArray] = useState<SignalValues[]>([]);
-    const {availableSignals, setAvailableSignals} = useGetAvailableSignals()
     const {execQuery} = useFaunaQuery()
 
     function onModalClose() {

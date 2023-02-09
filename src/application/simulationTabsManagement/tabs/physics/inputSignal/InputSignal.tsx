@@ -1,32 +1,37 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { ModalInputSignal } from "./ModalInputSignal";
 import { useFaunaQuery } from "cad-library";
 import { useDispatch } from "react-redux";
-import { useGetAvailableSignals } from "./useGetAvailableSignals";
 import { setAssociatedSignal } from "../../../../../store/projectSlice";
-import { saveSignal } from "../../../../../faunadb/signalsAPIs";
+import { saveSignal, getSignals } from "../../../../../faunadb/signalsAPIs";
 import {
 	Port,
 	Project,
 	Signal,
 	SignalValues,
 } from "../../../../../model/esymiaModels";
+import { ModalSignals } from "./ModalSignals";
 
 interface InputSignalProps {
-	setShowModalSignal: Function;
 	selectedProject: Project;
 	disabled: boolean;
 }
 
 export const InputSignal: React.FC<InputSignalProps> = ({
-	setShowModalSignal,
 	selectedProject,
 	disabled,
 }) => {
 	const dispatch = useDispatch();
-	const { availableSignals, setAvailableSignals } = useGetAvailableSignals();
 	const [show, setShow] = useState(false);
 	const { execQuery } = useFaunaQuery();
+	const [showModalSignal, setShowModalSignal] = useState(false);
+	const [availableSignals, setAvailableSignals] = useState<Signal[]>([]);
+
+	useEffect(() => {
+		execQuery(getSignals).then((res) => {
+			setAvailableSignals(res);
+		});
+	}, []);
 
 	function getSignalByName(name: string) {
 		return availableSignals.filter((signal) => signal.name === name)[0];
@@ -181,6 +186,12 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 					/>
 				)}
 			</div>
+			<ModalSignals
+				availableSignals={availableSignals}
+				setAvailableSignals={setAvailableSignals}
+				showModalSignal={showModalSignal}
+				setShowModalSignal={setShowModalSignal}
+			/>
 		</>
 	);
 };

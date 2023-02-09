@@ -18,7 +18,6 @@ import { PortPosition } from "./portManagement/components/PortPosition";
 import { RLCParamsComponent } from "./portManagement/components/RLCParamsComponent";
 import { ModalSelectPortType } from "./portManagement/ModalSelectPortType";
 import { InputSignal } from "./inputSignal/InputSignal";
-import { ModalSignals } from "./inputSignal/ModalSignals";
 import { useState } from "react";
 import { InputSignalManagement } from "./inputSignal/InputSignalManagement";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
@@ -43,7 +42,6 @@ export const Physics: React.FC<PhysicsProps> = ({
 	const selectedProject = useSelector(selectedProjectSelector);
 	let selectedPort = findSelectedPort(selectedProject);
 	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
-	const [showModalSignal, setShowModalSignal] = useState(false);
 	const dispatch = useDispatch();
 	return (
 		<>
@@ -187,12 +185,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 					<InputSignalManagement>
 						<InputSignal
 							disabled={selectedProject?.simulation?.status === "Completed"}
-							setShowModalSignal={setShowModalSignal}
 							selectedProject={selectedProject as Project}
-						/>
-						<ModalSignals
-							showModalSignal={showModalSignal}
-							setShowModalSignal={setShowModalSignal}
 						/>
 					</InputSignalManagement>
 				</>
