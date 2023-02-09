@@ -208,7 +208,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 					/>
 				</PortManagement>
 			)}
-			{/* </RightPanelSimulation> */}s
+			{/* </RightPanelSimulation> */}
 		</>
 	);
 };

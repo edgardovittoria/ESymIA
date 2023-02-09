@@ -18,7 +18,7 @@ export const DashboardTabsContentFactory: React.FC<
 	switch (menuItemSelected) {
 		case "Overview":
 			return (
-				<div className="container flex mx-auto pt-8">
+				<div className="container flex mx-auto pt-8 h-[88vh]">
 					<div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
 						<Overview setShowModal={setShowCreateNewProjectModal} />
 					</div>
@@ -31,7 +31,7 @@ export const DashboardTabsContentFactory: React.FC<
 
 		case "Projects":
 			return (
-				<div className="container flex mx-auto pt-8">
+				<div className="container flex mx-auto pt-8 h-[88vh]">
 					<div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
 						<Projects setShowModal={setShowCreateNewProjectModal} />
 					</div>
@@ -43,7 +43,7 @@ export const DashboardTabsContentFactory: React.FC<
 			);
 		case "Simulations":
 			return (
-				<div className="container flex mx-auto pt-8">
+				<div className="container flex mx-auto pt-8 h-[88vh]">
 					<div className="flex flex-wrap w-full mr-7 justify-between h-[650px]">
 						<Simulations />
 					</div>

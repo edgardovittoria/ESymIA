@@ -22,6 +22,7 @@
     "browser-image-compression": "^1.0.17",
     "cad-library": "^0.2.10",
     "chart.js": "^3.7.0",
+    "daisyui": "^2.50.0",
     "faunadb": "^4.5.4",
     "font-awesome": "^4.7.0",
     "ramda": "^0.28.0",

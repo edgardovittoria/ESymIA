@@ -32,7 +32,7 @@ export const Results: React.FC<ResultsProps> = ({
   >("grid");
   let simulation = selectedProject?.simulation
   return (
-    <div className="flex">
+    <div className="flex h-[88vh]">
       <div className="w-[20%]">
         <LeftPanel
           tabs={["Modeler", "Results"]}
