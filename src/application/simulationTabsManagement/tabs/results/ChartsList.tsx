@@ -11,7 +11,9 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { Project, Simulation } from "../../../../model/esymiaModels";
+import { Port, Project, Simulation } from "../../../../model/esymiaModels";
+import { useSelector } from "react-redux";
+import { selectedProjectSelector } from "../../../../store/projectSlice";
 
 ChartJS.register(
   CategoryScale,
@@ -37,6 +39,7 @@ interface Dataset {
   backgroundColor: string;
 }
 
+
 export const ChartsList: React.FC<ChartsListProps> = ({
   simulation,
   project,
@@ -55,11 +58,14 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     "S_Phase",
     "S_dB",
   ];
+
+  const selectedProject = useSelector(selectedProjectSelector)
+  const ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
   const matrix_Z = JSON.parse(simulation.results.matrix_Z);
   const matrix_Y = JSON.parse(simulation.results.matrix_Y);
   const matrix_S = JSON.parse(simulation.results.matrix_S);
   const chartsDataOptionsList = chartsOrderedIDs.map((id) =>
-    chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S)
+    chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S, ports)
   );
 
   const optionsWithScaleMode = (options: any, scaleMode: string) => {
@@ -108,7 +114,8 @@ const chartsDataOptionsFactory = (
   label: string, 
   matrix_Z: any,
   matrix_Y: any,
-  matrix_S: any
+  matrix_S: any, 
+  ports: Port[]
 ) => {
   const colorArray = [
     "red",
@@ -143,7 +150,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_Z_RER.forEach((matrix, index) => {
         datasetsR.push({
-          label: `Port ${index + 1} - R(mOhm)`,
+          label:  `${ports[index].name} - R(mOhm)`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -192,7 +199,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_Z_IM.forEach((matrix, index) => {
         datasetsH.push({
-          label: `Port ${index + 1} - L(nH)`,
+          label: `${ports[index].name} - L(nH)`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -242,7 +249,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_Z_Module_RE.forEach((matrix, index) => {
         datasetsZModule.push({
-          label: `Port ${index + 1} - Z Module`,
+          label: `${ports[index].name} - Z Module`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -289,7 +296,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_Z_Phase_RE.forEach((matrix, index) => {
         datasetsZPhase.push({
-          label: `Port ${index + 1} - Z Phase`,
+          label: `${ports[index].name} - Z Phase`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -336,7 +343,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_YG_RE.forEach((matrix, index) => {
         datasetsG.push({
-          label: `Port ${index + 1} - G(S)`,
+          label: `${ports[index].name} - G(S)`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -383,7 +390,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_YC_RE.forEach((matrix, index) => {
         datasetsC.push({
-          label: `Port ${index + 1} - C(F)`,
+          label: `${ports[index].name} - C(F)`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -434,7 +441,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_Y_Module_RE.forEach((matrix, index) => {
         datasetsYModule.push({
-          label: `Port ${index + 1} - Y Module`,
+          label: `${ports[index].name} - Y Module`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -481,7 +488,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_Y_Phase_RE.forEach((matrix, index) => {
         datasetsYPhase.push({
-          label: `Port ${index + 1} - Y Phase`,
+          label: `${ports[index].name} - Y Phase`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -532,7 +539,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_S_Module_RE.forEach((matrix, index) => {
         datasetsSModule.push({
-          label: `Port ${index + 1} - S Module`,
+          label: `${ports[index].name} - S Module`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -579,7 +586,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_S_Phase_RE.forEach((matrix, index) => {
         datasetsSPhase.push({
-          label: `Port ${index + 1} - S Phase`,
+          label: `${ports[index].name} - S Phase`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
@@ -628,7 +635,7 @@ const chartsDataOptionsFactory = (
       });
       matrices_S_dB_RE.forEach((matrix, index) => {
         datasetsSdB.push({
-          label: `Port ${index + 1} - S dB`,
+          label: `${ports[index].name} - S dB`,
           data: matrix,
           borderColor: colorArray[index],
           backgroundColor: "white",
