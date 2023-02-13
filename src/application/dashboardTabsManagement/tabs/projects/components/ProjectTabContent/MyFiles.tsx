@@ -3,7 +3,8 @@ import {HTML5Backend} from "react-dnd-html5-backend";
 import {
     mainFolderSelector,
     SelectedFolderSelector,
-    selectFolder} from "../../../../../../store/projectSlice";
+    selectFolder
+} from "../../../../../../store/projectSlice";
 import {DroppableAndDraggableFolder} from "../droppableDraggableFolderProject/DroppableAndDraggableFolder";
 import {DraggableProjectCard} from "../droppableDraggableFolderProject/DraggableProjectCard";
 import {SearchUserAndShare} from "../droppableDraggableFolderProject/searchUserAndShare/searchUserAndShare";
@@ -12,7 +13,7 @@ import {DndProvider} from "react-dnd";
 import {useDispatch, useSelector} from "react-redux";
 import {usersStateSelector} from "cad-library";
 
-export interface MyFilesProps{
+export interface MyFilesProps {
     setShowModal: Function;
     showCreateNewFolderModal: boolean
     setShowCreateNewFolderModal: Function;
@@ -37,7 +38,7 @@ const MyFiles: React.FC<MyFilesProps> = (
 
     const [path, setPath] = useState([mainFolder]);
 
-    return(
+    return (
         <>
             <DndProvider backend={HTML5Backend}>
                 <div className="box w-full h-full">
@@ -84,13 +85,13 @@ const MyFiles: React.FC<MyFilesProps> = (
                         <hr/>
                     </div>
 
-                    <div className="w-full text-left overflow-scroll overflow-x-hidden p-[20px] h-[80%]">
+                    <div className="w-full text-left p-[20px] h-[80%]">
                         {projects &&
                         folders &&
                         (projects.length > 0 || folders.length > 0) ? (
                             <>
-                                <div className="flex flex-wrap ">
-                                    {folders.length > 0 && <h5 className="w-[100%]">Folders</h5>}
+                                {folders.length > 0 && <h5 className="w-[100%]">Folders</h5>}
+                                <div className="flex flex-wrap overflow-scroll max-h-[100px]">
                                     {folders.map((folder) => {
                                         return (
                                             <DroppableAndDraggableFolder
@@ -102,8 +103,8 @@ const MyFiles: React.FC<MyFilesProps> = (
                                         );
                                     })}
                                 </div>
-                                <div className={`flex flex-wrap mt-4`}>
-                                    {projects.length > 0 && <h5 className="w-[100%]">Projects</h5>}
+                                {projects.length > 0 && <h5 className="w-[100%] mt-4">Projects</h5>}
+                                <div className={`flex flex-wrap mt-2 overflow-scroll max-h-[380px]`}>
                                     {projects
                                         .filter((p) => p.owner.userName === user.userName)
                                         .map((project) => {
