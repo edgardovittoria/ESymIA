@@ -144,7 +144,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       // })
       //https://teema-flask-api-4rys7fymga-uc.a.run.app -> 4GB
       //https://flask-app-16gb-4rys7fymga-uc.a.run.app -> 16GB
-      axios.post("https://flask-app-16gb-4rys7fymga-uc.a.run.app", dataToSendToSolver).then((res) => {
+      axios.post("http://127.0.0.1:5000/solving", dataToSendToSolver).then((res) => {
         dispatch(setSolverOutput(res.data));
         let simulationUpdated: Simulation = {
           ...simulation,
@@ -180,9 +180,9 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     if (mesherOutput) {
       dispatch(
           setQuantum([
-            mesherOutput.cell_size.cell_size_x,
-            mesherOutput.cell_size.cell_size_y,
-            mesherOutput.cell_size.cell_size_z,
+            mesherOutput.cell_size.cell_size_x*1000,
+            mesherOutput.cell_size.cell_size_y*1000,
+            mesherOutput.cell_size.cell_size_z*1000,
           ])
       );
     }

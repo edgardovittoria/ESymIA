@@ -112,9 +112,9 @@ const chartsDataOptionsFactory = (
   simulation: Simulation,
   project: Project | undefined,
   label: string, 
-  matrix_Z: any,
-  matrix_Y: any,
-  matrix_S: any, 
+  matrix_Z: any[][][][],
+  matrix_Y: any[][][][],
+  matrix_S: any[][][][],
   ports: Port[]
 ) => {
   const colorArray = [
@@ -134,6 +134,7 @@ const chartsDataOptionsFactory = (
   // let matrix_Z = eval(simulation.results.matrix_Z);
   // let matrix_Y = eval(simulation.results.matrix_Y);
   // let matrix_S = eval(simulation.results.matrix_S);
+  let portNumber: number = ports.length
   switch (label) {
     case "R":
       // let matrix_Z_ModuleR: any = eval(simulation.results.matrix_Z);
@@ -141,13 +142,15 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsR.push(sv.freq));
       const datasetsR: Dataset[] = [];
       let matrices_Z_RER: number[][] = [];
-      let matrix_Z_RE_valueR: number[] = [];
-      matrix_Z.forEach((mz: any[][]) => {
-        matrices_Z_RER.push(matrix_Z_RE_valueR);
-        mz.forEach((mz2: any[]) => {
-          matrix_Z_RE_valueR.push(mz2[0] * 1000);
-        });
-      });
+
+      for(let i = 0; i<portNumber; i++){
+        matrices_Z_RER.push([])
+        matrix_Z[i].forEach(m => {
+          m.forEach(v => {
+            (matrices_Z_RER[i] as Array<number>).push(v[0]*1000)
+          })
+        })
+      }
       matrices_Z_RER.forEach((matrix, index) => {
         datasetsR.push({
           label:  `${ports[index].name} - R(mOhm)`,
@@ -188,15 +191,16 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsH.push(sv.freq));
       const datasetsH: Dataset[] = [];
       let matrices_Z_IM: number[][] = [];
-      let matrix_Z_IM_value: number[] = [];
-      matrix_Z.forEach((mz: any[][]) => {
-        matrices_Z_IM.push(matrix_Z_IM_value);
-        mz.forEach((mz2: any[], index) => {
-          matrix_Z_IM_value.push(
-            (mz2[1] / (2 * Math.PI * labelsH[index])) * 1000000000
-          );
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_Z_IM.push([])
+        matrix_Z[i].forEach(m => {
+          m.forEach((v,index) => {
+            (matrices_Z_IM[i] as Array<number>).push(
+                (v[1] / (2 * Math.PI * labelsH[index])) * 1000000000
+            )
+          })
+        })
+      }
       matrices_Z_IM.forEach((matrix, index) => {
         datasetsH.push({
           label: `${ports[index].name} - L(nH)`,
@@ -238,15 +242,16 @@ const chartsDataOptionsFactory = (
       );
       const datasetsZModule: Dataset[] = [];
       let matrices_Z_Module_RE: number[][] = [];
-      let matrix_Z_Module_RE_value: number[] = [];
-      matrix_Z.forEach((mz: any[][]) => {
-        matrices_Z_Module_RE.push(matrix_Z_Module_RE_value);
-        mz.forEach((mz2: any[]) => {
-          matrix_Z_Module_RE_value.push(
-            Math.sqrt(mz2[0] * mz2[0] + mz2[1] * mz2[1])
-          );
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_Z_Module_RE.push([])
+        matrix_Z[i].forEach(m => {
+          m.forEach((v) => {
+            (matrices_Z_Module_RE[i] as Array<number>).push(
+                Math.sqrt(v[0] * v[0] + v[1] * v[1])
+            )
+          })
+        })
+      }
       matrices_Z_Module_RE.forEach((matrix, index) => {
         datasetsZModule.push({
           label: `${ports[index].name} - Z Module`,
@@ -287,13 +292,16 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsZPhase.push(sv.freq));
       const datasetsZPhase: Dataset[] = [];
       let matrices_Z_Phase_RE: number[][] = [];
-      let matrix_Z_Phase_RE_value: number[] = [];
-      matrix_Z.forEach((mz: any[][]) => {
-        matrices_Z_Phase_RE.push(matrix_Z_Phase_RE_value);
-        mz.forEach((mz2: any[]) => {
-          matrix_Z_Phase_RE_value.push(Math.atan2(mz2[1], mz2[0]));
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_Z_Phase_RE.push([])
+        matrix_Z[i].forEach(m => {
+          m.forEach((v) => {
+            (matrices_Z_Phase_RE[i] as Array<number>).push(
+                Math.atan2(v[1], v[0])
+            )
+          })
+        })
+      }
       matrices_Z_Phase_RE.forEach((matrix, index) => {
         datasetsZPhase.push({
           label: `${ports[index].name} - Z Phase`,
@@ -334,13 +342,16 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsG.push(sv.freq));
       const datasetsG: Dataset[] = [];
       let matrices_YG_RE: number[][] = [];
-      let matrix_YG_RE_value: number[] = [];
-      matrix_Y.forEach((mz: any[][]) => {
-        matrices_YG_RE.push(matrix_YG_RE_value);
-        mz.forEach((mz2: any[]) => {
-          matrix_YG_RE_value.push(mz2[0] as number);
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_YG_RE.push([])
+        matrix_Y[i].forEach(m => {
+          m.forEach((v) => {
+            (matrices_YG_RE[i] as Array<number>).push(
+                v[0]
+            )
+          })
+        })
+      }
       matrices_YG_RE.forEach((matrix, index) => {
         datasetsG.push({
           label: `${ports[index].name} - G(S)`,
@@ -381,13 +392,16 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsC.push(sv.freq));
       const datasetsC: Dataset[] = [];
       let matrices_YC_RE: number[][] = [];
-      let matrix_YC_RE_value: number[] = [];
-      matrix_Y.forEach((mz: any[][]) => {
-        matrices_YC_RE.push(matrix_YC_RE_value);
-        mz.forEach((mz2: any[], index) => {
-          matrix_YC_RE_value.push(mz2[1] / (2 * Math.PI * labelsC[index]));
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_YC_RE.push([])
+        matrix_Y[i].forEach(m => {
+          m.forEach((v, index) => {
+            (matrices_YC_RE[i] as Array<number>).push(
+                v[1] / (2 * Math.PI * labelsC[index])
+            )
+          })
+        })
+      }
       matrices_YC_RE.forEach((matrix, index) => {
         datasetsC.push({
           label: `${ports[index].name} - C(F)`,
@@ -430,15 +444,16 @@ const chartsDataOptionsFactory = (
       );
       const datasetsYModule: Dataset[] = [];
       let matrices_Y_Module_RE: number[][] = [];
-      let matrix_Y_Module_RE_value: number[] = [];
-      matrix_Y.forEach((mz: any[][]) => {
-        matrices_Y_Module_RE.push(matrix_Y_Module_RE_value);
-        mz.forEach((mz2: any[], index) => {
-          matrix_Y_Module_RE_value.push(
-            Math.sqrt(mz2[0] * mz2[0] + mz2[1] * mz2[1])
-          );
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_Y_Module_RE.push([])
+        matrix_Y[i].forEach(m => {
+          m.forEach((v) => {
+            (matrices_Y_Module_RE[i] as Array<number>).push(
+                Math.sqrt(v[0] * v[0] + v[1] * v[1])
+            )
+          })
+        })
+      }
       matrices_Y_Module_RE.forEach((matrix, index) => {
         datasetsYModule.push({
           label: `${ports[index].name} - Y Module`,
@@ -479,13 +494,16 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsYPhase.push(sv.freq));
       const datasetsYPhase: Dataset[] = [];
       let matrices_Y_Phase_RE: number[][] = [];
-      let matrix_Y_Phase_RE_value: number[] = [];
-      matrix_Y.forEach((mz: any[][]) => {
-        matrices_Y_Phase_RE.push(matrix_Y_Phase_RE_value);
-        mz.forEach((mz2: any[], index) => {
-          matrix_Y_Phase_RE_value.push(Math.atan2(mz2[1], mz2[0]));
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_Y_Phase_RE.push([])
+        matrix_Y[i].forEach(m => {
+          m.forEach((v) => {
+            (matrices_Y_Phase_RE[i] as Array<number>).push(
+                Math.atan2(v[1], v[0])
+            )
+          })
+        })
+      }
       matrices_Y_Phase_RE.forEach((matrix, index) => {
         datasetsYPhase.push({
           label: `${ports[index].name} - Y Phase`,
@@ -528,15 +546,16 @@ const chartsDataOptionsFactory = (
       );
       const datasetsSModule: Dataset[] = [];
       let matrices_S_Module_RE: number[][] = [];
-      let matrix_S_Module_RE_value: number[] = [];
-      matrix_S.forEach((mz: any[][]) => {
-        matrices_S_Module_RE.push(matrix_S_Module_RE_value);
-        mz.forEach((mz2: any[], index) => {
-          matrix_S_Module_RE_value.push(
-            Math.sqrt(mz2[0] * mz2[0] + mz2[1] * mz2[1])
-          );
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_S_Module_RE.push([])
+        matrix_S[i].forEach(m => {
+          m.forEach((v) => {
+            (matrices_S_Module_RE[i] as Array<number>).push(
+                Math.sqrt(v[0] * v[0] + v[1] * v[1])
+            )
+          })
+        })
+      }
       matrices_S_Module_RE.forEach((matrix, index) => {
         datasetsSModule.push({
           label: `${ports[index].name} - S Module`,
@@ -577,13 +596,16 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsSPhase.push(sv.freq));
       const datasetsSPhase: Dataset[] = [];
       let matrices_S_Phase_RE: number[][] = [];
-      let matrix_S_Phase_RE_value: number[] = [];
-      matrix_S.forEach((mz: any[][]) => {
-        matrices_S_Phase_RE.push(matrix_S_Phase_RE_value);
-        mz.forEach((mz2: any[], index) => {
-          matrix_S_Phase_RE_value.push(Math.atan2(mz2[1], mz2[0]));
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_S_Phase_RE.push([])
+        matrix_S[i].forEach(m => {
+          m.forEach((v) => {
+            (matrices_S_Phase_RE[i] as Array<number>).push(
+                Math.atan2(v[1], v[0])
+            )
+          })
+        })
+      }
       matrices_S_Phase_RE.forEach((matrix, index) => {
         datasetsSPhase.push({
           label: `${ports[index].name} - S Phase`,
@@ -624,15 +646,16 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsSdB.push(sv.freq));
       const datasetsSdB: Dataset[] = [];
       let matrices_S_dB_RE: number[][] = [];
-      let matrix_S_dB_RE_value: number[] = [];
-      matrix_S.forEach((mz: any[][]) => {
-        matrices_S_dB_RE.push(matrix_S_dB_RE_value);
-        mz.forEach((mz2: any[], index) => {
-          matrix_S_dB_RE_value.push(
-            20 * Math.log10(Math.sqrt(mz2[0] * mz2[0] + mz2[1] * mz2[1]))
-          );
-        });
-      });
+      for(let i = 0; i<portNumber; i++){
+        matrices_S_dB_RE.push([])
+        matrix_S[i].forEach(m => {
+          m.forEach((v) => {
+            (matrices_S_dB_RE[i] as Array<number>).push(
+                20 * Math.log10(Math.sqrt(v[0] * v[0] + v[1] * v[1]))
+            )
+          })
+        })
+      }
       matrices_S_dB_RE.forEach((matrix, index) => {
         datasetsSdB.push({
           label: `${ports[index].name} - S dB`,
