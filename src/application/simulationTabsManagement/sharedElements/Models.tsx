@@ -12,7 +12,7 @@ export const Models: React.FC<ModelsProps> = ({children}) => {
 
     return(
         <>
-            {(selectedProject && selectedProject.model.components !== undefined)
+            {(selectedProject && selectedProject.model?.components !== undefined)
                 ? <div>
                     {children}
                 </div>

@@ -23,6 +23,8 @@ import { updateProjectInFauna } from "../../../faunadb/projectsFolderAPIs";
 import { Provider, ReactReduxContext, useDispatch, useSelector } from "react-redux";
 import { s3 } from "../../../aws/s3Config";
 import { Screenshot } from "./Screenshot";
+import {addUnit} from "../../../store/unitSlice";
+import {convertInFaunaProjectThis} from "../../../faunadb/apiAuxiliaryFunctions";
 
 interface CanvasBaseWithReduxProps {
 	section: string;
@@ -46,7 +48,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 
 	useEffect(() => {
 		if (selectedProject && savedPortParameters === true) {
-			execQuery(updateProjectInFauna, selectedProject);
+			execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject));
 		}
 	}, [
 		selectedProject?.model,
@@ -73,7 +75,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 
 	return (
 		<div className="flex justify-center">
-			{selectedProject && selectedProject.model.components ? (
+			{selectedProject && selectedProject.model?.components ? (
 				<ReactReduxContext.Consumer>
 					{({ store }) => (
 						<Canvas style={{ width: "1920px", height: "828px" }}>
@@ -87,7 +89,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 								/>
 								{/* paint models */}
 								{(!mesherOutput || section !== "Simulator") &&
-									selectedProject?.model.components.map((component) => {
+									selectedProject?.model?.components.map((component) => {
 										return (
 											<mesh
 												ref={mesh}
@@ -120,9 +122,12 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 				<div className="absolute top-1/2 w-1/5 flex justify-between">
 					<ImportCadProjectButton
 						className="button buttonPrimary flex items-center"
-						importAction={importModel}
+						importAction={(importActionParamsObject) => {
+							dispatch(importModel(importActionParamsObject))
+							dispatch(addUnit({unit: importActionParamsObject.unit, projectId: importActionParamsObject.id}))
+						}}
 						actionParams={
-							{ id: selectedProject?.name } as ImportActionParamsObject
+							{ id: selectedProject?.faunaDocumentId, unit: "mm" } as ImportActionParamsObject
 						}>
 						<GiCubeforce
 							style={{ width: "25px", height: "25px", marginRight: "5px" }}
@@ -145,7 +150,10 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 					s3Config={s3}
 					bucket={process.env.REACT_APP_AWS_BUCKET_NAME as string}
 					showModalLoad={setShowModalLoadFromDB}
-					importAction={importModel}
+					importAction={(importActionParamsObject) => {
+						dispatch(importModel(importActionParamsObject))
+						dispatch(addUnit({unit: importActionParamsObject.unit, projectId: importActionParamsObject.id}))
+					}}
 					importActionParams={
 						{
 							canvas: {
@@ -154,7 +162,8 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 								numberOfGeneratedKey: 0,
 								selectedComponentKey: 0,
 							} as CanvasState,
-							id: selectedProject?.name,
+							unit: "mm",
+							id: selectedProject?.faunaDocumentId,
 						} as ImportActionParamsObject
 					}
 				/>

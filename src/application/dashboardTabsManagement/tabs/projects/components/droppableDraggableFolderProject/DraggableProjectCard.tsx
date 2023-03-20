@@ -12,13 +12,15 @@ import {
     allProjectFoldersSelector,
     moveProject,
     removeProject,
-    SelectedFolderSelector
+    SelectedFolderSelector, setModel
 } from "../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import {RenameProject} from './RenameProject';
 import {SearchUserAndShare} from './searchUserAndShare/searchUserAndShare';
 import {addProjectTab, closeProjectTab} from '../../../../../../store/tabsAndMenuItemsSlice';
 import { Folder, Project } from '../../../../../../model/esymiaModels';
+import {getModelFromS3} from "../../../shared/utilFunctions";
+import {addUnit} from "../../../../../../store/unitSlice";
 
 interface DraggableProjectCardProps {
     project: Project,
@@ -60,7 +62,16 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
             <div
                 className="w-[20%] p-[15px] flex flex-col justify-between h-[250px] border-2 border-green-200 mr-6 mt-4 rounded-lg hover:cursor-pointer hover:border-secondaryColor"
                 key={project.name} ref={drag}
-                onClick={() => dispatch(addProjectTab(project))}
+                onClick={() => {
+                    if(!project.model.components && project.modelS3){
+                        let model = getModelFromS3(project)
+                        if (model) {
+                            dispatch(addUnit({unit: model.unit, projectId: project.faunaDocumentId}))
+                            dispatch(setModel(model.components))
+                        }
+                    }
+                    dispatch(addProjectTab(project))
+                }}
                 style={{opacity: isDragging ? 0.5 : 1}} onContextMenu={handleContextMenu}>
                 <h5 className="text-center" role="Handle" ref={dragPreview}>
                     {(project.name.length > 11) ? project.name.substr(0, 11) + '...' : project.name}

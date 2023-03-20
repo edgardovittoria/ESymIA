@@ -19,7 +19,7 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 	mesherOutput,
 }) => {
 	let meshGenerated = selectedProject.meshData.meshGenerated;
-    let materialsList = selectedProject.model.components.map(c => c.material as Material)
+    let materialsList = selectedProject.model?.components.map(c => c.material as Material) as Material[]
 
 	const [mesherMatrices, setMesherMatrices] = useState<boolean[][][][]>([]);
 	const [modelMaterials, setModelMaterials] = useState<Material[]>([]);

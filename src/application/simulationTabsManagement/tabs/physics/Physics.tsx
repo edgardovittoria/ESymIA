@@ -145,7 +145,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 					</Models>
 				)}
 			</LeftPanel>
-			{selectedProject?.model.components && (
+			{selectedProject?.model?.components && (
 				<SelectPorts selectedProject={selectedProject} />
 			)}
 			<ImportExportPhysicsSetup />

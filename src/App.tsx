@@ -25,6 +25,7 @@ import {ImSpinner} from "react-icons/im";
 import { constructFolderStructure, faunaFolderHaveParentInList, faunaProjectHaveParentInFolderList } from "./faunadb/apiAuxiliaryFunctions";
 import { FaunaFolder, FaunaProject } from "./model/FaunaModels";
 import axios from "axios";
+import {addUnit} from "./store/unitSlice";
 
 function App() {
     const dispatch = useDispatch();

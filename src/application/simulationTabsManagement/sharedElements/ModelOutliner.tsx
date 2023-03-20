@@ -24,7 +24,7 @@ export const ModelOutliner: React.FC<ModelOutlinerProps> = () => {
                     </div>
                 </div>
                 <div className="flex-col ml-10 mt-1">
-                    {selectedProject && selectedProject.model.components.map(component => {
+                    {selectedProject && selectedProject.model?.components.map(component => {
                         return (
                             <div
                                 className="flex items-center"

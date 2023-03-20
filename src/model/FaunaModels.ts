@@ -9,7 +9,7 @@ export type FaunaProject = {
 export type FaunaProjectDetails = {
     name: string,
     description: string,
-    model: CanvasState,
+    modelS3?: string,
     ports: (Port | Probe)[],
     signal: Signal,
     simulation?: Simulation,

@@ -22,6 +22,7 @@ export type Project = {
     name: string,
     description: string,
     model: CanvasState,
+    modelS3?: string,
     ports: (Port | Probe | TempLumped)[],
     signal: Signal | undefined,
     simulation?: Simulation,

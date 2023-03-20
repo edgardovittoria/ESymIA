@@ -1,4 +1,4 @@
-import { ImportActionParamsObject, UsersState } from 'cad-library';
+import {ComponentEntity, ImportActionParamsObject, UsersState} from 'cad-library';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     recursiveFindFolders, removeFolderFromStore, removeProjectFromStore,
@@ -131,6 +131,12 @@ export const ProjectSlice = createSlice({
                 selectedProject.model = action.payload.canvas
             }
         },
+        setModel(state: ProjectState, action: PayloadAction<ComponentEntity[]>) {
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
+            if (selectedProject) {
+                selectedProject.model.components = action.payload
+            }
+        },
         updateSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             if (selectedProject) selectedProject.simulation = action.payload;
@@ -247,7 +253,7 @@ export const {
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
     setProjectsFolderToUser, removeFolder, shareProject, renameProject, moveFolder, moveProject, deleteSimulation,
     renameFolder, shareFolder, setQuantum, setMesh, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser,
-    unsetMesh, setOrbitTarget
+    unsetMesh, setOrbitTarget, setModel
 } = ProjectSlice.actions
 
 const selectTabEffects = (state: ProjectState, tab: string) => {

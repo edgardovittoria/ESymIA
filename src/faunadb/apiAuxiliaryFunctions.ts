@@ -1,5 +1,6 @@
 import { Folder, Project, sharingInfoUser } from "../model/esymiaModels"
-import { FaunaFolder, FaunaFolderDetails, FaunaProject } from "../model/FaunaModels"
+import {FaunaFolder, FaunaFolderDetails, FaunaProject, FaunaProjectDetails} from "../model/FaunaModels"
+import {CanvasState} from "cad-library";
 
 export const constructFolderStructure = (folderID: string, all_folders: FaunaFolder[], all_projects: FaunaProject[]) => {
     let rootFaunaFolder = all_folders.filter(faunaFolder => faunaFolder.id === folderID)[0]
@@ -36,9 +37,30 @@ export const convertInProjectThis = (faunaProject: FaunaProject) => {
     let project: Project = {
         ...faunaProject.project,
         faunaDocumentId: faunaProject.id,
+        model: {} as CanvasState,
         sharedWith: faunaProject.project.sharedWith as sharingInfoUser[]
     }
     return project
+}
+
+export const convertInFaunaProjectThis = (project: Project) => {
+    let faunaProject: FaunaProject = {
+        id: project.faunaDocumentId as string,
+        project: {
+            name: project.name,
+            description: project.description,
+            modelS3: project.modelS3,
+            ports: project.ports,
+            signal: project.signal,
+            simulation: project.simulation,
+            meshData: project.meshData,
+            screenshot: project.screenshot,
+            owner: project.owner,
+            sharedWith: project.sharedWith,
+            parentFolder: project.parentFolder
+        } as FaunaProjectDetails
+    }
+    return faunaProject
 }
 
 export const convertInFaunaFolderDetailsThis = (folder: Folder): FaunaFolderDetails => {

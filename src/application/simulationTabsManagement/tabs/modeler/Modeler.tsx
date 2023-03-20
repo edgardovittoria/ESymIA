@@ -13,6 +13,7 @@ export const Modeler: React.FC<ModelerProps> = ({
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
 }) => {
+
   return (
     <>
       <CanvasBaseWithRedux section="Modeler" />

@@ -1,8 +1,13 @@
 import React from 'react';
 import {Simulations} from "./Simulations";
 import {useDispatch, useSelector} from "react-redux";
-import {projectsSelector} from "../../../store/projectSlice";
-import { addProjectTab } from '../../../store/tabsAndMenuItemsSlice';
+import {importModel, projectsSelector, setModel} from "../../../store/projectSlice";
+import {addProjectTab} from '../../../store/tabsAndMenuItemsSlice';
+import {getFileS3} from "cad-library/dist/cjs/types/components/aws";
+import {s3, s3Config} from "../../../aws/s3Config";
+import {ComponentEntity, ImportActionParamsObject} from "cad-library";
+import {addUnit} from "../../../store/unitSlice";
+import {getModelFromS3} from "./shared/utilFunctions";
 
 interface OverviewProps {
     setShowModal: Function
@@ -48,7 +53,16 @@ export const Overview: React.FC<OverviewProps> = (
                             return (
                                 <div key={project.name}
                                      className="w-100 rounded border-[1px] border-gray-400 mb-[15px] hover:cursor-pointer"
-                                     onClick={() => dispatch(addProjectTab(project))}>
+                                     onClick={() => {
+                                         if(!project.model.components && project.modelS3){
+                                             let model = getModelFromS3(project)
+                                             if (model) {
+                                                 dispatch(addUnit({unit: model.unit, projectId: project.faunaDocumentId}))
+                                                 dispatch(setModel(model.components))
+                                             }
+                                         }
+                                         dispatch(addProjectTab(project))
+                                     }}>
                                     <div className="box">
                                         <div className="flex justify-between">
                                             <div className={`w-7/8 text-[20px] mb-[10px]`}>
@@ -91,7 +105,7 @@ export const Overview: React.FC<OverviewProps> = (
 
             </div>
             <div className="mt-3 justify-between w-full h-1/2">
-                <Simulations />
+                <Simulations/>
             </div>
 
 

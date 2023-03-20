@@ -74,10 +74,10 @@ export const DroppableAndDraggableFolder: React.FC<DroppableAndDraggableFolderPr
                     execQuery(moveProjectInFauna, {...objectToMove, parentFolder: dropTargetFolder.faunaDocumentId} as Project, objectToMove.parentFolder)
                 } else {
                     dispatch(moveFolder({
-                        objectToMove: objectToMove,
+                        objectToMove: objectToMove as Folder,
                         targetFolder: dropTargetFolder.faunaDocumentId as string
                     }))
-                    execQuery(moveFolderInFauna, {...objectToMove, parent: dropTargetFolder.faunaDocumentId} as Folder, objectToMove.parent)
+                    execQuery(moveFolderInFauna, {...objectToMove, parent: dropTargetFolder.faunaDocumentId} as Folder, (objectToMove as Folder).parent)
                 }
             }
         }

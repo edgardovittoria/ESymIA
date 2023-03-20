@@ -21,7 +21,7 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
     
     return (
         <>
-            {(selectedProject && selectedProject.model.components !== undefined) ?
+            {(selectedProject && selectedProject.model?.components !== undefined) ?
                 <div>
                     <ul className="ml-0 pl-3">
                         {allMaterials.map((material, index) => {

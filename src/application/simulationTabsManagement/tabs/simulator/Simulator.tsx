@@ -52,7 +52,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
   let materialsNames: string[] = [];
   let allMaterials: Material[] = [];
-  if (selectedProject?.model.components) {
+  if (selectedProject?.model?.components) {
     allMaterials = getMaterialListFrom(
       selectedProject?.model.components as ComponentEntity[]
     );

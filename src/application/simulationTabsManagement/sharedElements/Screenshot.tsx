@@ -47,7 +47,7 @@ export const Screenshot: FC<ScreenshotProps> = ({ selectedProject }) => {
 
 	useEffect(() => {
 		screenShot();
-	}, [selectedProject?.model.components]);
+	}, [selectedProject?.model?.components]);
 
 	return <></>;
 };

@@ -110,7 +110,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         solverInput: {
           ports: selectedProject.ports.filter(p => p.category === 'port'),
           lumped_elements: selectedProject.ports.filter(p => p.category === 'lumped'),
-          materials: getMaterialListFrom(selectedProject?.model.components as ComponentEntity[]),
+          materials: getMaterialListFrom(selectedProject?.model?.components as ComponentEntity[]),
           frequencies: frequencyArray,
           signals: signalsValuesArray,
           powerPort: (selectedProject) && selectedProject.signal?.powerPort
@@ -143,7 +143,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       //   }
       // })
       //https://teema-flask-api-4rys7fymga-uc.a.run.app -> 4GB
-      //https://flask-app-16gb-4rys7fymga-uc.a.run.app -> 16GB
+      //https://solver-16bg-4rys7fymga-uc.a.run.app -> 16GB
       axios.post("http://127.0.0.1:5000/solving", dataToSendToSolver).then((res) => {
         dispatch(setSolverOutput(res.data));
         let simulationUpdated: Simulation = {
@@ -190,7 +190,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
 
   useEffect(() => {
     if (meshGenerated === "Generating") {
-      let components = selectedProject?.model.components as ComponentEntity[];
+      let components = selectedProject?.model?.components as ComponentEntity[];
       let objToSendToMesher = {
         STLList:
           components && allMaterials &&
@@ -256,7 +256,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 <input
                   disabled={
                     selectedProject.simulation?.status === "Completed" ||
-                    selectedProject.model.components === undefined
+                    selectedProject.model?.components === undefined
                   }
                   min={0}
                   className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
@@ -278,7 +278,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 <input
                   disabled={
                     selectedProject.simulation?.status === "Completed" ||
-                    selectedProject.model.components === undefined
+                    selectedProject.model?.components === undefined
                   }
                   min={0.0}
                   className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
@@ -300,7 +300,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 <input
                   disabled={
                     selectedProject.simulation?.status === "Completed" ||
-                    selectedProject.model.components === undefined
+                    selectedProject.model?.components === undefined
                   }
                   min={0}
                   className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}

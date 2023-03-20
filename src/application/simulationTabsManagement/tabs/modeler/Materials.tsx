@@ -12,7 +12,7 @@ export const Materials: React.FC<MaterialsProps> = () => {
 
     return (
         <>
-            {(selectedProject && selectedProject.model.components !== undefined) ?
+            {(selectedProject && selectedProject.model?.components !== undefined) ?
                 <div>
                     <ul className="ml-0 pl-3">
                         {selectedProject.model.components.map((component, index) => {
