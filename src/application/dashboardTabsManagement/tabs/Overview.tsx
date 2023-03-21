@@ -1,13 +1,9 @@
 import React from 'react';
 import {Simulations} from "./Simulations";
 import {useDispatch, useSelector} from "react-redux";
-import {importModel, projectsSelector, setModel} from "../../../store/projectSlice";
+import {projectsSelector} from "../../../store/projectSlice";
 import {addProjectTab} from '../../../store/tabsAndMenuItemsSlice';
-import {getFileS3} from "cad-library/dist/cjs/types/components/aws";
-import {s3, s3Config} from "../../../aws/s3Config";
-import {ComponentEntity, ImportActionParamsObject} from "cad-library";
-import {addUnit} from "../../../store/unitSlice";
-import {getModelFromS3} from "./shared/utilFunctions";
+import {setModelInfoFromS3} from "./shared/utilFunctions";
 
 interface OverviewProps {
     setShowModal: Function
@@ -55,11 +51,7 @@ export const Overview: React.FC<OverviewProps> = (
                                      className="w-100 rounded border-[1px] border-gray-400 mb-[15px] hover:cursor-pointer"
                                      onClick={() => {
                                          if(!project.model.components && project.modelS3){
-                                             let model = getModelFromS3(project)
-                                             if (model) {
-                                                 dispatch(addUnit({unit: model.unit, projectId: project.faunaDocumentId}))
-                                                 dispatch(setModel(model.components))
-                                             }
+                                             setModelInfoFromS3(project, dispatch)
                                          }
                                          dispatch(addProjectTab(project))
                                      }}>

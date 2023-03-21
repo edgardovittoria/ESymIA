@@ -11,6 +11,7 @@ import {
 } from "../../../../../../../faunadb/projectsFolderAPIs";
 import axios from "axios";
 import { Folder, Project, sharingInfoUser } from '../../../../../../../model/esymiaModels';
+import { convertInFaunaProjectThis } from '../../../../../../../faunadb/apiAuxiliaryFunctions';
 
 interface SearchUserAndShareProps {
     setShowSearchUser: (v: boolean) => void,
@@ -135,7 +136,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = (
                                                             setShareDone(true)
                                                             if(projectToShare){
                                                                 dispatch(shareProject({projectToShare: projectToShare, user: {userEmail: selected, read: true, write:true}}))
-                                                                execQuery(updateProjectInFauna, {...projectToShare, sharedWith: [...projectToShare.sharedWith as sharingInfoUser[], {userEmail: selected, read: true, write:true} as sharingInfoUser]}).then(() => {
+                                                                execQuery(updateProjectInFauna, convertInFaunaProjectThis({...projectToShare, sharedWith: [...projectToShare.sharedWith as sharingInfoUser[], {userEmail: selected, read: true, write:true} as sharingInfoUser]})).then(() => {
                                                                     setShowSearchUser(false)
                                                                     window.alert("Sharing Successful!!")
                                                                 }).catch((err) => {

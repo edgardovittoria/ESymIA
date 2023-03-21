@@ -12,15 +12,13 @@ import {
     allProjectFoldersSelector,
     moveProject,
     removeProject,
-    SelectedFolderSelector, setModel
-} from "../../../../../../store/projectSlice";
+    SelectedFolderSelector} from "../../../../../../store/projectSlice";
 import {useFaunaQuery, usersStateSelector} from "cad-library";
 import {RenameProject} from './RenameProject';
 import {SearchUserAndShare} from './searchUserAndShare/searchUserAndShare';
 import {addProjectTab, closeProjectTab} from '../../../../../../store/tabsAndMenuItemsSlice';
 import { Folder, Project } from '../../../../../../model/esymiaModels';
-import {getModelFromS3} from "../../../shared/utilFunctions";
-import {addUnit} from "../../../../../../store/unitSlice";
+import {setModelInfoFromS3} from "../../../shared/utilFunctions";
 
 interface DraggableProjectCardProps {
     project: Project,
@@ -64,11 +62,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                 key={project.name} ref={drag}
                 onClick={() => {
                     if(!project.model.components && project.modelS3){
-                        let model = getModelFromS3(project)
-                        if (model) {
-                            dispatch(addUnit({unit: model.unit, projectId: project.faunaDocumentId}))
-                            dispatch(setModel(model.components))
-                        }
+                        setModelInfoFromS3(project, dispatch)
                     }
                     dispatch(addProjectTab(project))
                 }}

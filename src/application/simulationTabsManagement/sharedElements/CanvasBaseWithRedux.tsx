@@ -17,13 +17,14 @@ import {
 	OrbitTarget,
 	orbitTargetSelector,
 	selectedProjectSelector,
+  setModelS3,
+  setModelUnit,
   setOrbitTarget,
 } from "../../../store/projectSlice";
 import { updateProjectInFauna } from "../../../faunadb/projectsFolderAPIs";
 import { Provider, ReactReduxContext, useDispatch, useSelector } from "react-redux";
 import { s3 } from "../../../aws/s3Config";
 import { Screenshot } from "./Screenshot";
-import {addUnit} from "../../../store/unitSlice";
 import {convertInFaunaProjectThis} from "../../../faunadb/apiAuxiliaryFunctions";
 
 interface CanvasBaseWithReduxProps {
@@ -51,12 +52,11 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 			execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject));
 		}
 	}, [
-		selectedProject?.model,
 		savedPortParameters,
-		selectedProject?.ports,
 		selectedProject?.signal,
 		selectedProject?.simulation,
 		selectedProject?.meshData,
+		selectedProject?.modelS3
 	]);
 
   useEffect(() => {
@@ -124,7 +124,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 						className="button buttonPrimary flex items-center"
 						importAction={(importActionParamsObject) => {
 							dispatch(importModel(importActionParamsObject))
-							dispatch(addUnit({unit: importActionParamsObject.unit, projectId: importActionParamsObject.id}))
+							dispatch(setModelUnit(importActionParamsObject.unit))
 						}}
 						actionParams={
 							{ id: selectedProject?.faunaDocumentId, unit: "mm" } as ImportActionParamsObject
@@ -152,7 +152,8 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 					showModalLoad={setShowModalLoadFromDB}
 					importAction={(importActionParamsObject) => {
 						dispatch(importModel(importActionParamsObject))
-						dispatch(addUnit({unit: importActionParamsObject.unit, projectId: importActionParamsObject.id}))
+						dispatch(setModelUnit(importActionParamsObject.unit))
+						dispatch(setModelS3(importActionParamsObject.modelS3 as string))
 					}}
 					importActionParams={
 						{

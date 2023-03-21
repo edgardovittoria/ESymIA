@@ -137,6 +137,18 @@ export const ProjectSlice = createSlice({
                 selectedProject.model.components = action.payload
             }
         },
+        setModelS3(state: ProjectState, action: PayloadAction<string>) {
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
+            if (selectedProject) {
+                selectedProject.modelS3 = action.payload
+            }
+        },
+        setModelUnit(state: ProjectState, action: PayloadAction<string>) {
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
+            if (selectedProject) {
+                selectedProject.modelUnit = action.payload
+            }
+        },
         updateSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
             if (selectedProject) selectedProject.simulation = action.payload;
@@ -253,7 +265,7 @@ export const {
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
     setProjectsFolderToUser, removeFolder, shareProject, renameProject, moveFolder, moveProject, deleteSimulation,
     renameFolder, shareFolder, setQuantum, setMesh, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser,
-    unsetMesh, setOrbitTarget, setModel
+    unsetMesh, setOrbitTarget, setModel, setModelS3, setModelUnit
 } = ProjectSlice.actions
 
 const selectTabEffects = (state: ProjectState, tab: string) => {

@@ -20,7 +20,7 @@
     "aws-sdk": "^2.1276.0",
     "axios": "^0.24.0",
     "browser-image-compression": "^1.0.17",
-    "cad-library": "^0.2.11",
+    "cad-library": "^0.2.12",
     "chart.js": "^3.7.0",
     "daisyui": "^2.50.0",
     "faunadb": "^4.5.4",

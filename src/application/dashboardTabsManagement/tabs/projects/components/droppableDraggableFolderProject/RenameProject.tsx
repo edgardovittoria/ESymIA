@@ -5,6 +5,7 @@ import {useFaunaQuery} from "cad-library";
 import { renameProject } from '../../../../../../store/projectSlice';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { Project } from '../../../../../../model/esymiaModels';
+import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 
 
 interface RenameProjectProps {
@@ -79,10 +80,10 @@ export const RenameProject: React.FC<RenameProjectProps> = (
                                                     projectToRename: projectToRename.faunaDocumentId as string,
                                                     name: name
                                                 }))
-                                                execQuery(updateProjectInFauna, {
+                                                execQuery(updateProjectInFauna, convertInFaunaProjectThis({
                                                     ...projectToRename,
                                                     name: name
-                                                } as Project)
+                                                } as Project))
                                                 handleClose()
                                             }}
                                         >

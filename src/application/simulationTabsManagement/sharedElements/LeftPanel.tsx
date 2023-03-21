@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {Tab} from "@headlessui/react";
 import {tabTitles} from "./modelerTabTitlesAndIcons";
 import {useSelector} from "react-redux";
-import {unitsSelector} from "../../../store/unitSlice";
 import {selectedProjectSelector} from "../../../store/projectSlice";
 
 interface DashBoardProps {
@@ -23,7 +22,6 @@ export const LeftPanel: React.FC<DashBoardProps> = (
 
     const [selectedIndex, setSelectedIndex] = useState(0)
     const selectedProject = useSelector(selectedProjectSelector)
-    const units = useSelector(unitsSelector).filter(u => u.projectId === selectedProject?.faunaDocumentId)
 
     useEffect(() => {
         setSelectedIndex(0)
@@ -69,8 +67,8 @@ export const LeftPanel: React.FC<DashBoardProps> = (
                                 className='rounded-b-xl bg-white p-3'
                             >
                                 {children}
-                                {units.length > 0 &&
-                                    <div>unit: {units[0].unit}</div>
+                                {selectedProject?.modelUnit &&
+                                    <div>unit: {selectedProject.modelUnit}</div>
                                 }
                             </Tab.Panel>
                         ))}

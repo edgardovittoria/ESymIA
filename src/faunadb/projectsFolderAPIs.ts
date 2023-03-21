@@ -5,7 +5,7 @@ import {
     recursiveFindFolders,
     takeAllProjectsIn
 } from "../store/auxiliaryFunctions/managementProjectsAndFoldersFunction";
-import { convertInFaunaFolderDetailsThis } from "./apiAuxiliaryFunctions";
+import { convertInFaunaFolderDetailsThis, convertInFaunaProjectThis } from "./apiAuxiliaryFunctions";
 
 
 
@@ -231,12 +231,10 @@ export const addIDInFolderProjectsList = async (faunaClient: faunadb.Client, fau
 
 }
 
-export const updateProjectInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, projectToUpdate: Project) => {
+export const updateProjectInFauna = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, projectToUpdate: FaunaProject) => {
     const response = await faunaClient.query(
-        faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('SimulationProjects'), projectToUpdate.faunaDocumentId), {
-            data: {
-                ...projectToUpdate
-            } as FaunaProjectDetails
+        faunaQuery.Update(faunaQuery.Ref(faunaQuery.Collection('SimulationProjects'), projectToUpdate.id), {
+            data: projectToUpdate.project
         })
     )
         .catch((err) => console.error(
@@ -375,5 +373,5 @@ export const recursiveUpdateSharingInfoFolderInFauna = async (faunaClient: fauna
     let allFolders = recursiveFindFolders(folderToUpdate, [])
     allFolders.forEach(f => updateFolderInFauna(faunaClient, faunaQuery, f))
     let allProjects = takeAllProjectsIn(folderToUpdate)
-    allProjects.forEach(p => updateProjectInFauna(faunaClient, faunaQuery, p))
+    allProjects.forEach(p => updateProjectInFauna(faunaClient, faunaQuery, convertInFaunaProjectThis(p)))
 }
