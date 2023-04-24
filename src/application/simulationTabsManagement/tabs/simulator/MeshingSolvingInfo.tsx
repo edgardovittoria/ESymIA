@@ -144,7 +144,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       // })
       //https://teema-flask-api-4rys7fymga-uc.a.run.app -> 4GB
       //https://solver-16bg-4rys7fymga-uc.a.run.app -> 16GB
-      axios.post("http://34.125.6.61/solving", dataToSendToSolver).then((res) => {
+      axios.post("https://teemaserver.cloud/solving", dataToSendToSolver).then((res) => {
         dispatch(setSolverOutput(res.data));
         let simulationUpdated: Simulation = {
           ...simulation,
