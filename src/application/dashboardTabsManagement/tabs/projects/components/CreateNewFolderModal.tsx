@@ -1,9 +1,9 @@
-import React, {Fragment, useState} from 'react';
-import {useFaunaQuery, usersStateSelector} from "cad-library";
-import {createFolderInFauna, addIDInSubFoldersList} from "../../../../../faunadb/projectsFolderAPIs";
-import {useDispatch, useSelector} from "react-redux";
-import {addFolder, SelectedFolderSelector} from "../../../../../store/projectSlice";
-import {Dialog, Transition} from "@headlessui/react";
+import React, { Fragment, useState } from 'react';
+import { useFaunaQuery, usersStateSelector } from "cad-library";
+import { createFolderInFauna, addIDInSubFoldersList } from "../../../../../faunadb/projectsFolderAPIs";
+import { useDispatch, useSelector } from "react-redux";
+import { addFolder, SelectedFolderSelector } from "../../../../../store/projectSlice";
+import { Dialog, Transition } from "@headlessui/react";
 import { Folder } from '../../../../../model/esymiaModels';
 
 interface CreateNewFolderModalProps {
@@ -21,7 +21,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
     const user = useSelector(usersStateSelector)
     const selectedFolder = useSelector(SelectedFolderSelector) as Folder
 
-    const {execQuery} = useFaunaQuery()
+    const { execQuery } = useFaunaQuery()
 
     const [folderName, setFolderName] = useState("");
 
@@ -29,7 +29,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
 
 
     const handleCreate = () => {
-        if(folderName.length > 0){
+        if (folderName.length > 0) {
             let newFolder: Folder = {
                 name: folderName,
                 owner: user,
@@ -39,12 +39,12 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                 parent: selectedFolder.faunaDocumentId as string,
             }
             execQuery(createFolderInFauna, newFolder).then((ret: any) => {
-                newFolder = {...newFolder, faunaDocumentId: ret.ref.value.id}
+                newFolder = { ...newFolder, faunaDocumentId: ret.ref.value.id }
                 dispatch(addFolder(newFolder));
                 (selectedFolder.faunaDocumentId !== 'root') && execQuery(addIDInSubFoldersList, newFolder.faunaDocumentId, selectedFolder)
             })
             setShowNewFolderModal(false)
-        }else{
+        } else {
             alert("Folder's name is required!")
         }
     }
@@ -82,19 +82,26 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                                 >
                                     CREATE NEW FOLDER
                                 </Dialog.Title>
-                                <hr className="mt-2 mb-3"/>
-                                <div className="flex flex-col">
-                                    <div className="p-2">
-                                        <h6>Insert Folder's Name</h6>
-                                        <input
-                                            type="text"
-                                            className="formControl bg-gray-100 rounded p-2 w-full mt-3"
-                                            placeholder="Folder's Name"
-                                            value={folderName}
-                                            onChange={(e) => setFolderName(e.target.value)}/>
+                                <hr className="mt-2 mb-3" />
+                                {user.email ?
+                                    <div className="flex flex-col">
+                                        <div className="p-2">
+                                            <h6>Insert Folder's Name</h6>
+                                            <input
+                                                type="text"
+                                                className="formControl bg-gray-100 rounded p-2 w-full mt-3"
+                                                placeholder="Folder's Name"
+                                                value={folderName}
+                                                onChange={(e) => setFolderName(e.target.value)} />
+                                        </div>
                                     </div>
-                                </div>
-
+                                    :
+                                    <div className="flex flex-col">
+                                        <div className="p-2">
+                                            <h6>Please login first in order to create a new folder.</h6>
+                                        </div>
+                                    </div>
+                                }
                                 <div className="mt-4 flex justify-between">
                                     <button
                                         type="button"
@@ -103,14 +110,15 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                                     >
                                         CANCEL
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="button buttonPrimary"
-                                        onClick={handleCreate}
-                                    >
-                                        CREATE
-                                    </button>
-
+                                    {user.email &&
+                                        <button
+                                            type="button"
+                                            className="button buttonPrimary"
+                                            onClick={handleCreate}
+                                        >
+                                            CREATE
+                                        </button>
+                                    }
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>

@@ -108,27 +108,35 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                     CREATE NEW PROJECT
                   </Dialog.Title>
                   <hr className="mt-2 mb-3" />
-                  <div className="flex flex-col">
-                    <div className="p-2">
-                      <h6>Insert Project's Name</h6>
-                      <input
-                        type="text"
-                        className="formControl bg-gray-100 rounded p-2 w-full mt-3"
-                        placeholder="Project's Name"
-                        value={projectName}
-                        onChange={(e) => setProjectName(e.target.value)}
-                      />
+                  {user.email ?
+                    <div className="flex flex-col">
+                      <div className="p-2">
+                        <h6>Insert Project's Name</h6>
+                        <input
+                          type="text"
+                          className="formControl bg-gray-100 rounded p-2 w-full mt-3"
+                          placeholder="Project's Name"
+                          value={projectName}
+                          onChange={(e) => setProjectName(e.target.value)}
+                        />
+                      </div>
+                      <div className="p-2">
+                        <h6>Insert Project's Description</h6>
+                        <textarea
+                          className="formControl h-[100px] bg-gray-100 rounded p-2 w-full mt-3"
+                          placeholder="Project's Description"
+                          value={projectDescription}
+                          onChange={(e) => setProjectDescription(e.target.value)}
+                        />
+                      </div>
                     </div>
-                    <div className="p-2">
-                      <h6>Insert Project's Description</h6>
-                      <textarea
-                        className="formControl h-[100px] bg-gray-100 rounded p-2 w-full mt-3"
-                        placeholder="Project's Description"
-                        value={projectDescription}
-                        onChange={(e) => setProjectDescription(e.target.value)}
-                      />
+                    :
+                    <div className="flex flex-col">
+                      <div className="p-2">
+                        <h6>Please login first in order to create a new project.</h6>
+                      </div>
                     </div>
-                  </div>
+                  }
 
                   <div className="mt-4 flex justify-between">
                     <button
@@ -138,13 +146,15 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                     >
                       CANCEL
                     </button>
-                    <button
-                      type="button"
-                      className="button buttonPrimary"
-                      onClick={handleCreate}
-                    >
-                      CREATE
-                    </button>
+                    {user.email &&
+                      <button
+                        type="button"
+                        className="button buttonPrimary"
+                        onClick={handleCreate}
+                      >
+                        CREATE
+                      </button>
+                    }
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
