@@ -19,7 +19,7 @@ import {
     FactoryShapes,
     ImportActionParamsObject,
     ImportCadProjectButton,
-    ImportModelFromDBModal,
+    ImportModelFromDBModal, meshFrom,
     useFaunaQuery,
 } from "cad-library";
 import {
@@ -94,6 +94,15 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
         }
     }, [selectedProject, selectedProject?.model, mesh])
 
+    let group = new THREE.Group()
+    if(selectedProject){
+        selectedProject.model.components.forEach(c => {
+            group.add(meshFrom(c))
+        })
+    }
+    let boundingbox = new THREE.Box3().setFromObject(group)
+    let size = boundingbox.getSize(boundingbox.max)
+
     return (
         <div className="flex justify-center">
             {selectedProject && selectedProject.model?.components ? (
@@ -111,6 +120,8 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                 {/* paint models */}
                                 {(!mesherOutput || section !== "Simulator") && selectedPort && section === "Physics" &&
                                     selectedProject && selectedProject.model.components.map((c, index) => {
+
+
                                         return(
                                             <>
                                                 <instancedMesh ref={(el) => {
@@ -151,7 +162,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                                                }
                                                                }
                                                 >
-                                                    <boxBufferGeometry args={[0.005, 0.005, 0.001]}/>
+                                                    <boxBufferGeometry args={[size.x/100, size.y/100, size.z/100]}/>
                                                     <meshPhongMaterial attach="material" color={0xffffff}/>
                                                 </instancedMesh>
                                                 <SampledSurface
