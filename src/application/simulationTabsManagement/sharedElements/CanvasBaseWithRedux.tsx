@@ -95,7 +95,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
     }, [selectedProject, selectedProject?.model, mesh])
 
     let group = new THREE.Group()
-    if(selectedProject){
+    if(selectedProject && selectedProject.model.components){
         selectedProject.model.components.forEach(c => {
             group.add(meshFrom(c))
         })
