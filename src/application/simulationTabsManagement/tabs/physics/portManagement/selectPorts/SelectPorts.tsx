@@ -9,9 +9,10 @@ import { Project } from '../../../../../../model/esymiaModels';
 
 interface SelectPortsProps {
     selectedProject: Project,
+    setAddPort: (v:boolean) => void
 }
 
-export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
+export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject, setAddPort}) => {
 
     const dispatch = useDispatch()
 
@@ -54,6 +55,7 @@ export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
+                                            setAddPort(true)
                                             let port = getDefaultPort(generateNewKeyPort(keyPort))
                                             dispatch(addPorts(port))
                                         }}
@@ -69,6 +71,7 @@ export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
+                                            setAddPort(true)
                                             let lumped = getDefaultLumped(generateNewKeyPort(keyPort))
                                             dispatch(addPorts(lumped))
                                         }}

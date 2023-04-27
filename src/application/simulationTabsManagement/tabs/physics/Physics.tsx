@@ -43,11 +43,14 @@ export const Physics: React.FC<PhysicsProps> = ({
 	let selectedPort = findSelectedPort(selectedProject);
 	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
 	const dispatch = useDispatch();
+	const [addPort, setAddPort] = useState(false)
 	return (
 		<>
 			<CanvasBaseWithRedux
 				section="Physics"
-				savedPortParameters={savedPortParameters}>
+				savedPortParameters={savedPortParameters}
+				addPort={addPort}
+			>
 				{selectedProject?.ports.map((port, index) => {
 					if (port.category === "port" || port.category === "lumped") {
 						return (
@@ -146,7 +149,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 				)}
 			</LeftPanel>
 			{selectedProject?.model?.components && (
-				<SelectPorts selectedProject={selectedProject} />
+				<SelectPorts selectedProject={selectedProject} setAddPort={setAddPort}/>
 			)}
 			<ImportExportPhysicsSetup />
 			{/* <RightPanelSimulation> */}

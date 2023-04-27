@@ -16,7 +16,7 @@ export const Modeler: React.FC<ModelerProps> = ({
 
   return (
     <>
-      <CanvasBaseWithRedux section="Modeler" savedPortParameters={true}/>
+      <CanvasBaseWithRedux section="Modeler" savedPortParameters={true} addPort={false}/>
       <LeftPanel
         tabs={["Modeler", "Materials"]}
         selectedTab={selectedTabLeftPanel}

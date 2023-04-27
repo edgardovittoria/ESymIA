@@ -10,7 +10,7 @@ export function getDefaultPort(key: number){
             type: "CIRCLE",
             keyComponent: 0,
             geometryAttributes: {
-                radius: 0.05,
+                radius: 0.01,
                 segments: 10,
             } as CircleGeometryAttributes,
             name: "inputPort" + key,
@@ -32,7 +32,7 @@ export function getDefaultPort(key: number){
             type: "CIRCLE",
             keyComponent: 0,
             geometryAttributes: {
-                radius: 0.05,
+                radius: 0.01,
                 segments: 10,
             } as CircleGeometryAttributes,
             name: "outputPort" + key,
