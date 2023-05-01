@@ -12,7 +12,7 @@ export type FaunaProjectDetails = {
     modelS3?: string,
     ports: (Port | Probe)[],
     signal: Signal,
-    simulation?: Simulation,
+    simulation?: Simulation|null,
     meshData: MeshData,
     screenshot: string | undefined,
     owner: UsersState

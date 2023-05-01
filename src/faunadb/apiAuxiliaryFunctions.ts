@@ -37,6 +37,7 @@ export const convertInProjectThis = (faunaProject: FaunaProject) => {
     let project: Project = {
         ...faunaProject.project,
         faunaDocumentId: faunaProject.id,
+        simulation: (faunaProject.project.simulation === undefined || faunaProject.project.simulation === null) ? undefined : faunaProject.project.simulation,
         model: {} as CanvasState,
         sharedWith: faunaProject.project.sharedWith as sharingInfoUser[]
     }
@@ -52,7 +53,7 @@ export const convertInFaunaProjectThis = (project: Project) => {
             modelS3: project.modelS3,
             ports: project.ports,
             signal: project.signal,
-            simulation: project.simulation,
+            simulation: project.simulation === undefined ? null : project.simulation ,
             meshData: project.meshData,
             screenshot: project.screenshot,
             owner: project.owner,

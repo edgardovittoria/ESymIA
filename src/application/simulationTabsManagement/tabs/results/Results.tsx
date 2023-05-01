@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  deleteSimulation,
   findSelectedPort,
   selectedProjectSelector,
   selectPort,
+  updateSimulation,
 } from "../../../../store/projectSlice";
 import { ChartVisualizationMode } from "./ChartVisualizationMode";
 import { ChartsList } from "./ChartsList";
@@ -11,6 +13,10 @@ import { ResultsLeftPanelTab } from "./ResultsLeftPanelTab";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
+import { useFaunaQuery } from "cad-library";
+import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
+import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
+import { Project } from "../../../../model/esymiaModels";
 
 interface ResultsProps {
   selectedTabLeftPanel: string;
@@ -30,6 +36,7 @@ export const Results: React.FC<ResultsProps> = ({
   const [chartVisualizationMode, setChartVisualizationMode] = useState<
     "grid" | "full"
   >("grid");
+  const { execQuery } = useFaunaQuery();
   let simulation = selectedProject?.simulation
   return (
     <div className="flex h-[100vh]">
@@ -51,6 +58,22 @@ export const Results: React.FC<ResultsProps> = ({
               <ModelOutliner />
             </Models>
           )}
+          {(simulation) &&
+            <button
+              type="button"
+              className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
+              onClick={() => {
+                dispatch(deleteSimulation())
+                execQuery(updateProjectInFauna,
+                  convertInFaunaProjectThis(
+                    { ...selectedProject, simulation: undefined, meshData: { ...selectedProject?.meshData, meshApproved: false } } as Project
+                  )
+                )
+              }
+              }
+            >
+              REMOVE RESULTS
+            </button>}
         </LeftPanel>
       </div>
       <div className="w-[78%] ">
