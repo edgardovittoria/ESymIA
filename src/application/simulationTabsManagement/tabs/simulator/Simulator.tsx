@@ -67,7 +67,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
     useState<string[]>(materialsNames);
   return (
     <>
-      <CanvasBaseWithRedux section="Simulator" savedPortParameters={savedPortParameters} addPort={false}>
+      <CanvasBaseWithRedux section="Simulator" savedPortParameters={savedPortParameters}>
         {selectedProject && (
           <MeshedElement
             mesherOutput={mesherOutput}

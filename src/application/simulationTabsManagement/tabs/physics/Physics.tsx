@@ -49,7 +49,6 @@ export const Physics: React.FC<PhysicsProps> = ({
 			<CanvasBaseWithRedux
 				section="Physics"
 				savedPortParameters={savedPortParameters}
-				addPort={addPort}
 			>
 				{selectedProject?.ports.map((port, index) => {
 					if (port.category === "port" || port.category === "lumped") {

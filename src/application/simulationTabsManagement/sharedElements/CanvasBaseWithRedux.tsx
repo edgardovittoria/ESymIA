@@ -1,26 +1,15 @@
-import React, {MutableRefObject, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Canvas} from "@react-three/fiber";
 import * as THREE from "three";
-import {
-    BufferGeometry,
-    Color,
-    InstancedBufferAttribute,
-    InstancedMesh,
-    Material,
-    Mesh,
-    MeshPhongMaterial,
-    Object3D,
-    Vector3
-} from "three";
+import {Mesh} from "three";
 import {OrbitControls, GizmoHelper, GizmoViewport, Edges} from "@react-three/drei";
 import {GiCubeforce} from "react-icons/gi";
 import {
-    BufferGeometryAttributes,
     CanvasState,
     FactoryShapes,
     ImportActionParamsObject,
     ImportCadProjectButton,
-    ImportModelFromDBModal, meshFrom,
+    ImportModelFromDBModal,
     useFaunaQuery,
 } from "cad-library";
 import {
@@ -31,28 +20,25 @@ import {
     selectedProjectSelector,
     setModelS3,
     setModelUnit,
-    setOrbitTarget, updatePortPosition,
+    setOrbitTarget,
 } from "../../../store/projectSlice";
 import {updateProjectInFauna} from "../../../faunadb/projectsFolderAPIs";
 import {Provider, ReactReduxContext, useDispatch, useSelector} from "react-redux";
 import {s3} from "../../../aws/s3Config";
 import {Screenshot} from "./Screenshot";
 import {convertInFaunaProjectThis} from "../../../faunadb/apiAuxiliaryFunctions";
-import {MeshSurfaceSampler} from "three/examples/jsm/math/MeshSurfaceSampler";
-import SampledSurface from "./SampledSurface";
+import EdgesGenerator from "./EdgesGenerator";
 
 interface CanvasBaseWithReduxProps {
     section: string;
     portClickAction?: Function;
     savedPortParameters?: boolean;
-    addPort: boolean
 }
 
 export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                                                             section,
                                                                             savedPortParameters,
-                                                                            children,
-                                                                            addPort
+                                                                            children
                                                                         }) => {
         const selectedProject = useSelector(selectedProjectSelector);
         let mesherOutput = selectedProject?.meshData.mesh;
@@ -60,7 +46,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
         const orbitTarget = useSelector(orbitTargetSelector)
 
         const {execQuery} = useFaunaQuery();
-        const mesh = useRef(null);
+        const mesh = useRef<Mesh[]>([]);
         const dispatch = useDispatch()
         let selectedPort = findSelectedPort(selectedProject)
 
@@ -78,56 +64,18 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
         ]);
 
         useEffect(() => {
-            if (mesh.current) {
+            if (mesh.current && mesh.current.length !== 0) {
                 dispatch(
                     setOrbitTarget({
                         position: [
-                            (mesh.current as unknown as THREE.Mesh).geometry.boundingSphere?.center.x,
-                            (mesh.current as unknown as THREE.Mesh).geometry.boundingSphere?.center.y,
-                            (mesh.current as unknown as THREE.Mesh).geometry.boundingSphere?.center.z,
+                            (mesh.current[0] as Mesh).geometry.boundingSphere?.center.x,
+                            (mesh.current[0] as Mesh).geometry.boundingSphere?.center.y,
+                            (mesh.current[0] as Mesh).geometry.boundingSphere?.center.z,
                         ]
                     } as OrbitTarget)
                 );
             }
-        }, [selectedProject, selectedProject?.model, mesh])
-
-        let group = new THREE.Group()
-        if (selectedProject && selectedProject.model.components) {
-            selectedProject.model.components.forEach(c => {
-                group.add(meshFrom(c))
-            })
-        }
-        let boundingbox = new THREE.Box3().setFromObject(group)
-        let size = boundingbox.getSize(boundingbox.max)
-        const [inputPortPositioned, setInputPortPositioned] = useState(false);
-        const meshRef = useRef<InstancedMesh[]>([]);
-        useEffect(() => {
-            if (selectedProject && selectedProject.model.components && section === "Physics") {
-                let tempObject = new Object3D();
-
-                selectedProject.model.components.forEach((c, index) => {
-                    let j = 0;
-                    let positionVertices = Object.values((c.geometryAttributes as BufferGeometryAttributes).positionVertices)
-                    console.log(index)
-                    if(meshRef.current[index]){
-                        for(let i = 0; i<positionVertices.length; i++){
-                            if(i%3 === 0){
-                                tempObject.position.set(
-                                    positionVertices[i],
-                                    positionVertices[i + 1],
-                                    positionVertices[i + 2]
-                                )
-                                j++
-                                //console.log(j)
-                                tempObject.updateMatrix();
-                                meshRef.current[index].setMatrixAt(j, tempObject.matrix);
-                            }
-                        }
-                        meshRef.current[index].instanceMatrix.needsUpdate = true;
-                    }
-                })
-            }
-        }, [selectedPort, selectedProject, section])
+        }, [selectedProject, selectedProject?.model, mesh.current])
 
         return (
             <div className="flex justify-center">
@@ -145,51 +93,17 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                     />
                                     {/* paint models */}
                                     {(!mesherOutput || section !== "Simulator") && selectedPort && section === "Physics" &&
-                                        selectedProject && selectedProject.model.components.map((c, index) => {
-                                            return (
-                                                <>
-                                                    <instancedMesh
-                                                        ref={(el) => {
-                                                            if (el) {
-                                                                meshRef.current[index] = el;
-                                                            }
-                                                        }}
-                                                        key={index}
-                                                        args={[null as any, null as any, Object.values((c.geometryAttributes as BufferGeometryAttributes).positionVertices).length / 3]}
-                                                        onDoubleClick={(e) => {
-                                                            e.stopPropagation()
-                                                            if (!inputPortPositioned) {
-                                                                dispatch(
-                                                                    updatePortPosition({
-                                                                        type: "first",
-                                                                        position: [e.point.x, e.point.y, e.point.z],
-                                                                    })
-                                                                );
-                                                                setInputPortPositioned(true)
-                                                            } else {
-                                                                dispatch(
-                                                                    updatePortPosition({
-                                                                        type: "last",
-                                                                        position: [e.point.x, e.point.y, e.point.z],
-                                                                    })
-                                                                );
-                                                                setInputPortPositioned(false)
-                                                            }
-                                                        }
-                                                        }
-                                                    >
-                                                        <sphereGeometry args={[size.x/100, 20, 20]}/>
-                                                        <meshPhongMaterial color={"black"}/>
-                                                    </instancedMesh>
-                                                </>
-                                            )
-                                        })
+                                        <EdgesGenerator section={section} mesh={mesh}/>
                                     }
-                                    {(!mesherOutput || section !== "Simulator") && selectedProject && selectedProject.model.components.map(component => {
+                                    {(!mesherOutput || section !== "Simulator") && selectedProject && selectedProject.model.components.map((component, index) => {
                                         return (
                                             <>
                                                 <mesh
-                                                    ref={mesh}
+                                                    ref={(el) => {
+                                                        if (el) {
+                                                            mesh.current[index] = el;
+                                                        }
+                                                    }}
                                                     userData={{
                                                         keyComponent: component.keyComponent,
                                                         isSelected: false,
