@@ -71,10 +71,6 @@ export const Physics: React.FC<PhysicsProps> = ({
             }
         }
     }, [pointerEvent])
-
-	useEffect(() => {
-	  console.log(inputPortPositioned)
-	}, [inputPortPositioned])
 	
 
 	return (

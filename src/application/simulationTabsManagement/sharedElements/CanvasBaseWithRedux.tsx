@@ -78,7 +78,6 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                 if (selectedProject && selectedProject.model.components) {
                     selectedProject.model.components.forEach(c => {
                         group.add(meshFrom(c))
-                        console.log((group.children[0] as Mesh).geometry.attributes.position.array.length)
                     })
                 }
                 let boundingbox = new THREE.Box3().setFromObject(group)
