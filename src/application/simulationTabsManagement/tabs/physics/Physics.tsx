@@ -1,10 +1,12 @@
 import { FactoryShapes } from "cad-library";
 import { useDispatch, useSelector } from "react-redux";
 import {
+	addPorts,
 	findSelectedPort,
 	selectedProjectSelector,
-	selectPort,
-	updatePortPosition} from "../../../../store/projectSlice";
+	selectPort, setAssociatedSignal,
+	updatePortPosition
+} from "../../../../store/projectSlice";
 import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
 import * as THREE from "three";
 import { Line } from "@react-three/drei";
@@ -23,8 +25,9 @@ import { InputSignalManagement } from "./inputSignal/InputSignalManagement";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
-import { Probe, Project } from "../../../../model/esymiaModels";
+import {Port, Probe, Project, Signal, TempLumped} from "../../../../model/esymiaModels";
 import { ImportExportPhysicsSetup } from "./ImportExportPhysicsSetup";
+import {BiHide, BiImport, BiShow} from "react-icons/bi";
 
 interface PhysicsProps {
 	selectedTabLeftPanel: string;
@@ -43,12 +46,13 @@ export const Physics: React.FC<PhysicsProps> = ({
 	let selectedPort = findSelectedPort(selectedProject);
 	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
 	const dispatch = useDispatch();
-	const [addPort, setAddPort] = useState(false)
+	const [surfaceAdvices, setSurfaceAdvices] = useState(true)
 	return (
 		<>
 			<CanvasBaseWithRedux
 				section="Physics"
 				savedPortParameters={savedPortParameters}
+				surfaceAdvices={surfaceAdvices}
 			>
 				{selectedProject?.ports.map((port, index) => {
 					if (port.category === "port" || port.category === "lumped") {
@@ -148,9 +152,20 @@ export const Physics: React.FC<PhysicsProps> = ({
 				)}
 			</LeftPanel>
 			{selectedProject?.model?.components && (
-				<SelectPorts selectedProject={selectedProject} setAddPort={setAddPort}/>
+				<SelectPorts selectedProject={selectedProject}/>
 			)}
 			<ImportExportPhysicsSetup />
+			<div className="tooltip absolute left-[33%] top-[160px]" data-tip={surfaceAdvices ? "Hide Surface Advices" : "Show Surface Advices"}>
+				<button
+					className={`bg-white rounded p-2`}
+					onClick={() => setSurfaceAdvices(!surfaceAdvices)}>
+					{surfaceAdvices ? <BiShow className="h-5 w-5 text-green-300 hover:text-secondaryColor"/>
+						: <BiHide className="h-5 w-5 text-green-300 hover:text-secondaryColor"/>
+					}
+
+				</button>
+			</div>
+
 			{/* <RightPanelSimulation> */}
 			{selectedPort &&
 			(selectedPort?.category === "port" ||

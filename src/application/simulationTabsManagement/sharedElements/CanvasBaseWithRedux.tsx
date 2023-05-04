@@ -9,7 +9,7 @@ import {
     FactoryShapes,
     ImportActionParamsObject,
     ImportCadProjectButton,
-    ImportModelFromDBModal,
+    ImportModelFromDBModal, meshFrom,
     useFaunaQuery,
 } from "cad-library";
 import {
@@ -33,11 +33,13 @@ interface CanvasBaseWithReduxProps {
     section: string;
     portClickAction?: Function;
     savedPortParameters?: boolean;
+    surfaceAdvices?: boolean
 }
 
 export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                                                             section,
                                                                             savedPortParameters,
+                                                                            surfaceAdvices,
                                                                             children
                                                                         }) => {
         const selectedProject = useSelector(selectedProjectSelector);
@@ -65,12 +67,20 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 
         useEffect(() => {
             if (mesh.current && mesh.current.length !== 0) {
+                let group = new THREE.Group()
+                if (selectedProject && selectedProject.model.components) {
+                    selectedProject.model.components.forEach(c => {
+                        group.add(meshFrom(c))
+                        console.log((group.children[0] as Mesh).geometry.attributes.position.array.length)
+                    })
+                }
+                let boundingbox = new THREE.Box3().setFromObject(group)
                 dispatch(
                     setOrbitTarget({
                         position: [
-                            (mesh.current[0] as Mesh).geometry.boundingSphere?.center.x,
-                            (mesh.current[0] as Mesh).geometry.boundingSphere?.center.y,
-                            (mesh.current[0] as Mesh).geometry.boundingSphere?.center.z,
+                            boundingbox.getCenter(new THREE.Vector3()).x,
+                            boundingbox.getCenter(new THREE.Vector3()).y,
+                            boundingbox.getCenter(new THREE.Vector3()).z,
                         ]
                     } as OrbitTarget)
                 );
@@ -93,7 +103,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                     />
                                     {/* paint models */}
                                     {(!mesherOutput || section !== "Simulator") && selectedPort && section === "Physics" &&
-                                        <EdgesGenerator section={section} mesh={mesh}/>
+                                        <EdgesGenerator section={section} meshRef={mesh} surfaceAdvices={surfaceAdvices as boolean}/>
                                     }
                                     {(!mesherOutput || section !== "Simulator") && selectedProject && selectedProject.model.components.map((component, index) => {
                                         return (
