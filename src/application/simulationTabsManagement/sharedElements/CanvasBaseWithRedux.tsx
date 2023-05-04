@@ -11,6 +11,7 @@ import {
     ImportCadProjectButton,
     ImportModelFromDBModal, meshFrom,
     useFaunaQuery,
+    usePointerIntersectionOnMeshSurface,
 } from "cad-library";
 import {
     findSelectedPort,
@@ -33,13 +34,19 @@ interface CanvasBaseWithReduxProps {
     section: string;
     portClickAction?: Function;
     savedPortParameters?: boolean;
-    surfaceAdvices?: boolean
+    surfaceAdvices?: boolean,
+    setPointerEvent?: Function, 
+    setInputPortPositioned?: Function
+    inputPortPositioned?: boolean
 }
 
 export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                                                             section,
                                                                             savedPortParameters,
                                                                             surfaceAdvices,
+                                                                            setPointerEvent,
+                                                                            setInputPortPositioned,
+                                                                            inputPortPositioned,
                                                                             children
                                                                         }) => {
         const selectedProject = useSelector(selectedProjectSelector);
@@ -51,7 +58,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
         const mesh = useRef<Mesh[]>([]);
         const dispatch = useDispatch()
         let selectedPort = findSelectedPort(selectedProject)
-
+      
 
         useEffect(() => {
             if (selectedProject && savedPortParameters === true) {
@@ -103,11 +110,10 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                     />
                                     {/* paint models */}
                                     {(!mesherOutput || section !== "Simulator") && selectedPort && section === "Physics" &&
-                                        <EdgesGenerator section={section} meshRef={mesh} surfaceAdvices={surfaceAdvices as boolean}/>
+                                        <EdgesGenerator section={section} meshRef={mesh} surfaceAdvices={surfaceAdvices as boolean} inputPortPositioned={inputPortPositioned as boolean} setInputPortPositioned={setInputPortPositioned as Function}/>
                                     }
                                     {(!mesherOutput || section !== "Simulator") && selectedProject && selectedProject.model.components.map((component, index) => {
                                         return (
-                                            <>
                                                 <mesh
                                                     ref={(el) => {
                                                         if (el) {
@@ -121,11 +127,12 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                                     key={component.keyComponent}
                                                     position={component.transformationParams.position}
                                                     scale={component.transformationParams.scale}
-                                                    rotation={component.transformationParams.rotation}>
+                                                    rotation={component.transformationParams.rotation}
+                                                    onDoubleClick={(e) => setPointerEvent && setPointerEvent(e)}
+                                                    >
                                                     <FactoryShapes entity={component}/>
                                                     <Edges/>
                                                 </mesh>
-                                            </>
                                         )
                                     })}
                                     {children}

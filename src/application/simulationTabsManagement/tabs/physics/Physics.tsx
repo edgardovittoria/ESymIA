@@ -1,10 +1,9 @@
 import { FactoryShapes } from "cad-library";
 import { useDispatch, useSelector } from "react-redux";
 import {
-	addPorts,
 	findSelectedPort,
 	selectedProjectSelector,
-	selectPort, setAssociatedSignal,
+	selectPort, 
 	updatePortPosition
 } from "../../../../store/projectSlice";
 import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
@@ -20,14 +19,15 @@ import { PortPosition } from "./portManagement/components/PortPosition";
 import { RLCParamsComponent } from "./portManagement/components/RLCParamsComponent";
 import { ModalSelectPortType } from "./portManagement/ModalSelectPortType";
 import { InputSignal } from "./inputSignal/InputSignal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputSignalManagement } from "./inputSignal/InputSignalManagement";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
-import {Port, Probe, Project, Signal, TempLumped} from "../../../../model/esymiaModels";
+import { Probe, Project } from "../../../../model/esymiaModels";
 import { ImportExportPhysicsSetup } from "./ImportExportPhysicsSetup";
-import {BiHide, BiImport, BiShow} from "react-icons/bi";
+import { BiHide, BiShow } from "react-icons/bi";
+import { ThreeEvent } from "@react-three/fiber";
 
 interface PhysicsProps {
 	selectedTabLeftPanel: string;
@@ -47,12 +47,45 @@ export const Physics: React.FC<PhysicsProps> = ({
 	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
 	const dispatch = useDispatch();
 	const [surfaceAdvices, setSurfaceAdvices] = useState(true)
+	const [pointerEvent, setPointerEvent] = useState<ThreeEvent<MouseEvent> | undefined>(undefined)
+	const [inputPortPositioned, setInputPortPositioned] = useState(false)
+
+	useEffect(() => {
+        if (pointerEvent) {
+            if (!inputPortPositioned) {
+                dispatch(
+                    updatePortPosition({
+                        type: "first",
+                        position: [pointerEvent.point.x, pointerEvent.point.y, pointerEvent.point.z],
+                    })
+                );
+                setInputPortPositioned(true)
+            } else {
+                dispatch(
+                    updatePortPosition({
+                        type: "last",
+                        position: [pointerEvent.point.x, pointerEvent.point.y, pointerEvent.point.z],
+                    })
+                );
+                setInputPortPositioned(false)
+            }
+        }
+    }, [pointerEvent])
+
+	useEffect(() => {
+	  console.log(inputPortPositioned)
+	}, [inputPortPositioned])
+	
+
 	return (
 		<>
 			<CanvasBaseWithRedux
 				section="Physics"
 				savedPortParameters={savedPortParameters}
 				surfaceAdvices={surfaceAdvices}
+				setPointerEvent={setPointerEvent}
+				inputPortPositioned={inputPortPositioned}
+				setInputPortPositioned={setInputPortPositioned}
 			>
 				{selectedProject?.ports.map((port, index) => {
 					if (port.category === "port" || port.category === "lumped") {
@@ -152,15 +185,15 @@ export const Physics: React.FC<PhysicsProps> = ({
 				)}
 			</LeftPanel>
 			{selectedProject?.model?.components && (
-				<SelectPorts selectedProject={selectedProject}/>
+				<SelectPorts selectedProject={selectedProject} />
 			)}
 			<ImportExportPhysicsSetup />
 			<div className="tooltip absolute left-[33%] top-[160px]" data-tip={surfaceAdvices ? "Hide Surface Advices" : "Show Surface Advices"}>
 				<button
 					className={`bg-white rounded p-2`}
 					onClick={() => setSurfaceAdvices(!surfaceAdvices)}>
-					{surfaceAdvices ? <BiShow className="h-5 w-5 text-green-300 hover:text-secondaryColor"/>
-						: <BiHide className="h-5 w-5 text-green-300 hover:text-secondaryColor"/>
+					{surfaceAdvices ? <BiShow className="h-5 w-5 text-green-300 hover:text-secondaryColor" />
+						: <BiHide className="h-5 w-5 text-green-300 hover:text-secondaryColor" />
 					}
 
 				</button>
@@ -168,8 +201,8 @@ export const Physics: React.FC<PhysicsProps> = ({
 
 			{/* <RightPanelSimulation> */}
 			{selectedPort &&
-			(selectedPort?.category === "port" ||
-				selectedPort?.category === "lumped") ? (
+				(selectedPort?.category === "port" ||
+					selectedPort?.category === "lumped") ? (
 				<>
 					<PortManagement
 						selectedPort={selectedPort}

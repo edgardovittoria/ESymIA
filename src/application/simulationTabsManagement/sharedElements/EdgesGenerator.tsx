@@ -8,10 +8,12 @@ import {findSelectedPort, selectedProjectSelector, updatePortPosition} from "../
 export interface EdgesGeneratorProps {
     section: string,
     meshRef: React.MutableRefObject<THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>[]>,
-    surfaceAdvices: boolean
+    surfaceAdvices: boolean,
+    inputPortPositioned: boolean,
+    setInputPortPositioned: Function
 }
 
-const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef    , surfaceAdvices}) => {
+const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfaceAdvices, inputPortPositioned, setInputPortPositioned}) => {
 
     const selectedProject = useSelector(selectedProjectSelector);
     const dispatch = useDispatch()
@@ -25,7 +27,6 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef    , su
     }
     let boundingbox = new THREE.Box3().setFromObject(group)
     let size = boundingbox.getSize(boundingbox.max)
-    const [inputPortPositioned, setInputPortPositioned] = useState(false);
     const [instanceId, setInstanceId] = useState<number | undefined>(undefined)
     const instancedMeshRef = useRef<InstancedMesh[]>([]);
     useEffect(() => {
@@ -95,7 +96,7 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef    , su
                                                     position: [e.point.x, e.point.y, e.point.z],
                                                 })
                                             );
-                                            setInputPortPositioned(false)
+                                            setInputPortPositioned(false)                                            
                                         }
                                     }}
                                 >
