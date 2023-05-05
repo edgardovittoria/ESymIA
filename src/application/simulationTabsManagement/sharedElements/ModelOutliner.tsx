@@ -14,13 +14,13 @@ export const ModelOutliner: React.FC<ModelOutlinerProps> = () => {
 
     return (
         <>
-            <div className='mt-2'>
-                <div className="flex pl-2">
-                    <div className="w-[13%]">
-                        <FaCubes className="w-[33px] h-[33px]"/>
+            <div className='mt-1'>
+                <div className="flex pl-1 items-center">
+                    <div className="w-[10%]">
+                        <FaCubes className="w-[20px] h-[20px]"/>
                     </div>
                     <div className="w-[80%] text-left">
-                        <h5 className="ml-[5px] text-[20px] font-normal">Components</h5>
+                        <h5 className="ml-[5px] text-[16px] font-normal">Components</h5>
                     </div>
                 </div>
                 <div className="flex-col ml-10 mt-1">
@@ -31,10 +31,10 @@ export const ModelOutliner: React.FC<ModelOutlinerProps> = () => {
                                 key={component.keyComponent}
                             >
                                 <div className="w-[10%]">
-                                    <FaCube className="w-[22px] h-[22px]" color={(component.material !== undefined) ? component.material.color : "gray"}/>
+                                    <FaCube className="w-[15px] h-[15px]" color={(component.material !== undefined) ? component.material.color : "gray"}/>
                                 </div>
                                 <div className="w-[90%] text-start">
-                                    <h6 className="lowercase text-[18px] pl-2 font-[400]">{component.name}</h6>
+                                    <h6 className="lowercase text-[15px] font-[600]">{component.name}</h6>
                                 </div>
                             </div>
                         )

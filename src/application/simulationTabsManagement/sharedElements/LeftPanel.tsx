@@ -68,7 +68,7 @@ export const LeftPanel: React.FC<DashBoardProps> = (
                             >
                                 {children}
                                 {selectedProject?.modelUnit &&
-                                    <div>unit: {selectedProject.modelUnit}</div>
+                                    <div className="mt-4 text-[15px]">unit: <span className="font-bold">{selectedProject.modelUnit}</span></div>
                                 }
                             </Tab.Panel>
                         ))}

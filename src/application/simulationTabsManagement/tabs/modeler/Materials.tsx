@@ -24,7 +24,7 @@ export const Materials: React.FC<MaterialsProps> = () => {
                                                     color={(component.material !== undefined) ? component.material.color : "gray"}/>
                                             </div>
                                             <div className="w-[80%] text-left flex items-center">
-                                                <h6 className="mb-0 text-[18px] font-normal">{(component.material !== undefined) ? component.material.name : "No material"}</h6>
+                                                <h6 className="mb-0 text-[15px] font-normal">{(component.material !== undefined) ? component.material.name : "No material"}</h6>
                                             </div>
                                         </div>
                                     </li>

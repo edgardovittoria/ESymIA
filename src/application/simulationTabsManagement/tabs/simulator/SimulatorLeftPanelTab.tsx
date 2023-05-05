@@ -27,15 +27,15 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
                         {allMaterials.map((material, index) => {
                             return (
                                 <li key={index} className='p-[3px] rounded mt-1'>
-                                    <div className="flex">
-                                        <div className="flex w-[10%] items-center">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center">
                                             <FaCircle
                                                 color={(material !== undefined) ? material.color : "gray"}/>
                                         </div>
-                                        <div className="w-[60%] text-left flex items-center">
-                                            <h6 className="mb-0 text-[18px] font-normal">{(material !== undefined) ? material.name : "No material"}</h6>
+                                        <div className="text-left">
+                                            <h6 className="mb-0 text-[15px] font-normal">{(material !== undefined) ? material.name : "No material"}</h6>
                                         </div>
-                                        <div className="w-[30%] text-left flex items-center">
+                                        <div className="text-left">
                                             <Switch
                                                 checked={selectedMaterials.filter(m => m === material?.name).length > 0}
                                                 onChange={() => {

@@ -259,7 +259,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     selectedProject.model?.components === undefined
                   }
                   min={0}
-                  className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+                  className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
                   type="number"
                   step={0.000001}
                   value={quantumDimensions[0]}
@@ -281,7 +281,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     selectedProject.model?.components === undefined
                   }
                   min={0.0}
-                  className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+                  className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
                   type="number"
                   step={0.000001}
                   value={quantumDimensions[1]}
@@ -303,7 +303,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     selectedProject.model?.components === undefined
                   }
                   min={0}
-                  className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+                  className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
                   type="number"
                   step={0.000001}
                   value={quantumDimensions[2]}

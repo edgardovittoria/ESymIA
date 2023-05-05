@@ -11,6 +11,7 @@ import {
 	SignalValues,
 } from "../../../../../model/esymiaModels";
 import { ModalSignals } from "./ModalSignals";
+import {BiImport, BiPlus, BiShow} from "react-icons/bi";
 
 interface InputSignalProps {
 	selectedProject: Project;
@@ -85,11 +86,11 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 	return (
 		<>
 			<div className=" p-[10px] border-[1px] border-secondaryColor rounded bg-[#f6f6f6] text-left">
-				<div className="flex flex-wrap">
-					<h6 className="w-[100%]">Input Signal</h6>
-					<div className="w-[28%]">
+				<h6 className="w-[100%]">Input Signal</h6>
+				<div className="flex flex-wrap items-center">
+					<div className="w-[50%]">
 						<select
-							className=" bg-transparent pt-[3px] pb-[3px] border-[1px] border-[#a3a3a3] rounded-xl text-[12px] font-[500]"
+							className=" bg-transparent pt-[3px] pb-[3px] border-[1px] border-[#a3a3a3] rounded-xl text-[12px] font-[500] w-[80%]"
 							disabled={disabled}
 							value={selectedProject.signal?.name as string}
 							onChange={(event) => {
@@ -110,16 +111,16 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 								})}
 						</select>
 					</div>
-					<div className="w-[35%]">
+					<div className="tooltip w-[25%] flex justify-center" data-tip={"New Signal"}>
 						<button
 							disabled={disabled}
 							onClick={() => setShowModalSignal(true)}
-							className="w-[100%] border-none bg-transparent underline text-[#a3a3a3] p-0 text-[15px] hover:cursor-pointer hover:text-black">
-							+New Signal
+							className="rounded py-1 px-4 hover:cursor-pointer border border-secondaryColor">
+							<BiPlus className="h-4 w-4 text-secondaryColor hover:text-green-300"/>
 						</button>
 					</div>
-					<div className="w-[35%]">
-						<label className="w-[100%] border-none bg-transparent underline text-[#a3a3a3] p-0 text-[15px] hover:cursor-pointer hover:text-black">
+					<div className="w-[25%] tooltip flex justify-center" data-tip={"Load Signal"}>
+						<label className="rounded py-1 px-4 hover:cursor-pointer border border-secondaryColor">
 							<input
 								type="file"
 								accept="text/plain"
@@ -127,7 +128,7 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 								disabled={disabled}
 								onInput={(event) => loadSignal(event)}
 							/>
-							Load Signal
+							<BiImport className="h-4 w-4 text-secondaryColor  hover:text-green-300"/>
 						</label>
 					</div>
 					{selectedProject.signal && (
@@ -148,7 +149,6 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 									};
 									dispatch(setAssociatedSignal(signal));
 								}}>
-								<option value="undefined">UNDEFINED</option>
 								{selectedProject.ports &&
 									selectedProject.ports
 										.filter(
@@ -156,14 +156,16 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 										)
 										.map((port, index) => {
 											return (
-												<option key={index} value={port.name}>
+												<option key={index} value={port.name} defaultChecked={index === 0}>
 													{port.name}
 												</option>
 											);
 										})}
 							</select>
 							<span className="ml-6 text-[15px] font-[500]">
-								Select target port of signal
+								{selectedProject.signal
+									? selectedProject.signal.powerPort
+									: "Select Target Port of Signal"}
 							</span>
 						</div>
 					)}

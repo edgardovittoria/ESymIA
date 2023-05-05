@@ -29,7 +29,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 							<div className="w-[30%]">
 								<input
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
 									step={0.000001}
 									value={selectedPort.inputElement.transformationParams.position[0]}
@@ -55,7 +55,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 							<div className="w-[30%]">
 								<input
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
 									step={0.000001}
 									value={selectedPort.inputElement.transformationParams.position[1]}
@@ -81,7 +81,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 							<div className="w-[30%]">
 								<input
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
 									step={0.000001}
 									value={selectedPort.inputElement.transformationParams.position[2]}
@@ -112,7 +112,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 							<div className="w-[30%]">
 								<input
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
 									step={0.000001}
 									value={selectedPort.outputElement.transformationParams.position[0]}
@@ -138,7 +138,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 							<div className="w-[30%]">
 								<input
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
 									step={0.000001}
 									value={selectedPort.outputElement.transformationParams.position[1]}
@@ -164,7 +164,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 							<div className="w-[30%]">
 								<input
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
 									step={0.000001}
 									value={selectedPort.outputElement.transformationParams.position[2]}
@@ -200,7 +200,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 							<div className="w-[30%]">
 								<input
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
 									step={0.000001}
 									value={(selectedPort as Probe).groupPosition[0].toFixed(6)}
@@ -224,7 +224,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 							<div className="w-[30%]">
 								<input
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
 									step={0.000001}
 									value={(selectedPort as Probe).groupPosition[1].toFixed(6)}
@@ -248,7 +248,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 							<div className="w-[30%]">
 								<input
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
 									step={0.000001}
 									value={(selectedPort as Probe).groupPosition[2].toFixed(6)}

@@ -27,20 +27,20 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                             }
                             return (
                                 <li key={port.name}
-                                    className={port.isSelected ? "mt-[5px] pt-[5px] rounded bg-gray-200 hover:bg-gray-200 hover:cursor-pointer hover:rounded" : "mt-[5px] pt-[5px] hover:bg-gray-200 hover:cursor-pointer hover:rounded"}
+                                    className={port.isSelected ? "mt-[5px] rounded bg-gray-200 hover:bg-gray-200 hover:cursor-pointer hover:rounded" : "mt-[5px] hover:bg-gray-200 hover:cursor-pointer hover:rounded"}
                                     onClick={() => dispatch(selectPort(port.name))}
                                 >
-                                    <div className="flex">
-                                        <div className="w-[15%]">
+                                    <div className="flex items-center">
+                                        <div className="w-[10%]">
                                             <AiOutlineThunderbolt color={portColor}
-                                                                  style={{width: "25px", height: "25px"}}/>
+                                                                  style={{width: "20px", height: "20px"}}/>
                                         </div>
                                         <div className="w-[75%] text-start">
-                                            <h5 className="text-[18px] font-normal">{port.name}</h5>
+                                            <h5 className="text-[15px] font-normal">{port.name}</h5>
                                         </div>
                                         {port.isSelected &&
                                             <div
-                                                className="w-[15%]"
+                                                className="w-[15%] tooltip" data-tip={"Delete"}
                                                 onClick={() => dispatch(deletePort(port.name))}
                                             >
                                                 <IoTrashOutline color={'#d80233'} style={{width: "20px", height: "20px"}}/>
