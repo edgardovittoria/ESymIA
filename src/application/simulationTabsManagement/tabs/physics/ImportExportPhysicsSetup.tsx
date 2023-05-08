@@ -12,6 +12,7 @@ import {
     setAssociatedSignal,
 } from "../../../../store/projectSlice";
 import {BiExport, BiImport} from "react-icons/bi";
+import { exportToJsonFileThis } from "../../sharedElements/utilityFunctions";
 
 export const ImportExportPhysicsSetup: FC<{}> = () => {
     const selectedProject = useSelector(selectedProjectSelector);
@@ -23,17 +24,6 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
         if (input) {
             (input as HTMLInputElement).click();
         }
-    };
-
-    const exportDataToJsonFile = (data: any) => {
-        const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
-            JSON.stringify(data)
-        )}`;
-        const link = document.createElement("a");
-        link.href = jsonString;
-        link.download = selectedProject?.name + "_physics.json";
-
-        link.click();
     };
     return (
         <>
@@ -76,7 +66,7 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                             ports: selectedProject?.ports,
                             signal: selectedProject?.signal,
                         };
-                        exportDataToJsonFile(physics);
+                        exportToJsonFileThis(physics, selectedProject?.name + "_physics.json");
                     }}>
                     <BiExport className={`h-5 w-5 text-green-300 hover:text-secondaryColor ${!(selectedProject &&
                         (selectedProject.ports.length > 0 || selectedProject.signal)) && 'opacity-40'}`}/>

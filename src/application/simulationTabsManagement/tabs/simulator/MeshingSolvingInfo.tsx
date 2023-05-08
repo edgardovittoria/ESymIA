@@ -1,8 +1,8 @@
 import { ComponentEntity, exportToSTL, Material } from "cad-library";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import { useDispatch } from "react-redux";
-import {setSolverOutput} from "../../../../store/solverSlice";
+import { setSolverOutput } from "../../../../store/solverSlice";
 import {
   updateSimulation,
   setQuantum,
@@ -12,11 +12,12 @@ import {
 } from "../../../../store/projectSlice";
 import axios from "axios";
 import { MesherOutput } from "./MesherInputOutput";
-import {deleteFileS3, uploadFileS3} from "../../../../aws/mesherAPIs";
+import { deleteFileS3, uploadFileS3 } from "../../../../aws/mesherAPIs";
 import { selectMenuItem } from "../../../../store/tabsAndMenuItemsSlice";
-import {ImSpinner} from "react-icons/im";
+import { ImSpinner } from "react-icons/im";
 import { Project, Simulation, SolverOutput } from "../../../../model/esymiaModels";
-import {getMaterialListFrom} from "./Simulator";
+import { getMaterialListFrom } from "./Simulator";
+import { exportToJsonFileThis } from "../../sharedElements/utilityFunctions";
 
 
 interface MeshingSolvingInfoProps {
@@ -38,6 +39,38 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
 
   const [solverIterations, setSolverIterations] = useState<[number, number]>([100, 1])
   const [convergenceThreshold, setConvergenceThreshold] = useState(0.0001)
+
+  const solverInputFrom = (project: Project, solverIterations: [number, number], convergenceThreshold: number) => {
+    let frequencyArray: number[] = [];
+    if (project)
+      project.signal?.signalValues.forEach((sv) =>
+        frequencyArray.push(sv.freq)
+      );
+
+    let signalsValuesArray: { Re: number; Im: number }[] = [];
+    if (project)
+      project.signal?.signalValues.forEach((sv) =>
+        signalsValuesArray.push(sv.signal)
+      );
+
+    let dataToSendToSolver = {
+      mesherOutput: mesherOutput,
+      solverInput: {
+        ports: project.ports.filter(p => p.category === 'port'),
+        lumped_elements: project.ports.filter(p => p.category === 'lumped'),
+        materials: getMaterialListFrom(project?.model?.components as ComponentEntity[]),
+        frequencies: frequencyArray,
+        signals: signalsValuesArray,
+        powerPort: (project) && project.signal?.powerPort
+      },
+      solverAlgoParams: {
+        innerIteration: solverIterations[0],
+        outerIteration: solverIterations[1],
+        convergenceThreshold: convergenceThreshold
+      }
+    }
+    return dataToSendToSolver
+  }
 
   function generateSTLListFromComponents(
     materialList: Material[],
@@ -93,34 +126,36 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       };
       dispatch(updateSimulation(simulation));
 
-      let frequencyArray: number[] = [];
-      if (selectedProject)
-        selectedProject.signal?.signalValues.forEach((sv) =>
-          frequencyArray.push(sv.freq)
-        );
+      // let frequencyArray: number[] = [];
+      // if (selectedProject)
+      //   selectedProject.signal?.signalValues.forEach((sv) =>
+      //     frequencyArray.push(sv.freq)
+      //   );
 
-      let signalsValuesArray: { Re: number; Im: number }[] = [];
-      if (selectedProject)
-        selectedProject.signal?.signalValues.forEach((sv) =>
-          signalsValuesArray.push(sv.signal)
-        );
+      // let signalsValuesArray: { Re: number; Im: number }[] = [];
+      // if (selectedProject)
+      //   selectedProject.signal?.signalValues.forEach((sv) =>
+      //     signalsValuesArray.push(sv.signal)
+      //   );
 
-      let dataToSendToSolver = {
-        mesherOutput: mesherOutput,
-        solverInput: {
-          ports: selectedProject.ports.filter(p => p.category === 'port'),
-          lumped_elements: selectedProject.ports.filter(p => p.category === 'lumped'),
-          materials: getMaterialListFrom(selectedProject?.model?.components as ComponentEntity[]),
-          frequencies: frequencyArray,
-          signals: signalsValuesArray,
-          powerPort: (selectedProject) && selectedProject.signal?.powerPort
-        },
-        solverAlgoParams: {
-          innerIteration: solverIterations[0],
-          outerIteration: solverIterations[1],
-          convergenceThreshold: convergenceThreshold
-        }
-      }
+      // let dataToSendToSolver = {
+      //   mesherOutput: mesherOutput,
+      //   solverInput: {
+      //     ports: selectedProject.ports.filter(p => p.category === 'port'),
+      //     lumped_elements: selectedProject.ports.filter(p => p.category === 'lumped'),
+      //     materials: getMaterialListFrom(selectedProject?.model?.components as ComponentEntity[]),
+      //     frequencies: frequencyArray,
+      //     signals: signalsValuesArray,
+      //     powerPort: (selectedProject) && selectedProject.signal?.powerPort
+      //   },
+      //   solverAlgoParams: {
+      //     innerIteration: solverIterations[0],
+      //     outerIteration: solverIterations[1],
+      //     convergenceThreshold: convergenceThreshold
+      //   }
+      // }
+
+
       // lambdaClient.invoke({
       //   FunctionName: "meshing-solving-dev-solving",
       //   Payload: JSON.stringify(dataToSendToSolver),
@@ -144,7 +179,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       // })
       //https://teema-flask-api-4rys7fymga-uc.a.run.app -> 4GB
       //https://solver-16bg-4rys7fymga-uc.a.run.app -> 16GB
-      axios.post("https://teemaserver.cloud/solving", dataToSendToSolver).then((res) => {
+      axios.post("https://teemaserver.cloud/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
         dispatch(setSolverOutput(res.data));
         let simulationUpdated: Simulation = {
           ...simulation,
@@ -179,11 +214,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   useEffect(() => {
     if (mesherOutput) {
       dispatch(
-          setQuantum([
-            mesherOutput.cell_size.cell_size_x*1000,
-            mesherOutput.cell_size.cell_size_y*1000,
-            mesherOutput.cell_size.cell_size_z*1000,
-          ])
+        setQuantum([
+          mesherOutput.cell_size.cell_size_x * 1000,
+          mesherOutput.cell_size.cell_size_y * 1000,
+          mesherOutput.cell_size.cell_size_z * 1000,
+        ])
       );
     }
   }, [mesherOutput])
@@ -206,8 +241,8 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         saveMeshToS3((res.data)).then(() => {
           dispatch(setMeshGenerated("Generated"))
         });
-      }).catch((err) =>{
-        if(err){
+      }).catch((err) => {
+        if (err) {
           window.alert("Error while generating mesh, please try again")
           dispatch(setMeshGenerated("Not Generated"))
           dispatch(unsetMesh())
@@ -237,7 +272,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   return (
     <>
       {(meshGenerated === "Generating" || selectedProject.simulation?.status === "Queued") && (
-          <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2`}/>
+        <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2`} />
       )}
       <div className={`${(meshGenerated === "Generating" || selectedProject.simulation?.status === "Queued") && 'opacity-40'} flex-col absolute right-[2%] top-[160px] w-[22%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor`}>
         <div className="flex">
@@ -357,88 +392,99 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
           </div>
         </div>
         <div
-            className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
+          className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
         >
-            <h6>Solver Iterations</h6>
+          <h6>Solver Iterations</h6>
           <div className="mt-2">
             <span>Inner, Outer</span>
             <div className="flex justify-between mt-2">
               <div className="w-[45%]">
                 <input
-                    disabled={
-                        selectedProject.simulation?.status === "Completed" ||
-                        meshGenerated !== "Generated"
-                    }
-                    min={1}
-                    className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
-                    type="number"
-                    step={1}
-                    value={selectedProject.simulation ? selectedProject.simulation.solverAlgoParams.innerIteration : solverIterations[0]}
-                    onChange={(event) => {setSolverIterations([parseInt(event.target.value), solverIterations[1]])} }
+                  disabled={
+                    selectedProject.simulation?.status === "Completed" ||
+                    meshGenerated !== "Generated"
+                  }
+                  min={1}
+                  className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+                  type="number"
+                  step={1}
+                  value={selectedProject.simulation ? selectedProject.simulation.solverAlgoParams.innerIteration : solverIterations[0]}
+                  onChange={(event) => { setSolverIterations([parseInt(event.target.value), solverIterations[1]]) }}
                 />
               </div>
               <div className="w-[45%]">
                 <input
-                    disabled={
-                        selectedProject.simulation?.status === "Completed" ||
-                        meshGenerated !== "Generated"
-                    }
-                    min={1}
-                    className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
-                    type="number"
-                    step={1}
-                    value={selectedProject.simulation ? selectedProject.simulation.solverAlgoParams.outerIteration : solverIterations[1]}
-                    onChange={(event) =>{setSolverIterations([solverIterations[0], parseInt(event.target.value)])}}
+                  disabled={
+                    selectedProject.simulation?.status === "Completed" ||
+                    meshGenerated !== "Generated"
+                  }
+                  min={1}
+                  className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+                  type="number"
+                  step={1}
+                  value={selectedProject.simulation ? selectedProject.simulation.solverAlgoParams.outerIteration : solverIterations[1]}
+                  onChange={(event) => { setSolverIterations([solverIterations[0], parseInt(event.target.value)]) }}
                 />
               </div>
             </div>
           </div>
         </div>
         <div
-            className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
+          className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
         >
           <h6>Convergence Threshold</h6>
           <div className="mt-2">
             <div className="flex justify-between mt-2">
               <div className="w-full">
                 <input
-                    disabled={
-                        selectedProject.simulation?.status === "Completed" ||
-                        meshGenerated !== "Generated"
-                    }
-                    min={0.0000000001}
-                    max={0.1}
-                    className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
-                    type="number"
-                    step={0.0000000001}
-                    value={selectedProject.simulation ? selectedProject.simulation.solverAlgoParams.convergenceThreshold : convergenceThreshold}
-                    onChange={(event) => {setConvergenceThreshold(parseFloat(event.target.value))} }
+                  disabled={
+                    selectedProject.simulation?.status === "Completed" ||
+                    meshGenerated !== "Generated"
+                  }
+                  min={0.0000000001}
+                  max={0.1}
+                  className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl`}
+                  type="number"
+                  step={0.0000000001}
+                  value={selectedProject.simulation ? selectedProject.simulation.solverAlgoParams.convergenceThreshold : convergenceThreshold}
+                  onChange={(event) => { setConvergenceThreshold(parseFloat(event.target.value)) }}
                 />
               </div>
             </div>
           </div>
         </div>
+        <button
+          className={`w-full mt-3 button
+              ${(meshGenerated !== "Generated") ? 'bg-gray-300 text-gray-600 opacity-70' : 'buttonPrimary'}`}
+          disabled={meshGenerated !== "Generated"}
+          onClick={() => {
+            exportToJsonFileThis(solverInputFrom(selectedProject, solverIterations, convergenceThreshold), selectedProject?.name + "_solverInput.json")
+          }}
+        >
+          Export Solver Input
+        </button>
         {selectedProject.simulation?.status === "Completed" ? (
-            <button
-                className="button buttonPrimary w-[100%] mt-3"
-                onClick={() => {
-                  //dispatch(setSimulationStatus("notStarted"));
-                  dispatch(selectMenuItem("Results"));
-                }}
-            >
-              Results
-            </button>
+          <button
+            className="button buttonPrimary w-[100%] mt-3"
+            onClick={() => {
+              dispatch(selectMenuItem("Results"));
+            }}
+          >
+            Results
+          </button>
         ) :
+          <>
             <button
-                className={`w-full mt-3 button
-              ${(meshGenerated !== "Generated") ? 'bg-gray-300 text-gray-600 opacity-70': 'buttonPrimary'}`}
-                disabled={meshGenerated !== "Generated"}
-                onClick={() => {
-                  dispatch(setMeshApproved(true));
-                }}
+              className={`w-full mt-3 button
+              ${(meshGenerated !== "Generated") ? 'bg-gray-300 text-gray-600 opacity-70' : 'buttonPrimary'}`}
+              disabled={meshGenerated !== "Generated"}
+              onClick={() => {
+                dispatch(setMeshApproved(true));
+              }}
             >
               Start Simulation
             </button>
+          </>
         }
       </div>
     </>
