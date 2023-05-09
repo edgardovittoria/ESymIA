@@ -124,7 +124,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                         edgeRef.current[index] = el;
                     }
                 }}
-                key={index}
+                key={index + 1}
                 args={[null as any, null as any, numberOfCells[index]]}>
                 <boxBufferGeometry
                     args={

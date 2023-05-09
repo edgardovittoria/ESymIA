@@ -4,7 +4,7 @@ import {
   deleteSimulation,
   findSelectedPort,
   selectedProjectSelector,
-  selectPort,
+  selectPort, setMeshApproved,
   updateSimulation,
 } from "../../../../store/projectSlice";
 import { ChartVisualizationMode } from "./ChartVisualizationMode";
@@ -64,6 +64,7 @@ export const Results: React.FC<ResultsProps> = ({
               className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
               onClick={() => {
                 dispatch(deleteSimulation())
+                dispatch(setMeshApproved(false));
                 execQuery(updateProjectInFauna,
                   convertInFaunaProjectThis(
                     { ...selectedProject, simulation: undefined, meshData: { ...selectedProject?.meshData, meshApproved: false } } as Project

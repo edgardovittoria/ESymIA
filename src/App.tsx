@@ -36,6 +36,7 @@ function App() {
 
     const {execQuery} = useFaunaQuery();
 
+
     //USE EFFECT
     useEffect(() => {
         if (user.userName) {
