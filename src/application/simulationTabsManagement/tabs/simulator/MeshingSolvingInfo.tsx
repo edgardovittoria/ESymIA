@@ -112,7 +112,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         return validity;
     }
 
-    const WS_URL = 'ws://127.0.0.1:8080';
+    const WS_URL = 'ws://teemaserver.cloud:8080';
     const [solverStatus, setSolverStatus] = useState<"Computing P" | "Computing Lpx" | "Computing Lpy" | "Computing Lpz" | "Doing Iterations">("Computing P")
     const [iterations, setIterations] = useState(0)
 
@@ -158,7 +158,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             dispatch(updateSimulation(simulation));
 
             //https://teemaserver.cloud/solving
-            axios.post("http://127.0.0.1:8001/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
+            axios.post("https://teemaserver.cloud/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
                 dispatch(setSolverOutput(res.data));
                 let simulationUpdated: Simulation = {
                     ...simulation,
