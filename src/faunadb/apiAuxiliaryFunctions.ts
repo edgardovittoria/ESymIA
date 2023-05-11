@@ -52,6 +52,7 @@ export const convertInFaunaProjectThis = (project: Project) => {
             description: project.description,
             modelS3: project.modelS3,
             ports: project.ports,
+            portKey: project.portKey,
             signal: project.signal,
             simulation: project.simulation === undefined ? null : project.simulation ,
             meshData: project.meshData,

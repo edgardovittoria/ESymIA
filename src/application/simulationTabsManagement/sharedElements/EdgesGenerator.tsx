@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import * as THREE from "three";
-import {BufferGeometryAttributes, meshFrom} from "cad-library";
+import {meshFrom} from "cad-library";
 import {BufferGeometry, InstancedMesh, Material, Mesh, Object3D} from "three";
 import {useDispatch, useSelector} from "react-redux";
 import {findSelectedPort, selectedProjectSelector, updatePortPosition} from "../../../store/projectSlice";
@@ -27,7 +27,6 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfac
     }
     let boundingbox = new THREE.Box3().setFromObject(group)
     let size = boundingbox.getSize(boundingbox.max)
-    const [instanceId, setInstanceId] = useState<number | undefined>(undefined)
     const instancedMeshRef = useRef<InstancedMesh[]>([]);
     useEffect(() => {
         if (section === "Physics") {
@@ -36,7 +35,6 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfac
                 if (meshRef.current && selectedPort && meshRef.current.length !== 0 && surfaceAdvices) {
                     ((meshRef.current[index] as Mesh).material as Material).opacity = 0.5
                 } else if ((meshRef.current && meshRef.current.length !== 0) && (!surfaceAdvices || !selectedPort )) {
-                    console.log(surfaceAdvices);
                     ((meshRef.current[index] as Mesh).material as Material).opacity = 1
                 }
                 let j = 0;
@@ -60,7 +58,7 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfac
                 }
             })
         }
-    }, [selectedPort, selectedProject, section, instanceId, surfaceAdvices])
+    }, [selectedPort, selectedProject, section, surfaceAdvices])
 
     return (
         <>
@@ -76,7 +74,7 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfac
                                         }
                                     }}
                                     position={c.position}
-                                    key={index}
+                                    key={c.name}
                                     //TODO: sistemare problemi derivanti dai tipi risultanti dalle operazioni binarie
                                     args={[null as any, null as any, ((c as Mesh).geometry as BufferGeometry).attributes.position.array.length / 3]}
                                     onDoubleClick={(e) => {

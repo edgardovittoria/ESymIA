@@ -1,11 +1,11 @@
 import {ComponentEntity, ImportActionParamsObject, UsersState} from 'cad-library';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {
     recursiveFindFolders, removeFolderFromStore, removeProjectFromStore,
     takeAllProjectsIn
 } from "./auxiliaryFunctions/managementProjectsAndFoldersFunction";
-import { addProjectTab, closeProjectTab, selectMenuItem, selectTab } from './tabsAndMenuItemsSlice';
-import { deleteFileS3 } from "../aws/mesherAPIs";
+import {addProjectTab, closeProjectTab, selectMenuItem, selectTab} from './tabsAndMenuItemsSlice';
+import {deleteFileS3} from "../aws/mesherAPIs";
 import {
     Folder,
     Port,
@@ -19,7 +19,7 @@ import {
 } from '../model/esymiaModels';
 
 export type OrbitTarget = {
-	position: [number, number, number];
+    position: [number, number, number];
 };
 
 
@@ -28,7 +28,7 @@ export type ProjectState = {
     sharedElements: Folder,
     selectedProject: string | undefined,
     selectedFolder: string | undefined,
-    orbitTarget: OrbitTarget|undefined
+    orbitTarget: OrbitTarget | undefined
 }
 
 export const ProjectSlice = createSlice({
@@ -76,7 +76,7 @@ export const ProjectSlice = createSlice({
         }>) {
             removeFolderFromStore(state, action.payload.objectToMove)
             let targetF = folderByID(state, action.payload.targetFolder)
-            targetF?.subFolders.push({ ...action.payload.objectToMove, parent: targetF.faunaDocumentId } as Folder)
+            targetF?.subFolders.push({...action.payload.objectToMove, parent: targetF.faunaDocumentId} as Folder)
         },
         moveProject(state: ProjectState, action: PayloadAction<{
             objectToMove: Project,
@@ -84,7 +84,10 @@ export const ProjectSlice = createSlice({
         }>) {
             removeProjectFromStore(state, action.payload.objectToMove.faunaDocumentId as string)
             let targetF = folderByID(state, action.payload.targetFolder)
-            targetF?.projectList.push({ ...action.payload.objectToMove, parentFolder: targetF.faunaDocumentId } as Project)
+            targetF?.projectList.push({
+                ...action.payload.objectToMove,
+                parentFolder: targetF.faunaDocumentId
+            } as Project)
         },
         shareProject(state: ProjectState, action: PayloadAction<{ projectToShare: Project, user: sharingInfoUser }>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToShare.faunaDocumentId);
@@ -186,9 +189,18 @@ export const ProjectSlice = createSlice({
         },
         setPortKey(state: ProjectState, action: PayloadAction<number>) {
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
-            if(selectedProject){
+            if (selectedProject) {
                 selectedProject.portKey = action.payload
             }
+        },
+        setPortName(state: ProjectState, action: PayloadAction<string>) {
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
+            selectedProject?.ports.forEach(port => {
+                if (port.isSelected) {
+                    port.name = action.payload
+                    port.isSelected = true
+                }
+            })
         },
         updatePortPosition(state: ProjectState, action: PayloadAction<{ type: 'first' | 'last' | 'probe', position: [number, number, number] }>) {
             let selectedPort = findSelectedPort(findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject))
@@ -206,7 +218,7 @@ export const ProjectSlice = createSlice({
                 if (selectedPort.category === 'port' || selectedPort.category === 'lumped') {
                     selectedPort.rlcParams = action.payload
                 }
-                if(selectedPort.category === 'lumped'){
+                if (selectedPort.category === 'lumped') {
                     (selectedPort as TempLumped).value = action.payload.resistance as number
                 }
             }
@@ -241,7 +253,7 @@ export const ProjectSlice = createSlice({
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.meshApproved = action.payload
         },
-        setOrbitTarget(state: ProjectState, action: PayloadAction<OrbitTarget|undefined>){
+        setOrbitTarget(state: ProjectState, action: PayloadAction<OrbitTarget | undefined>) {
             state.orbitTarget = action.payload
         }
     },
@@ -267,18 +279,48 @@ export const ProjectSlice = createSlice({
 
 export const {
     //qui vanno inserite tutte le azioni che vogliamo esporatare
-    addProject, removeProject, importModel, selectProject, updateSimulation, addPorts,
-    selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
-    setProjectsFolderToUser, removeFolder, shareProject, renameProject, moveFolder, moveProject, deleteSimulation,
-    renameFolder, shareFolder, setQuantum, setMesh, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser,
-    unsetMesh, setOrbitTarget, setModel, setModelS3, setModelUnit, setPortKey
+    addProject,
+    removeProject,
+    importModel,
+    selectProject,
+    updateSimulation,
+    addPorts,
+    selectPort,
+    deletePort,
+    setPortType,
+    updatePortPosition,
+    setRLCParams,
+    setAssociatedSignal,
+    setScreenshot,
+    addFolder,
+    selectFolder,
+    setProjectsFolderToUser,
+    removeFolder,
+    shareProject,
+    renameProject,
+    moveFolder,
+    moveProject,
+    deleteSimulation,
+    renameFolder,
+    shareFolder,
+    setQuantum,
+    setMesh,
+    setMeshGenerated,
+    setMeshApproved,
+    setFolderOfElementsSharedWithUser,
+    unsetMesh,
+    setOrbitTarget,
+    setModel,
+    setModelS3,
+    setModelUnit,
+    setPortKey,
+    setPortName
 } = ProjectSlice.actions
 
 const selectTabEffects = (state: ProjectState, tab: string) => {
     if (tab === "DASHBOARD") {
         state.selectedProject = undefined
-    }
-    else {
+    } else {
         state.selectedProject = tab
     }
 }

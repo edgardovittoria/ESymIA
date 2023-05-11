@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {AiOutlineThunderbolt} from "react-icons/ai";
 import {IoTrashOutline} from "react-icons/io5";
 import {useDispatch, useSelector} from "react-redux";
@@ -7,8 +7,9 @@ import {
     portKeySelector,
     selectedProjectSelector,
     selectPort,
-    setPortKey
+    setPortKey, setPortName
 } from '../../../../store/projectSlice';
+import {BiRename} from "react-icons/bi";
 
 interface PhysicsLeftPanelTabProps {
 }
@@ -19,6 +20,9 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
     const selectedProject = useSelector(selectedProjectSelector)
     const portKey = useSelector(portKeySelector)
 
+    const [portRename, setPortRename] = useState("")
+
+
     return (
         <>
             {(selectedProject && selectedProject.ports.length !== 0)
@@ -27,9 +31,9 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                     <ul className="list-none pl-3 mb-0">
                         {selectedProject.ports && selectedProject.ports.map((port) => {
                             let portColor = 'orange';
-                            if(port.category === 'lumped'){
+                            if (port.category === 'lumped') {
                                 portColor = 'violet'
-                            }else if(port.category === 'port'){
+                            } else if (port.category === 'port') {
                                 portColor = 'red'
                             }
                             return (
@@ -46,14 +50,38 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                             <h5 className="text-[15px] font-normal">{port.name}</h5>
                                         </div>
                                         {port.isSelected &&
-                                            <div
-                                                className="w-[15%] tooltip" data-tip={"Delete"}
-                                                onClick={() => {
-                                                    dispatch(deletePort(port.name))
-                                                    dispatch(setPortKey((portKey as number)-1))
-                                                }}
-                                            >
-                                                <IoTrashOutline color={'#d80233'} style={{width: "20px", height: "20px"}}/>
+                                            <div className="flex">
+                                                <div className="w-[15%] tooltip mr-5" data-tip={"Rename"}>
+                                                    <label htmlFor="modalRename" onClick={() => setPortRename(port.name)}>
+                                                        <BiRename color={'#464847'} style={{width: "20px", height: "20px"}}/>
+                                                    </label>
+                                                </div>
+                                                <input type="checkbox" id="modalRename" className="modal-toggle" />
+                                                <div className="modal">
+                                                    <div className="modal-box">
+                                                        <h3 className="font-bold text-lg">Rename Port</h3>
+                                                        <div className="flex justify-center items-center py-5">
+                                                            <input type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs"
+                                                                value={portRename} onChange={(e) => setPortRename(e.currentTarget.value)}
+                                                            />
+                                                        </div>
+                                                        <div className="modal-action flex justify-between">
+                                                            <label htmlFor="modalRename" className="btn h-[2rem] min-h-[2rem] bg-red-500 border-red-500">Cancel</label>
+                                                            <label htmlFor="modalRename" className="btn h-[2rem] min-h-[2rem]"
+                                                                   onClick={() => dispatch(setPortName(portRename))}
+                                                            >Rename</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    className="w-[15%] tooltip" data-tip={"Delete"}
+                                                    onClick={() => {
+                                                        dispatch(deletePort(port.name))
+                                                        dispatch(setPortKey((portKey as number) - 1))
+                                                    }}
+                                                >
+                                                    <IoTrashOutline color={'#d80233'} style={{width: "20px", height: "20px"}}/>
+                                                </div>
                                             </div>
                                         }
                                     </div>
