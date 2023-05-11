@@ -2,7 +2,13 @@ import React from 'react';
 import {AiOutlineThunderbolt} from "react-icons/ai";
 import {IoTrashOutline} from "react-icons/io5";
 import {useDispatch, useSelector} from "react-redux";
-import { deletePort, selectedProjectSelector, selectPort } from '../../../../store/projectSlice';
+import {
+    deletePort,
+    portKeySelector,
+    selectedProjectSelector,
+    selectPort,
+    setPortKey
+} from '../../../../store/projectSlice';
 
 interface PhysicsLeftPanelTabProps {
 }
@@ -11,6 +17,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
 
     const dispatch = useDispatch()
     const selectedProject = useSelector(selectedProjectSelector)
+    const portKey = useSelector(portKeySelector)
 
     return (
         <>
@@ -41,7 +48,10 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                         {port.isSelected &&
                                             <div
                                                 className="w-[15%] tooltip" data-tip={"Delete"}
-                                                onClick={() => dispatch(deletePort(port.name))}
+                                                onClick={() => {
+                                                    dispatch(deletePort(port.name))
+                                                    dispatch(setPortKey((portKey as number)-1))
+                                                }}
                                             >
                                                 <IoTrashOutline color={'#d80233'} style={{width: "20px", height: "20px"}}/>
                                             </div>

@@ -1,10 +1,10 @@
 import React, {Fragment, useState} from 'react';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {Menu, Transition} from "@headlessui/react";
 import {FiChevronDown} from "react-icons/fi";
 import {AiOutlineThunderbolt} from "react-icons/ai";
 import {getDefaultLumped, getDefaultPort, getDefaultProbe} from "./portLumpedProbeGenerator";
-import { addPorts } from '../../../../../../store/projectSlice';
+import {addPorts, portKeySelector, setPortKey} from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
 
 interface SelectPortsProps {
@@ -15,11 +15,8 @@ export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
 
     const dispatch = useDispatch()
 
-    const [keyPort, setKeyPort] = useState(selectedProject.ports.length)
-    const generateNewKeyPort = (key: number) => {
-        setKeyPort(key + 1)
-        return key + 1
-    }
+    const keyPort = useSelector(portKeySelector)
+
     return (
         <>
             < div className={`${(selectedProject.simulation?.status === 'Completed') && 'opacity-40'} absolute left-[20%] top-[160px]`}>
@@ -54,7 +51,8 @@ export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let port = getDefaultPort(generateNewKeyPort(keyPort))
+                                            let port = getDefaultPort((keyPort as number)+1)
+                                            dispatch(setPortKey((keyPort as number)+1))
                                             dispatch(addPorts(port))
                                         }}
                                     >
@@ -69,7 +67,8 @@ export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let lumped = getDefaultLumped(generateNewKeyPort(keyPort))
+                                            let lumped = getDefaultLumped((keyPort as number)+1)
+                                            dispatch(setPortKey((keyPort as number)+1))
                                             dispatch(addPorts(lumped))
                                         }}
                                     >
@@ -84,7 +83,8 @@ export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let probe = getDefaultProbe(generateNewKeyPort(keyPort))
+                                            let probe = getDefaultProbe((keyPort as number)+1)
+                                            dispatch(setPortKey((keyPort as number)+1))
                                             dispatch(addPorts(probe))
                                         }}
                                     >

@@ -9,7 +9,7 @@ import {
 import {
     addPorts,
     selectedProjectSelector,
-    setAssociatedSignal,
+    setAssociatedSignal, setPortKey,
 } from "../../../../store/projectSlice";
 import {BiExport, BiImport} from "react-icons/bi";
 import { exportToJsonFileThis } from "../../sharedElements/utilityFunctions";
@@ -45,10 +45,12 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                                 let physics: {
                                     ports: (Port | Probe | TempLumped)[];
                                     signal: Signal | undefined;
+                                    portKey: number
                                 } = JSON.parse(value);
                                 physics.ports.length > 0 &&
                                 physics.ports.forEach((p) => dispatch(addPorts(p)));
                                 physics.signal && dispatch(setAssociatedSignal(physics.signal));
+                                dispatch(setPortKey(physics.portKey))
                             });
                         }}
                     />
@@ -65,6 +67,7 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                         let physics = {
                             ports: selectedProject?.ports,
                             signal: selectedProject?.signal,
+                            portKey: selectedProject?.portKey
                         };
                         exportToJsonFileThis(physics, selectedProject?.name + "_physics.json");
                     }}>

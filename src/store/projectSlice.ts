@@ -184,6 +184,12 @@ export const ProjectSlice = createSlice({
                 }
             })
         },
+        setPortKey(state: ProjectState, action: PayloadAction<number>) {
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
+            if(selectedProject){
+                selectedProject.portKey = action.payload
+            }
+        },
         updatePortPosition(state: ProjectState, action: PayloadAction<{ type: 'first' | 'last' | 'probe', position: [number, number, number] }>) {
             let selectedPort = findSelectedPort(findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject))
             if (selectedPort) {
@@ -265,7 +271,7 @@ export const {
     selectPort, deletePort, setPortType, updatePortPosition, setRLCParams, setAssociatedSignal, setScreenshot, addFolder, selectFolder,
     setProjectsFolderToUser, removeFolder, shareProject, renameProject, moveFolder, moveProject, deleteSimulation,
     renameFolder, shareFolder, setQuantum, setMesh, setMeshGenerated, setMeshApproved, setFolderOfElementsSharedWithUser,
-    unsetMesh, setOrbitTarget, setModel, setModelS3, setModelUnit
+    unsetMesh, setOrbitTarget, setModel, setModelS3, setModelUnit, setPortKey
 } = ProjectSlice.actions
 
 const selectTabEffects = (state: ProjectState, tab: string) => {
@@ -300,6 +306,10 @@ export const findProjectByFaunaID = (projects: Project[], faunaDocumentId: strin
     return (faunaDocumentId !== undefined) ? projects.filter(project => project.faunaDocumentId === faunaDocumentId)[0] : undefined
 }
 export const findSelectedPort = (project: Project | undefined) => (project) ? project.ports.filter(port => port.isSelected)[0] : undefined
+export const portKeySelector = (state: { projects: ProjectState }) => {
+    let project = findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
+    return project?.portKey
+}
 export const folderByID = (state: ProjectState, folderID: string | undefined) => {
     if (folderID) {
         let folders = recursiveFindFolders(state.projects, [] as Folder[]).filter(f => f.faunaDocumentId === folderID)

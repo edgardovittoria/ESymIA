@@ -41,6 +41,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         description: projectDescription,
         model: {} as CanvasState,
         ports: [],
+        portKey: 0,
         signal: undefined,
         meshData: {
           meshApproved: false,
