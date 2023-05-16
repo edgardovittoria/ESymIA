@@ -31,7 +31,7 @@ interface ChartsListProps {
   project: Project | undefined;
   scaleMode: string;
   graphToVisualize: "All Graph" | "Z" | "S" | "Y";
-  selectedLabel: string[]
+  selectedLabel: { label:string, id:number }[]
 }
 
 interface Dataset {
@@ -153,7 +153,7 @@ const chartsDataOptionsFactory = (
   matrix_Y: any[][][][],
   matrix_S: any[][][][],
   ports: Port[],
-  selectedLabel: string[]
+  selectedLabel: { label:string, id:number }[]
 ) => {
   const colorArray = [
     "red",
@@ -187,7 +187,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Z_RER.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsR.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -195,10 +195,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsR.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -250,7 +250,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Z_IM.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsH.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -258,10 +258,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsH.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -314,7 +314,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Z_Module_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsZModule.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -322,10 +322,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsZModule.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -377,7 +377,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Z_Phase_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsZPhase.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -385,10 +385,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsZPhase.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -440,7 +440,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_YG_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsG.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -448,10 +448,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsG.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -503,7 +503,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_YC_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsC.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -511,10 +511,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsC.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -568,7 +568,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Y_Module_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsYModule.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -576,10 +576,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsYModule.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -631,7 +631,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Y_Phase_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsYPhase.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -639,10 +639,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsYPhase.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -696,7 +696,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_S_Module_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsSModule.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -704,10 +704,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsSModule.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -759,7 +759,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_S_Phase_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsSPhase.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -767,10 +767,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsSPhase.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",
@@ -822,7 +822,7 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_S_dB_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
           datasetsSdB.push({
             label:  `${labels[index][0]} - ${labels[index][1]}`,
             data: matrix,
@@ -830,10 +830,10 @@ const chartsDataOptionsFactory = (
             backgroundColor: "white",
           });
         }else{
-          selectedLabel.forEach((l, ind) => {
-            if(index === ind){
+          selectedLabel.forEach((l) => {
+            if(index === l.id){
               datasetsSdB.push({
-                label:  l,
+                label:  l.label,
                 data: matrix,
                 borderColor: colorArray[index],
                 backgroundColor: "white",

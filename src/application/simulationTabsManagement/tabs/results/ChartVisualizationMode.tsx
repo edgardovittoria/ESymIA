@@ -12,7 +12,7 @@ interface ChartVisualizationModeProps {
     chartsScaleMode: 'logarithmic' | 'linear',
     setChartsScaleMode: Function,
     setGraphToVisualize: Function,
-    selectedLabel: string[],
+    selectedLabel: { label:string, id:number }[],
     setSelectedLabel: Function
 }
 
@@ -61,14 +61,14 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
                                    value={"All Ports"}
                                    onChange={(e) => {
                                        if(e.currentTarget.checked){
-                                           setSelectedLabel([...selectedLabel, e.currentTarget.value])
+                                           setSelectedLabel([...selectedLabel, {label:e.currentTarget.value, id:-1}])
                                        }else{
-                                           setSelectedLabel(selectedLabel.filter(l => l !== e.currentTarget.value))
+                                           setSelectedLabel(selectedLabel.filter(l => l.label !== e.currentTarget.value))
                                        }
                                    }}
                             />
                         </li>
-                        {labels.map((l) => {
+                        {labels.map((l, index) => {
                             return(
                                 <li className="flex flex-row items-center justify-between p-2" key={`${l[0]} - ${l[1]}`}>
                                     <span>{`${l[0]} - ${l[1]}`}</span>
@@ -76,9 +76,9 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
                                            value={`${l[0]} - ${l[1]}`}
                                            onChange={(e) => {
                                                if(e.currentTarget.checked){
-                                                   setSelectedLabel([...selectedLabel, e.currentTarget.value])
+                                                   setSelectedLabel([...selectedLabel, {label:e.currentTarget.value, id:index}])
                                                }else{
-                                                   setSelectedLabel(selectedLabel.filter(l => l !== e.currentTarget.value))
+                                                   setSelectedLabel(selectedLabel.filter(l => l.label !== e.currentTarget.value))
                                                }
                                            }}
                                     />

@@ -15,7 +15,7 @@ import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { useFaunaQuery } from "cad-library";
 import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
 import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
-import {Port, Project} from "../../../../model/esymiaModels";
+import {Project} from "../../../../model/esymiaModels";
 
 interface ResultsProps {
   selectedTabLeftPanel: string;
@@ -29,7 +29,7 @@ export const Results: React.FC<ResultsProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   let selectedPort = findSelectedPort(selectedProject);
   const dispatch = useDispatch();
-  const [selectedLabel, setSelectedLabel] = useState<string[]>(["All Ports"])
+  const [selectedLabel, setSelectedLabel] = useState<{ label: string, id: number }[]>([{label: "All Ports", id: 0}])
   const [chartsScaleMode, setChartsScaleMode] = useState<
     "logarithmic" | "linear"
   >("logarithmic");
