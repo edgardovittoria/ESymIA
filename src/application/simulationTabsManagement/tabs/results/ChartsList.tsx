@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,7 +8,7 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend,
+  Legend, Chart, LegendElement, LegendItem, ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { Port, Project, Simulation } from "../../../../model/esymiaModels";
@@ -30,6 +30,8 @@ interface ChartsListProps {
   simulation: Simulation;
   project: Project | undefined;
   scaleMode: string;
+  graphToVisualize: "All Graph" | "Z" | "S" | "Y";
+  selectedLabel: string[]
 }
 
 interface Dataset {
@@ -44,8 +46,15 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   simulation,
   project,
   scaleMode,
+  graphToVisualize,
+  selectedLabel
 }) => {
-  const chartsOrderedIDs = [
+  const selectedProject = useSelector(selectedProjectSelector)
+  const ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
+  const matrix_Z = JSON.parse(simulation.results.matrix_Z);
+  const matrix_Y = JSON.parse(simulation.results.matrix_Y);
+  const matrix_S = JSON.parse(simulation.results.matrix_S);
+  const [chartsOrderedIDs, setChartsOrderedIDs] = useState([
     "R",
     "L",
     "Z_Module",
@@ -57,16 +66,40 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     "S_Module",
     "S_Phase",
     "S_dB",
-  ];
+  ])
+  const [chartsDataOptionsList, setChartsDataOptionsList] = useState(chartsOrderedIDs.map((id) =>
+      chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+  ))
+  const [chartsDataToVisualize, setChartsDataToVisualize] = useState(chartsDataOptionsList)
+  useEffect(() => {
+    if(graphToVisualize === "All Graph"){
+      setChartsOrderedIDs(["R", "L", "Z_Module", "Z_Phase", "G", "C", "Y_Module", "Y_Phase", "S_Module", "S_Phase", "S_dB",])
+    }
+    if(graphToVisualize === "Z"){
+      setChartsOrderedIDs(["R", "L", "Z_Module", "Z_Phase"])
+    }
+    if(graphToVisualize === "Y"){
+      setChartsOrderedIDs(["G", "C", "Y_Module", "Y_Phase"])
+    }
+    if(graphToVisualize === "S"){
+      setChartsOrderedIDs(["S_Module", "S_Phase", "S_dB"])
+    }
+  }, [graphToVisualize])
 
-  const selectedProject = useSelector(selectedProjectSelector)
-  const ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
-  const matrix_Z = JSON.parse(simulation.results.matrix_Z);
-  const matrix_Y = JSON.parse(simulation.results.matrix_Y);
-  const matrix_S = JSON.parse(simulation.results.matrix_S);
-  const chartsDataOptionsList = chartsOrderedIDs.map((id) =>
-    chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S, ports)
-  );
+  useEffect(() => {
+    setChartsDataToVisualize(
+        chartsOrderedIDs.map((id) =>
+            chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+        )
+    )
+  }, [chartsOrderedIDs])
+
+  useEffect(() => {
+    setChartsDataToVisualize(chartsOrderedIDs.map((id) =>
+        chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+    ))
+  }, [selectedLabel])
+
 
   const optionsWithScaleMode = (options: any, scaleMode: string) => {
     let updatedOptions;
@@ -94,16 +127,20 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     return updatedOptions;
   };
 
+
+
   return (
     <>
-      {chartsDataOptionsList.map((chartData, index) => (
-        <div className="box w-[100%]" key={index}>
-          <Line
-            options={optionsWithScaleMode(chartData.options, scaleMode)}
-            data={chartData.data}
-          />
-        </div>
-      ))}
+      {chartsDataToVisualize.map((chartData, index) => {
+        return(
+            <div className="box w-[100%]" key={index}>
+              <Line
+                  options={optionsWithScaleMode(chartData.options, scaleMode)}
+                  data={chartData.data}
+              />
+            </div>
+        )
+      })}
     </>
   );
 };
@@ -115,7 +152,8 @@ const chartsDataOptionsFactory = (
   matrix_Z: any[][][][],
   matrix_Y: any[][][][],
   matrix_S: any[][][][],
-  ports: Port[]
+  ports: Port[],
+  selectedLabel: string[]
 ) => {
   const colorArray = [
     "red",
@@ -131,10 +169,8 @@ const chartsDataOptionsFactory = (
       data: { datasets: [], labels: [] },
       options: {},
     };
-  // let matrix_Z = eval(simulation.results.matrix_Z);
-  // let matrix_Y = eval(simulation.results.matrix_Y);
-  // let matrix_S = eval(simulation.results.matrix_S);
   let portNumber: number = ports.length
+  const labels = pairs(ports.map(p => p.name))
   switch (label) {
     case "R":
       // let matrix_Z_ModuleR: any = eval(simulation.results.matrix_Z);
@@ -142,8 +178,7 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsR.push(sv.freq));
       const datasetsR: Dataset[] = [];
       let matrices_Z_RER: number[][] = [];
-
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_Z_RER.push([])
         matrix_Z[i].forEach(m => {
           m.forEach(v => {
@@ -152,23 +187,36 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Z_RER.forEach((matrix, index) => {
-        datasetsR.push({
-          label:  `${ports[index].name} - R(mOhm)`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsR.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsR.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
-      const optionsR = {
+      let optionsR = {
         responsive: true,
         plugins: {
           legend: {
-            position: "top" as const,
+            position: "top" as const
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - R(mOhm)` : "",
           },
         },
         layout: {
@@ -191,7 +239,7 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsH.push(sv.freq));
       const datasetsH: Dataset[] = [];
       let matrices_Z_IM: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_Z_IM.push([])
         matrix_Z[i].forEach(m => {
           m.forEach((v,index) => {
@@ -202,12 +250,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Z_IM.forEach((matrix, index) => {
-        datasetsH.push({
-          label: `${ports[index].name} - L(nH)`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsH.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsH.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
       const optionsH = {
         responsive: true,
@@ -217,7 +278,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - L(nH)` : "",
           },
         },
         layout: {
@@ -242,7 +303,7 @@ const chartsDataOptionsFactory = (
       );
       const datasetsZModule: Dataset[] = [];
       let matrices_Z_Module_RE: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_Z_Module_RE.push([])
         matrix_Z[i].forEach(m => {
           m.forEach((v) => {
@@ -253,12 +314,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Z_Module_RE.forEach((matrix, index) => {
-        datasetsZModule.push({
-          label: `${ports[index].name} - Z Module`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsZModule.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsZModule.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
       const optionsZModule = {
@@ -269,7 +343,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - Z Module` : "",
           },
         },
         layout: {
@@ -292,7 +366,7 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsZPhase.push(sv.freq));
       const datasetsZPhase: Dataset[] = [];
       let matrices_Z_Phase_RE: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_Z_Phase_RE.push([])
         matrix_Z[i].forEach(m => {
           m.forEach((v) => {
@@ -303,12 +377,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Z_Phase_RE.forEach((matrix, index) => {
-        datasetsZPhase.push({
-          label: `${ports[index].name} - Z Phase`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsZPhase.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsZPhase.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
       const optionsZPhase = {
@@ -319,7 +406,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - Z Phase` : "",
           },
         },
         layout: {
@@ -342,7 +429,7 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsG.push(sv.freq));
       const datasetsG: Dataset[] = [];
       let matrices_YG_RE: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_YG_RE.push([])
         matrix_Y[i].forEach(m => {
           m.forEach((v) => {
@@ -353,12 +440,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_YG_RE.forEach((matrix, index) => {
-        datasetsG.push({
-          label: `${ports[index].name} - G(S)`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsG.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsG.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
       const optionsG = {
@@ -369,7 +469,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - G(S)` : "",
           },
         },
         layout: {
@@ -392,7 +492,7 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsC.push(sv.freq));
       const datasetsC: Dataset[] = [];
       let matrices_YC_RE: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_YC_RE.push([])
         matrix_Y[i].forEach(m => {
           m.forEach((v, index) => {
@@ -403,12 +503,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_YC_RE.forEach((matrix, index) => {
-        datasetsC.push({
-          label: `${ports[index].name} - C(F)`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsC.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsC.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
       const optionsC = {
@@ -419,7 +532,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - C(F)` : "",
           },
         },
         layout: {
@@ -444,7 +557,7 @@ const chartsDataOptionsFactory = (
       );
       const datasetsYModule: Dataset[] = [];
       let matrices_Y_Module_RE: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_Y_Module_RE.push([])
         matrix_Y[i].forEach(m => {
           m.forEach((v) => {
@@ -455,12 +568,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Y_Module_RE.forEach((matrix, index) => {
-        datasetsYModule.push({
-          label: `${ports[index].name} - Y Module`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsYModule.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsYModule.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
       const optionsYModule = {
@@ -471,7 +597,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - Y Module` : "",
           },
         },
         layout: {
@@ -494,7 +620,7 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsYPhase.push(sv.freq));
       const datasetsYPhase: Dataset[] = [];
       let matrices_Y_Phase_RE: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_Y_Phase_RE.push([])
         matrix_Y[i].forEach(m => {
           m.forEach((v) => {
@@ -505,12 +631,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_Y_Phase_RE.forEach((matrix, index) => {
-        datasetsYPhase.push({
-          label: `${ports[index].name} - Y Phase`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsYPhase.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsYPhase.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
       const optionsYPhase = {
@@ -521,7 +660,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - Y Phase` : "",
           },
         },
         layout: {
@@ -546,7 +685,7 @@ const chartsDataOptionsFactory = (
       );
       const datasetsSModule: Dataset[] = [];
       let matrices_S_Module_RE: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_S_Module_RE.push([])
         matrix_S[i].forEach(m => {
           m.forEach((v) => {
@@ -557,12 +696,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_S_Module_RE.forEach((matrix, index) => {
-        datasetsSModule.push({
-          label: `${ports[index].name} - S Module`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsSModule.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsSModule.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
       const optionsSModule = {
@@ -573,7 +725,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - S Module` : "",
           },
         },
         layout: {
@@ -596,7 +748,7 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsSPhase.push(sv.freq));
       const datasetsSPhase: Dataset[] = [];
       let matrices_S_Phase_RE: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_S_Phase_RE.push([])
         matrix_S[i].forEach(m => {
           m.forEach((v) => {
@@ -607,12 +759,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_S_Phase_RE.forEach((matrix, index) => {
-        datasetsSPhase.push({
-          label: `${ports[index].name} - S Phase`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsSPhase.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsSPhase.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
       const optionsSPhase = {
@@ -623,7 +788,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - S Phase` : "",
           },
         },
         layout: {
@@ -646,7 +811,7 @@ const chartsDataOptionsFactory = (
       project?.signal?.signalValues.forEach((sv) => labelsSdB.push(sv.freq));
       const datasetsSdB: Dataset[] = [];
       let matrices_S_dB_RE: number[][] = [];
-      for(let i = 0; i<portNumber; i++){
+      for(let i = 0; i<portNumber*portNumber; i++){
         matrices_S_dB_RE.push([])
         matrix_S[i].forEach(m => {
           m.forEach((v) => {
@@ -657,12 +822,25 @@ const chartsDataOptionsFactory = (
         })
       }
       matrices_S_dB_RE.forEach((matrix, index) => {
-        datasetsSdB.push({
-          label: `${ports[index].name} - S dB`,
-          data: matrix,
-          borderColor: colorArray[index],
-          backgroundColor: "white",
-        });
+        if(selectedLabel.filter(l => l === "All Ports").length > 0){
+          datasetsSdB.push({
+            label:  `${labels[index][0]} - ${labels[index][1]}`,
+            data: matrix,
+            borderColor: colorArray[index],
+            backgroundColor: "white",
+          });
+        }else{
+          selectedLabel.forEach((l, ind) => {
+            if(index === ind){
+              datasetsSdB.push({
+                label:  l,
+                data: matrix,
+                borderColor: colorArray[index],
+                backgroundColor: "white",
+              });
+            }
+          })
+        }
       });
 
       const optionsSdB = {
@@ -673,7 +851,7 @@ const chartsDataOptionsFactory = (
           },
           title: {
             display: true,
-            text: simulation ? simulation.name : "",
+            text: simulation ? `${simulation.name} - S dB` : "",
           },
         },
         layout: {
@@ -695,3 +873,10 @@ const chartsDataOptionsFactory = (
   }
   return result;
 };
+export const pairs = (a:string[]) => {
+  return a.flatMap( (x:string) => {
+    return a.flatMap( (y:string) => {
+      return [[x,y]]
+    });
+  });
+}

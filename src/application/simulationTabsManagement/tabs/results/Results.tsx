@@ -5,10 +5,9 @@ import {
   findSelectedPort,
   selectedProjectSelector,
   selectPort, setMeshApproved,
-  updateSimulation,
 } from "../../../../store/projectSlice";
 import { ChartVisualizationMode } from "./ChartVisualizationMode";
-import { ChartsList } from "./ChartsList";
+import {ChartsList, pairs} from "./ChartsList";
 import { ResultsLeftPanelTab } from "./ResultsLeftPanelTab";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
@@ -16,7 +15,7 @@ import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { useFaunaQuery } from "cad-library";
 import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
 import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
-import { Project } from "../../../../model/esymiaModels";
+import {Port, Project} from "../../../../model/esymiaModels";
 
 interface ResultsProps {
   selectedTabLeftPanel: string;
@@ -30,12 +29,14 @@ export const Results: React.FC<ResultsProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   let selectedPort = findSelectedPort(selectedProject);
   const dispatch = useDispatch();
+  const [selectedLabel, setSelectedLabel] = useState<string[]>(["All Ports"])
   const [chartsScaleMode, setChartsScaleMode] = useState<
     "logarithmic" | "linear"
   >("logarithmic");
   const [chartVisualizationMode, setChartVisualizationMode] = useState<
     "grid" | "full"
   >("grid");
+  const [graphToVisualize, setGraphToVisualize] = useState<"All Graph" | "Z" | "S" | "Y">("All Graph")
   const { execQuery } = useFaunaQuery();
   let simulation = selectedProject?.simulation
   return (
@@ -77,7 +78,7 @@ export const Results: React.FC<ResultsProps> = ({
             </button>}
         </LeftPanel>
       </div>
-      <div className="w-[78%] ">
+      <div className="w-[78%]">
         {selectedProject && simulation ? (
           chartVisualizationMode === "full" ? (
             <>
@@ -87,6 +88,9 @@ export const Results: React.FC<ResultsProps> = ({
                   setChartVisualizationMode={setChartVisualizationMode}
                   chartsScaleMode={chartsScaleMode}
                   setChartsScaleMode={setChartsScaleMode}
+                  setGraphToVisualize={setGraphToVisualize}
+                  selectedLabel={selectedLabel}
+                  setSelectedLabel={setSelectedLabel}
                 />
               )}
               <div className="overflow-scroll grid grid-cols-1 gap-4 max-h-[800px]">
@@ -94,6 +98,8 @@ export const Results: React.FC<ResultsProps> = ({
                   simulation={simulation}
                   project={selectedProject}
                   scaleMode={chartsScaleMode}
+                  graphToVisualize={graphToVisualize}
+                  selectedLabel={selectedLabel}
                 />
               </div>
             </>
@@ -105,6 +111,9 @@ export const Results: React.FC<ResultsProps> = ({
                   setChartVisualizationMode={setChartVisualizationMode}
                   chartsScaleMode={chartsScaleMode}
                   setChartsScaleMode={setChartsScaleMode}
+                  setGraphToVisualize={setGraphToVisualize}
+                  selectedLabel={selectedLabel}
+                  setSelectedLabel={setSelectedLabel}
                 />
               )}
               <div className="grid grid-cols-2 gap-4 overflow-scroll max-h-[800px]">
@@ -112,6 +121,8 @@ export const Results: React.FC<ResultsProps> = ({
                   simulation={simulation}
                   project={selectedProject}
                   scaleMode={chartsScaleMode}
+                  graphToVisualize={graphToVisualize}
+                  selectedLabel={selectedLabel}
                 />
               </div>
             </>

@@ -1,19 +1,31 @@
-import React from 'react';
+import React, {SyntheticEvent, useState} from 'react';
 import {BsGrid3X3Gap} from "react-icons/bs";
 import {GiHamburgerMenu} from "react-icons/gi";
+import {useSelector} from "react-redux";
+import {selectedProjectSelector} from "../../../../store/projectSlice";
+import {Port} from "../../../../model/esymiaModels";
+import {pairs} from "./ChartsList";
 
 interface ChartVisualizationModeProps {
     chartVisualizationMode: 'grid' | 'full',
     setChartVisualizationMode: Function,
     chartsScaleMode: 'logarithmic' | 'linear',
-    setChartsScaleMode: Function
+    setChartsScaleMode: Function,
+    setGraphToVisualize: Function,
+    selectedLabel: string[],
+    setSelectedLabel: Function
 }
 
 export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
     {
-        chartVisualizationMode, setChartVisualizationMode, chartsScaleMode, setChartsScaleMode
+        chartVisualizationMode, setChartVisualizationMode, chartsScaleMode, setChartsScaleMode,
+        setGraphToVisualize, selectedLabel, setSelectedLabel
     }
 ) => {
+
+    const selectedProject = useSelector(selectedProjectSelector);
+    const ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
+    const labels = pairs(ports.map(p => p.name))
 
     return (
         <div className="mt-11 flex justify-between">
@@ -30,7 +42,64 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
                 >
                     <GiHamburgerMenu size={20} color="#0fb25b"/>
                 </div>
-
+            </div>
+            <div className="flex justify-center">
+                <select className="select select-success w-full max-w-xs h-[35px] min-h-[35px] mr-2"
+                    onChange={(e) => setGraphToVisualize(e.currentTarget.value)}
+                >
+                    <option selected>All Graph</option>
+                    <option>Z</option>
+                    <option>Y</option>
+                    <option>S</option>
+                </select>
+                <div className="dropdown dropdown-bottom">
+                    <label tabIndex={0} className="select select-success h-[35px] w-[300px] min-h-[35px] mr-2 flex items-center">Select Ports</label>
+                    <ul tabIndex={0} className="dropdown-content p-2 shadow bg-base-100 rounded-box w-52">
+                        <li className="flex flex-row items-center justify-between p-2" key={"All Ports"}>
+                            <span>All Ports</span>
+                            <input type="checkbox" defaultChecked className="checkbox checkbox-xs"
+                                   value={"All Ports"}
+                                   onChange={(e) => {
+                                       if(e.currentTarget.checked){
+                                           setSelectedLabel([...selectedLabel, e.currentTarget.value])
+                                       }else{
+                                           setSelectedLabel(selectedLabel.filter(l => l !== e.currentTarget.value))
+                                       }
+                                   }}
+                            />
+                        </li>
+                        {labels.map((l) => {
+                            return(
+                                <li className="flex flex-row items-center justify-between p-2" key={`${l[0]} - ${l[1]}`}>
+                                    <span>{`${l[0]} - ${l[1]}`}</span>
+                                    <input type="checkbox" className="checkbox checkbox-xs"
+                                           value={`${l[0]} - ${l[1]}`}
+                                           onChange={(e) => {
+                                               if(e.currentTarget.checked){
+                                                   setSelectedLabel([...selectedLabel, e.currentTarget.value])
+                                               }else{
+                                                   setSelectedLabel(selectedLabel.filter(l => l !== e.currentTarget.value))
+                                               }
+                                           }}
+                                    />
+                                </li>
+                            )
+                        })}
+                    </ul>
+                </div>
+                {/*<select className="select select-success w-full max-w-xs h-[35px] min-h-[35px]"
+                        multiple={true}
+                        onChange={(e) => {
+                            setSelectedLabel([e.currentTarget.value])
+                        }}
+                >
+                    <option selected>All Ports</option>
+                    {labels.map((l) => {
+                        return(
+                            <option>{`${l[0]} - ${l[1]}`}</option>
+                        )
+                    })}
+                </select>*/}
             </div>
             <div className="flex">
                 <div

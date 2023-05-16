@@ -1,7 +1,7 @@
 import {ComponentEntity, exportToSTL, Material} from "cad-library";
 import React, {useEffect, useState} from "react";
 import {AiOutlineThunderbolt} from "react-icons/ai";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {setSolverOutput} from "../../../../store/solverSlice";
 import {
     updateSimulation,
@@ -64,13 +64,14 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 materials: getMaterialListFrom(project?.model?.components as ComponentEntity[]),
                 frequencies: frequencyArray,
                 signals: signalsValuesArray,
-                powerPort: (project) && project.signal?.powerPort
+                powerPort: (project) && project.signal?.powerPort,
+                unit: selectedProject.modelUnit
             },
             solverAlgoParams: {
                 innerIteration: solverIterations[0],
                 outerIteration: solverIterations[1],
                 convergenceThreshold: convergenceThreshold
-            }
+            },
         }
         return dataToSendToSolver
     }
