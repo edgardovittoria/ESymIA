@@ -3,9 +3,7 @@ import {InstancedMesh, Object3D} from "three";
 import {Material} from "cad-library";
 import {MesherOutput} from "../../MesherInputOutput";
 import {Project} from "../../../../../../model/esymiaModels";
-import * as THREE from "three";
-import {Edges} from "@react-three/drei";
-//import { Wireframe } from "@react-three/drei";
+
 
 interface InstancedMeshProps {
     selectedProject: Project;
