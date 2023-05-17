@@ -31,13 +31,14 @@ import {convertInFaunaProjectThis} from "../../../faunadb/apiAuxiliaryFunctions"
 import EdgesGenerator from "./EdgesGenerator";
 import {uploadFileS3} from "../../../aws/mesherAPIs";
 import {setModelInfoFromS3} from "../../dashboardTabsManagement/tabs/shared/utilFunctions";
+import {menuItemsSelector, selectedMenuItemSelector} from "../../../store/tabsAndMenuItemsSlice";
 
 interface CanvasBaseWithReduxProps {
     section: string;
     portClickAction?: Function;
     savedPortParameters?: boolean;
     surfaceAdvices?: boolean,
-    setPointerEvent?: Function, 
+    setPointerEvent?: Function,
     setInputPortPositioned?: Function
     inputPortPositioned?: boolean
 }
@@ -56,11 +57,12 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
         const [showModalLoadFromDB, setShowModalLoadFromDB] = useState(false);
         const orbitTarget = useSelector(orbitTargetSelector)
 
+
         const {execQuery} = useFaunaQuery();
         const mesh = useRef<Mesh[]>([]);
         const dispatch = useDispatch()
         let selectedPort = findSelectedPort(selectedProject)
-      
+
 
         useEffect(() => {
             if (selectedProject && savedPortParameters === true) {
@@ -96,7 +98,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
         }, [selectedProject, selectedProject?.model, mesh.current])
 
         useEffect(() => {
-            if(!selectedProject?.model.components && selectedProject?.modelS3){
+            if (!selectedProject?.model.components && selectedProject?.modelS3) {
                 setModelInfoFromS3(selectedProject, dispatch)
             }
         }, [])
@@ -106,21 +108,25 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                 {selectedProject && selectedProject.model?.components ? (
                     <ReactReduxContext.Consumer>
                         {({store}) => (
-                            <Canvas style={{width: "1920px", height: "828px"}}>
-                                <Provider store={store}>
-                                    <pointLight position={[100, 100, 100]} intensity={0.8}/>
-                                    <hemisphereLight
-                                        color={"#ffffff"}
-                                        groundColor={new THREE.Color("#b9b9b9")}
-                                        position={[-7, 25, 13]}
-                                        intensity={0.85}
-                                    />
-                                    {/* paint models */}
-                                    {(!mesherOutput || section !== "Simulator") && selectedPort && section === "Physics" &&
-                                        <EdgesGenerator section={section} meshRef={mesh} surfaceAdvices={surfaceAdvices as boolean} inputPortPositioned={inputPortPositioned as boolean} setInputPortPositioned={setInputPortPositioned as Function}/>
-                                    }
-                                    {(!mesherOutput || section !== "Simulator") && selectedProject && selectedProject.model.components.map((component, index) => {
-                                        return (
+                            <div className="flex flex-col">
+                                <Canvas style={{width: "1920px", height: "805px"}}>
+                                    <Provider store={store}>
+                                        <pointLight position={[100, 100, 100]} intensity={0.8}/>
+                                        <hemisphereLight
+                                            color={"#ffffff"}
+                                            groundColor={new THREE.Color("#b9b9b9")}
+                                            position={[-7, 25, 13]}
+                                            intensity={0.85}
+                                        />
+                                        {/* paint models */}
+                                        {(!mesherOutput || section !== "Simulator") && selectedPort && section === "Physics" &&
+                                            <EdgesGenerator section={section} meshRef={mesh}
+                                                            surfaceAdvices={surfaceAdvices as boolean}
+                                                            inputPortPositioned={inputPortPositioned as boolean}
+                                                            setInputPortPositioned={setInputPortPositioned as Function}/>
+                                        }
+                                        {(!mesherOutput || section !== "Simulator") && selectedProject && selectedProject.model.components.map((component, index) => {
+                                            return (
                                                 <mesh
                                                     ref={(el) => {
                                                         if (el) {
@@ -136,24 +142,25 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                                     scale={component.transformationParams.scale}
                                                     rotation={component.transformationParams.rotation}
                                                     onDoubleClick={(e) => setPointerEvent && setPointerEvent(e)}
-                                                    >
+                                                >
                                                     <FactoryShapes entity={component}/>
                                                     <Edges/>
                                                 </mesh>
-                                        )
-                                    })}
-                                    {children}
-                                    <OrbitControls makeDefault
-                                                   target={(orbitTarget) ? new THREE.Vector3(orbitTarget?.position[0], orbitTarget?.position[1], orbitTarget?.position[2]) : new THREE.Vector3(0, 0, 0)}/>
-                                    <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
-                                        <GizmoViewport
-                                            axisColors={["red", "#40ff00", "blue"]}
-                                            labelColor="white"
-                                        />
-                                    </GizmoHelper>
-                                    <Screenshot selectedProject={selectedProject}/>
-                                </Provider>
-                            </Canvas>
+                                            )
+                                        })}
+                                        {children}
+                                        <OrbitControls makeDefault
+                                                       target={(orbitTarget) ? new THREE.Vector3(orbitTarget?.position[0], orbitTarget?.position[1], orbitTarget?.position[2]) : new THREE.Vector3(0, 0, 0)}/>
+                                        <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
+                                            <GizmoViewport
+                                                axisColors={["red", "#40ff00", "blue"]}
+                                                labelColor="white"
+                                            />
+                                        </GizmoHelper>
+                                        <Screenshot selectedProject={selectedProject}/>
+                                    </Provider>
+                                </Canvas>
+                            </div>
                         )}
                     </ReactReduxContext.Consumer>
                 ) : (
@@ -163,11 +170,14 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                             importAction={(importActionParamsObject) => {
                                 dispatch(importModel(importActionParamsObject))
                                 dispatch(setModelUnit(importActionParamsObject.unit))
-                                let model = JSON.stringify({components: importActionParamsObject.canvas.components, unit: importActionParamsObject.unit})
+                                let model = JSON.stringify({
+                                    components: importActionParamsObject.canvas.components,
+                                    unit: importActionParamsObject.unit
+                                })
                                 let blobFile = new Blob([model])
                                 let modelFile = new File([blobFile], `${selectedProject?.faunaDocumentId}.json`, {type: 'application/json'})
                                 uploadFileS3(modelFile).then(res => {
-                                    if(res){
+                                    if (res) {
                                         dispatch(setModelS3(res.key))
                                     }
                                 })

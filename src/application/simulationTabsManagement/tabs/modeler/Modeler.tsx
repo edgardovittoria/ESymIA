@@ -3,6 +3,7 @@ import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
+import StatusBar from "../../sharedElements/StatusBar";
 
 interface ModelerProps {
   selectedTabLeftPanel: string;
@@ -17,6 +18,7 @@ export const Modeler: React.FC<ModelerProps> = ({
   return (
     <>
       <CanvasBaseWithRedux section="Modeler" savedPortParameters={true}/>
+      <StatusBar/>
       <LeftPanel
         tabs={["Modeler", "Materials"]}
         selectedTab={selectedTabLeftPanel}

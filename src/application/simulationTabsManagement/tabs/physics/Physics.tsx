@@ -28,6 +28,7 @@ import { Probe, Project } from "../../../../model/esymiaModels";
 import { ImportExportPhysicsSetup } from "./ImportExportPhysicsSetup";
 import { BiHide, BiShow } from "react-icons/bi";
 import { ThreeEvent } from "@react-three/fiber";
+import StatusBar from "../../sharedElements/StatusBar";
 
 interface PhysicsProps {
 	selectedTabLeftPanel: string;
@@ -168,6 +169,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 					</>
 				)}
 			</CanvasBaseWithRedux>
+			<StatusBar/>
 			<LeftPanel
 				tabs={["Modeler", "Physics"]}
 				selectedTab={selectedTabLeftPanel}

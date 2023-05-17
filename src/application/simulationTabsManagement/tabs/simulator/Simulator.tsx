@@ -12,6 +12,7 @@ import { ModelOutliner } from "../../sharedElements/ModelOutliner";
 import { MesherOutput } from "./MesherInputOutput";
 import { s3 } from "../../../../aws/s3Config";
 import { Project } from "../../../../model/esymiaModels";
+import StatusBar from "../../sharedElements/StatusBar";
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;
@@ -27,9 +28,9 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [mesherOutput, setMesherOutput] = useState<MesherOutput | undefined>(
     undefined
   );
+  const [voxelsNumber, setVoxelsNumber] = useState(0)
 
   const selectedProject = useSelector(selectedProjectSelector);
-
 
   useEffect(() => {
     if (selectedProject?.meshData.mesh) {
@@ -49,6 +50,12 @@ export const Simulator: React.FC<SimulatorProps> = ({
       );
     }
   }, [selectedProject?.meshData.mesh]);
+
+  useEffect(() => {
+    if(mesherOutput){
+      setVoxelsNumber(mesherOutput.n_cells.n_cells_x * mesherOutput.n_cells.n_cells_y * mesherOutput.n_cells.n_cells_z)
+    }
+  }, [mesherOutput])
 
   let materialsNames: string[] = [];
   let allMaterials: Material[] = [];
@@ -76,6 +83,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
           />
         )}
       </CanvasBaseWithRedux>
+      <StatusBar voxelsNumber={voxelsNumber}/>
       <LeftPanel
         tabs={["Modeler", "Simulator"]}
         selectedTab={selectedTabLeftPanel}
