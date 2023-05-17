@@ -13,6 +13,7 @@ import { MesherOutput } from "./MesherInputOutput";
 import { s3 } from "../../../../aws/s3Config";
 import { Project } from "../../../../model/esymiaModels";
 import StatusBar from "../../sharedElements/StatusBar";
+import {getNumberOfCells} from "./MeshedElement/components/MyInstancedMesh";
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;
@@ -28,7 +29,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [mesherOutput, setMesherOutput] = useState<MesherOutput | undefined>(
     undefined
   );
-  const [voxelsNumber, setVoxelsNumber] = useState(0)
+  const [voxelsPainted, setVoxelsPainted] = useState(0)
+  const [totalVoxels, setTotalVoxels] = useState(0)
 
   const selectedProject = useSelector(selectedProjectSelector);
 
@@ -52,8 +54,13 @@ export const Simulator: React.FC<SimulatorProps> = ({
   }, [selectedProject?.meshData.mesh]);
 
   useEffect(() => {
+    setVoxelsPainted(0)
     if(mesherOutput){
-      setVoxelsNumber(mesherOutput.n_cells.n_cells_x * mesherOutput.n_cells.n_cells_y * mesherOutput.n_cells.n_cells_z)
+      let numberOfCells = getNumberOfCells(mesherOutput)
+      let sum = 0
+      numberOfCells.forEach(n => sum = sum+n)
+      setVoxelsPainted(sum)
+      setTotalVoxels(mesherOutput.n_cells.n_cells_x * mesherOutput.n_cells.n_cells_y * mesherOutput.n_cells.n_cells_z)
     }
   }, [mesherOutput])
 
@@ -83,7 +90,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
           />
         )}
       </CanvasBaseWithRedux>
-      <StatusBar voxelsNumber={voxelsNumber}/>
+      <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels}/>
       <LeftPanel
         tabs={["Modeler", "Simulator"]}
         selectedTab={selectedTabLeftPanel}

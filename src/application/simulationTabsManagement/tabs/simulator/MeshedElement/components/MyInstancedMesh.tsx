@@ -25,29 +25,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
     const meshRef = useRef<InstancedMesh[]>([]);
     const edgeRef = useRef<InstancedMesh[]>([])
 
-    function getNumberOfCells(output: MesherOutput | undefined) {
-        let numberOfCells: number[] = [];
-        let matrices: boolean[][][][] = [];
-        if (output) {
-            Object.values(output.mesher_matrices).forEach((matrix) => {
-                matrices.push(matrix);
-            });
-            matrices.forEach((matrix) => {
-                let cells = 0;
-                matrix.forEach((m) => {
-                    m.forEach((m) => {
-                        m.forEach((m) => {
-                            if (m) {
-                                cells += 1;
-                            }
-                        });
-                    });
-                });
-                numberOfCells.push(cells);
-            });
-        }
-        return numberOfCells;
-    }
+
 
     let numberOfCells = getNumberOfCells(mesherOutput);
 
@@ -142,3 +120,27 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
         </>
     );
 };
+
+export function getNumberOfCells(output: MesherOutput | undefined) {
+    let numberOfCells: number[] = [];
+    let matrices: boolean[][][][] = [];
+    if (output) {
+        Object.values(output.mesher_matrices).forEach((matrix) => {
+            matrices.push(matrix);
+        });
+        matrices.forEach((matrix) => {
+            let cells = 0;
+            matrix.forEach((m) => {
+                m.forEach((m) => {
+                    m.forEach((m) => {
+                        if (m) {
+                            cells += 1;
+                        }
+                    });
+                });
+            });
+            numberOfCells.push(cells);
+        });
+    }
+    return numberOfCells;
+}
