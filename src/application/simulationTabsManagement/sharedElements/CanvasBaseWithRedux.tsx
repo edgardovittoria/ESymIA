@@ -29,6 +29,8 @@ import {s3} from "../../../aws/s3Config";
 import {Screenshot} from "./Screenshot";
 import {convertInFaunaProjectThis} from "../../../faunadb/apiAuxiliaryFunctions";
 import EdgesGenerator from "./EdgesGenerator";
+import {uploadFileS3} from "../../../aws/mesherAPIs";
+import {setModelInfoFromS3} from "../../dashboardTabsManagement/tabs/shared/utilFunctions";
 
 interface CanvasBaseWithReduxProps {
     section: string;
@@ -93,6 +95,12 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
             }
         }, [selectedProject, selectedProject?.model, mesh.current])
 
+        useEffect(() => {
+            if(!selectedProject?.model.components && selectedProject?.modelS3){
+                setModelInfoFromS3(selectedProject, dispatch)
+            }
+        }, [])
+
         return (
             <div className="flex justify-center">
                 {selectedProject && selectedProject.model?.components ? (
@@ -155,6 +163,14 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                             importAction={(importActionParamsObject) => {
                                 dispatch(importModel(importActionParamsObject))
                                 dispatch(setModelUnit(importActionParamsObject.unit))
+                                let model = JSON.stringify({components: importActionParamsObject.canvas.components, unit: importActionParamsObject.unit})
+                                let blobFile = new Blob([model])
+                                let modelFile = new File([blobFile], `${selectedProject?.faunaDocumentId}.json`, {type: 'application/json'})
+                                uploadFileS3(modelFile).then(res => {
+                                    if(res){
+                                        dispatch(setModelS3(res.key))
+                                    }
+                                })
                             }}
                             actionParams={
                                 {id: selectedProject?.faunaDocumentId, unit: "mm"} as ImportActionParamsObject

@@ -437,7 +437,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                         </div>
                     </div>
                 </div>
-                <button
+                {/*<button
                     className={`w-full mt-3 button
               ${(meshGenerated !== "Generated") ? 'bg-gray-300 text-gray-600 opacity-70' : 'buttonPrimary'}`}
                     disabled={meshGenerated !== "Generated"}
@@ -446,7 +446,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     }}
                 >
                     Export Solver Input
-                </button>
+                </button>*/}
                 {selectedProject.simulation?.status === "Completed" ? (
                         <button
                             className="button buttonPrimary w-[100%] mt-3"
