@@ -18,7 +18,7 @@ import {
     importModel,
     OrbitTarget,
     orbitTargetSelector,
-    selectedProjectSelector,
+    selectedProjectSelector, setBoundingBoxDimension,
     setModelS3,
     setModelUnit,
     setOrbitTarget,
@@ -85,6 +85,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                     })
                 }
                 let boundingbox = new THREE.Box3().setFromObject(group)
+                dispatch(setBoundingBoxDimension(boundingbox.getSize(boundingbox.max).x))
                 dispatch(
                     setOrbitTarget({
                         position: [

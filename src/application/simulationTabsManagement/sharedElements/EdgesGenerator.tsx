@@ -3,7 +3,12 @@ import * as THREE from "three";
 import {meshFrom} from "cad-library";
 import {BufferGeometry, InstancedMesh, Material, Mesh, Object3D} from "three";
 import {useDispatch, useSelector} from "react-redux";
-import {findSelectedPort, selectedProjectSelector, updatePortPosition} from "../../../store/projectSlice";
+import {
+    boundingBoxDimensionSelector,
+    findSelectedPort,
+    selectedProjectSelector,
+    updatePortPosition
+} from "../../../store/projectSlice";
 
 export interface EdgesGeneratorProps {
     section: string,
@@ -25,8 +30,7 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfac
             group.add(meshFrom(c))
         })
     }
-    let boundingbox = new THREE.Box3().setFromObject(group)
-    let size = boundingbox.getSize(boundingbox.max)
+    let size = useSelector(boundingBoxDimensionSelector)
     const instancedMeshRef = useRef<InstancedMesh[]>([]);
     useEffect(() => {
         if (section === "Physics") {
@@ -98,7 +102,7 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfac
                                         }
                                     }}
                                 >
-                                    <sphereGeometry args={[size.x / 100, 20, 20]}/>
+                                    <sphereGeometry args={[(size as number) / 100, 20, 20]}/>
                                     <meshPhongMaterial color={"black"}/>
                                 </instancedMesh>
                             }

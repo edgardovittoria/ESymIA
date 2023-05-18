@@ -33,7 +33,8 @@ export type Project = {
     owner: UsersState
     sharedWith: sharingInfoUser[]
     faunaDocumentId?: string,
-    parentFolder: string
+    parentFolder: string,
+    boundingBoxDimension?: number
 }
 
 export type Port = {

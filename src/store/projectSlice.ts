@@ -255,7 +255,13 @@ export const ProjectSlice = createSlice({
         },
         setOrbitTarget(state: ProjectState, action: PayloadAction<OrbitTarget | undefined>) {
             state.orbitTarget = action.payload
-        }
+        },
+        setBoundingBoxDimension(state: ProjectState, action:PayloadAction<number>){
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
+            if (selectedProject) {
+                selectedProject.boundingBoxDimension = action.payload
+            }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -314,7 +320,8 @@ export const {
     setModelS3,
     setModelUnit,
     setPortKey,
-    setPortName
+    setPortName,
+    setBoundingBoxDimension
 } = ProjectSlice.actions
 
 const selectTabEffects = (state: ProjectState, tab: string) => {
@@ -352,6 +359,10 @@ export const findSelectedPort = (project: Project | undefined) => (project) ? pr
 export const portKeySelector = (state: { projects: ProjectState }) => {
     let project = findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
     return project?.portKey
+}
+export const boundingBoxDimensionSelector = (state: { projects: ProjectState }) => {
+    let project = findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject);
+    return project?.boundingBoxDimension
 }
 export const folderByID = (state: ProjectState, folderID: string | undefined) => {
     if (folderID) {
