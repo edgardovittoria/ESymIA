@@ -3,6 +3,8 @@ import {InstancedMesh, Object3D} from "three";
 import {Material} from "cad-library";
 import {MesherOutput} from "../../MesherInputOutput";
 import {Project} from "../../../../../../model/esymiaModels";
+import {useSelector} from "react-redux";
+import {meshGeneratedSelector} from "../../../../../../store/projectSlice";
 
 
 interface InstancedMeshProps {
@@ -20,7 +22,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                                                                   materialsList,
                                                                   mesherOutput,
                                                               }) => {
-    let meshGenerated = selectedProject.meshData.meshGenerated;
+    let meshGenerated = useSelector(meshGeneratedSelector)
 
     const meshRef = useRef<InstancedMesh[]>([]);
     const edgeRef = useRef<InstancedMesh[]>([])
@@ -30,43 +32,46 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
     let numberOfCells = getNumberOfCells(mesherOutput);
 
     useEffect(() => {
-        let tempObject = new Object3D();
-        mesherMatrices.forEach((matrix, index) => {
-            if (mesherOutput && meshRef.current[index]) {
-                let y = 0;
-                for (let i = 0; i < mesherOutput.n_cells.n_cells_x; i++) {
-                    for (let j = 0; j < mesherOutput.n_cells.n_cells_y; j++) {
-                        for (let k = 0; k < mesherOutput.n_cells.n_cells_z; k++) {
-                            if (matrix[i][j][k]) {
-                                const id = y++;
-                                tempObject.position.set(
-                                    i !== 0
-                                        ? ((i - 1) * mesherOutput.cell_size.cell_size_x +
-                                            mesherOutput.cell_size.cell_size_x) *
-                                        1020
-                                        : mesherOutput.origin.origin_x,
-                                    j !== 0
-                                        ? ((j - 1) * mesherOutput.cell_size.cell_size_y +
-                                            mesherOutput.cell_size.cell_size_y) *
-                                        1020
-                                        : mesherOutput.origin.origin_y,
-                                    k !== 0
-                                        ? ((k - 1) * mesherOutput.cell_size.cell_size_z +
-                                            mesherOutput.cell_size.cell_size_z) *
-                                        1020
-                                        : mesherOutput.origin.origin_z
-                                );
-                                tempObject.updateMatrix();
-                                meshRef.current[index].setMatrixAt(id, tempObject.matrix);
-                                edgeRef.current[index].setMatrixAt(id, tempObject.matrix);
+        if(meshGenerated === "Generated"){
+            let tempObject = new Object3D();
+            mesherMatrices.forEach((matrix, index) => {
+                if (mesherOutput && meshRef.current[index] && matrix.length === mesherOutput.n_cells.n_cells_x) {
+                    let y = 0;
+                    console.log(matrix.length,mesherOutput.n_cells.n_cells_x)
+                    for (let i = 0; i < mesherOutput.n_cells.n_cells_x; i++) {
+                        for (let j = 0; j < mesherOutput.n_cells.n_cells_y; j++) {
+                            for (let k = 0; k < mesherOutput.n_cells.n_cells_z; k++) {
+                                if (matrix[i][j][k]) {
+                                    const id = y++;
+                                    tempObject.position.set(
+                                        i !== 0
+                                            ? ((i - 1) * mesherOutput.cell_size.cell_size_x +
+                                                mesherOutput.cell_size.cell_size_x) *
+                                            1020
+                                            : mesherOutput.origin.origin_x,
+                                        j !== 0
+                                            ? ((j - 1) * mesherOutput.cell_size.cell_size_y +
+                                                mesherOutput.cell_size.cell_size_y) *
+                                            1020
+                                            : mesherOutput.origin.origin_y,
+                                        k !== 0
+                                            ? ((k - 1) * mesherOutput.cell_size.cell_size_z +
+                                                mesherOutput.cell_size.cell_size_z) *
+                                            1020
+                                            : mesherOutput.origin.origin_z
+                                    );
+                                    tempObject.updateMatrix();
+                                    meshRef.current[index].setMatrixAt(id, tempObject.matrix);
+                                    edgeRef.current[index].setMatrixAt(id, tempObject.matrix);
+                                }
                             }
                         }
                     }
+                    meshRef.current[index].instanceMatrix.needsUpdate = true;
+                    edgeRef.current[index].instanceMatrix.needsUpdate = true;
                 }
-                meshRef.current[index].instanceMatrix.needsUpdate = true;
-                edgeRef.current[index].instanceMatrix.needsUpdate = true;
-            }
-        });
+            });
+        }
     }, [meshGenerated, materialsList, mesherMatrices, mesherOutput]);
 
     return (

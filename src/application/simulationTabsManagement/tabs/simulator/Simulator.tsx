@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { selectedProjectSelector } from "../../../../store/projectSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {selectedProjectSelector, setMeshGenerated} from "../../../../store/projectSlice";
 import { SimulatorLeftPanelTab } from "./SimulatorLeftPanelTab";
 import { MeshingSolvingInfo } from "./MeshingSolvingInfo";
 import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
@@ -33,6 +33,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [totalVoxels, setTotalVoxels] = useState(0)
 
   const selectedProject = useSelector(selectedProjectSelector);
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (selectedProject?.meshData.mesh) {
@@ -45,9 +46,11 @@ export const Simulator: React.FC<SimulatorProps> = ({
           if (err) {
             console.log(err);
           }
+          //console.log('pippo')
           setMesherOutput(
             JSON.parse(data.Body?.toString() as string) as MesherOutput
           );
+          dispatch(setMeshGenerated("Generated"))
         }
       );
     }

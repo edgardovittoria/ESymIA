@@ -27,25 +27,27 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 
 
 	useEffect(() => {
-		let matrices: boolean[][][][] = []
-		let entries = (mesherOutput) && Object.entries(mesherOutput.mesher_matrices)
-		let selectedEntries: [string, any][] = []
-		let materials: Material[] = []
-		let finalMaterialList: Material[] = []
-		if (mesherOutput) {
+		if(meshGenerated === "Generated"){
+			let matrices: boolean[][][][] = []
+			let entries = (mesherOutput) && Object.entries(mesherOutput.mesher_matrices)
+			let selectedEntries: [string, any][] = []
+			let materials: Material[] = []
+			let finalMaterialList: Material[] = []
+			if (mesherOutput) {
 
-			selectedMaterials.forEach(sm => {
-				if (entries) selectedEntries = [...selectedEntries, ...entries.filter(e => e[0] === sm)]
-				materials = [...materials, ...materialsList.filter(m => m.name === sm)]
-			})
+				selectedMaterials.forEach(sm => {
+					if (entries) selectedEntries = [...selectedEntries, ...entries.filter(e => e[0] === sm)]
+					materials = [...materials, ...materialsList.filter(m => m.name === sm)]
+				})
 
 
-			selectedEntries.forEach(e => matrices.push(e[1]))
-			materials.forEach(m => finalMaterialList.push(m))
+				selectedEntries.forEach(e => matrices.push(e[1]))
+				materials.forEach(m => finalMaterialList.push(m))
 
-			setModelMaterials(finalMaterialList)
-			setMesherMatrices(matrices)
+				setModelMaterials(finalMaterialList)
+				setMesherMatrices(matrices)
 
+			}
 		}
 	}, [mesherOutput, meshGenerated, selectedMaterials]);
 

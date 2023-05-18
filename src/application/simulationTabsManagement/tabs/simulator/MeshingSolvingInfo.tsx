@@ -98,8 +98,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 STL: STLToPush,
             });
         });
-
-        console.log(STLList)
         return STLList;
     }
 
@@ -220,7 +218,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             //lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
             axios.post('https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/', objToSendToMesher).then((res) => {
                 saveMeshToS3((res.data)).then(() => {
-                    dispatch(setMeshGenerated("Generated"))
+                    //dispatch(setMeshGenerated("Generated"))
                 });
             }).catch((err) => {
                 if (err) {
@@ -359,7 +357,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                     onClick={() => {
                                         dispatch(setMeshGenerated("Generating"));
                                         deleteFileS3(selectedProject.meshData.mesh as string).then(() => {
-
+                                            //dispatch(unsetMesh())
                                         })
                                     }}
                                 >
