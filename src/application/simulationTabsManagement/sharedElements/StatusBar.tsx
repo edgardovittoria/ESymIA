@@ -18,8 +18,8 @@ const StatusBar: React.FC<StatusBarProps> = ({voxelsPainted, totalVoxels}) => {
                 <div className="w-full bg-gray-300 flex justify-end">
                     {menuItemSelected === "Simulator" &&
                         <>
-                            <div className="pr-5">Voxels Painted: <span className="font-bold">{voxelsPainted}</span></div>
-                            <div className="pr-5">Total Voxels: <span className="font-bold">{totalVoxels}</span></div>
+                            <div className="pr-5">Number of bricks: <span className="font-bold">{voxelsPainted}</span></div>
+                            {/*<div className="pr-5">Total Voxels: <span className="font-bold">{totalVoxels}</span></div>*/}
                         </>
                     }
                     <div className="pr-5">Distance Unit: <span className="font-bold">{selectedProject?.modelUnit}</span>
