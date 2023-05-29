@@ -38,7 +38,7 @@ export const Results: React.FC<ResultsProps> = ({
   >("grid");
   const [graphToVisualize, setGraphToVisualize] = useState<"All Graph" | "Z" | "S" | "Y">("All Graph")
   const { execQuery } = useFaunaQuery();
-  let simulation = selectedProject?.simulation
+
   return (
     <div className="flex h-[100vh]">
       <div className="w-[20%]">
@@ -59,7 +59,7 @@ export const Results: React.FC<ResultsProps> = ({
               <ModelOutliner />
             </Models>
           )}
-          {(simulation) &&
+          {(selectedProject?.simulation) &&
             <button
               type="button"
               className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
@@ -79,7 +79,7 @@ export const Results: React.FC<ResultsProps> = ({
         </LeftPanel>
       </div>
       <div className="w-[78%]">
-        {selectedProject && simulation ? (
+        {selectedProject && selectedProject.simulation ? (
           chartVisualizationMode === "full" ? (
             <>
               {selectedTabLeftPanel === "Results" && (
@@ -95,8 +95,6 @@ export const Results: React.FC<ResultsProps> = ({
               )}
               <div className="overflow-scroll grid grid-cols-1 gap-4 max-h-[800px]">
                 <ChartsList
-                  simulation={simulation}
-                  project={selectedProject}
                   scaleMode={chartsScaleMode}
                   graphToVisualize={graphToVisualize}
                   selectedLabel={selectedLabel}
@@ -118,8 +116,6 @@ export const Results: React.FC<ResultsProps> = ({
               )}
               <div className="grid grid-cols-2 gap-4 overflow-scroll max-h-[800px]">
                 <ChartsList
-                  simulation={simulation}
-                  project={selectedProject}
                   scaleMode={chartsScaleMode}
                   graphToVisualize={graphToVisualize}
                   selectedLabel={selectedLabel}

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,7 +8,7 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend, Chart, LegendElement, LegendItem, ChartOptions,
+  Legend
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { Port, Project, Simulation } from "../../../../model/esymiaModels";
@@ -27,8 +27,6 @@ ChartJS.register(
 );
 
 interface ChartsListProps {
-  simulation: Simulation;
-  project: Project | undefined;
   scaleMode: string;
   graphToVisualize: "All Graph" | "Z" | "S" | "Y";
   selectedLabel: { label:string, id:number }[]
@@ -43,17 +41,15 @@ interface Dataset {
 
 
 export const ChartsList: React.FC<ChartsListProps> = ({
-  simulation,
-  project,
   scaleMode,
   graphToVisualize,
   selectedLabel
 }) => {
   const selectedProject = useSelector(selectedProjectSelector)
   const ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
-  const matrix_Z = JSON.parse(simulation.results.matrix_Z);
-  const matrix_Y = JSON.parse(simulation.results.matrix_Y);
-  const matrix_S = JSON.parse(simulation.results.matrix_S);
+  const matrix_Z = JSON.parse((selectedProject?.simulation as Simulation).results.matrix_Z);
+  const matrix_Y = JSON.parse((selectedProject?.simulation as Simulation).results.matrix_Y);
+  const matrix_S = JSON.parse((selectedProject?.simulation as Simulation).results.matrix_S);
   const [chartsOrderedIDs, setChartsOrderedIDs] = useState([
     "R",
     "L",
@@ -68,7 +64,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     "S_dB",
   ])
   const [chartsDataOptionsList, setChartsDataOptionsList] = useState(chartsOrderedIDs.map((id) =>
-      chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+      chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
   ))
   const [chartsDataToVisualize, setChartsDataToVisualize] = useState(chartsDataOptionsList)
   useEffect(() => {
@@ -84,21 +80,21 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     if(graphToVisualize === "S"){
       setChartsOrderedIDs(["S_Module", "S_Phase", "S_dB"])
     }
-  }, [graphToVisualize])
+  }, [graphToVisualize, selectedProject])
 
   useEffect(() => {
     setChartsDataToVisualize(
         chartsOrderedIDs.map((id) =>
-            chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+            chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
         )
     )
-  }, [chartsOrderedIDs])
+  }, [chartsOrderedIDs, selectedProject])
 
   useEffect(() => {
     setChartsDataToVisualize(chartsOrderedIDs.map((id) =>
-        chartsDataOptionsFactory(simulation, project, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+        chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
     ))
-  }, [selectedLabel])
+  }, [selectedLabel, selectedProject])
 
 
   const optionsWithScaleMode = (options: any, scaleMode: string) => {
