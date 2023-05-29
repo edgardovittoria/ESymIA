@@ -1,7 +1,7 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
-import { OrbitControls, GizmoHelper, GizmoViewport, Edges, useBounds, Bounds } from "@react-three/drei";
+import { OrbitControls, GizmoHelper, GizmoViewport, Edges } from "@react-three/drei";
 import { GiCubeforce } from "react-icons/gi";
 import uniqid from "uniqid"
 import {
@@ -23,7 +23,7 @@ import { s3 } from "../../../aws/s3Config";
 import { Screenshot } from "./Screenshot";
 import { uploadFileS3 } from "../../../aws/mesherAPIs";
 import { setModelInfoFromS3 } from "../../dashboardTabsManagement/tabs/shared/utilFunctions";
-import { Project } from "../../../model/esymiaModels";
+import { FocusView } from "./FocusView";
 
 interface CanvasBaseWithReduxProps {
     section: string;
@@ -66,8 +66,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                         intensity={0.85}
                                     />
                                     {/* paint models */}
-                                    <Bounds fit clip observe margin={1.2}>
-                                        <CommonObjectsActions selectedProject={selectedProject}>
+                                    <FocusView>
                                             {(!mesherOutput || section !== "Simulator") && selectedProject && selectedProject.model.components.map((component, index) => {
                                                 return (
                                                     <>
@@ -91,8 +90,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                                     </>
                                                 )
                                             })}
-                                        </CommonObjectsActions>
-                                    </Bounds>
+                                       </FocusView>
                                     {children}
                                     <OrbitControls makeDefault />
                                     <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
@@ -171,20 +169,4 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
             )}
         </div>
     );
-}
-    ;
-
-export const CommonObjectsActions: FC<{selectedProject: Project}> = ({ selectedProject, children }) => {
-    const bounds = useBounds()
-    useEffect(() => {
-        bounds.refresh().fit()
-    }, [selectedProject])
-    
-    return (
-        <group
-            onPointerMissed={(e) => e.button === 0 && bounds.refresh().fit()}
-        >
-            {children}
-        </group>
-    )
 }

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectedProjectSelector, setMeshGenerated } from "../../../../store/projectSlice";
 import { SimulatorLeftPanelTab } from "./SimulatorLeftPanelTab";
 import { MeshingSolvingInfo } from "./MeshingSolvingInfo";
-import { CanvasBaseWithRedux, CommonObjectsActions } from "../../sharedElements/CanvasBaseWithRedux";
+import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
 import { MeshedElement } from "./MeshedElement/MeshedElement";
 import { ComponentEntity, Material } from "cad-library";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
@@ -14,7 +14,7 @@ import { s3 } from "../../../../aws/s3Config";
 import { Project } from "../../../../model/esymiaModels";
 import StatusBar from "../../sharedElements/StatusBar";
 import { getNumberOfCells } from "./MeshedElement/components/MyInstancedMesh";
-import { Bounds } from "@react-three/drei";
+import { FocusView } from "../../sharedElements/FocusView";
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;
@@ -85,15 +85,13 @@ export const Simulator: React.FC<SimulatorProps> = ({
     <>
       <CanvasBaseWithRedux section="Simulator">
         {selectedProject && (
-          <Bounds fit clip observe margin={1.2}>
-            <CommonObjectsActions selectedProject={selectedProject}>
-              <MeshedElement
-                mesherOutput={mesherOutput}
-                selectedProject={selectedProject}
-                selectedMaterials={selectedMaterials}
-              />
-            </CommonObjectsActions>
-          </Bounds>
+          <FocusView>
+            <MeshedElement
+              mesherOutput={mesherOutput}
+              selectedProject={selectedProject}
+              selectedMaterials={selectedMaterials}
+            />
+          </FocusView>
         )}
       </CanvasBaseWithRedux>
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
