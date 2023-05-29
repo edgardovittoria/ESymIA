@@ -18,13 +18,11 @@ import {getNumberOfCells} from "./MeshedElement/components/MyInstancedMesh";
 interface SimulatorProps {
   selectedTabLeftPanel: string;
   setSelectedTabLeftPanel: Function;
-  savedPortParameters: boolean;
 }
 
 export const Simulator: React.FC<SimulatorProps> = ({
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
-  savedPortParameters
 }) => {
   const [mesherOutput, setMesherOutput] = useState<MesherOutput | undefined>(
     undefined
@@ -84,7 +82,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
     useState<string[]>(materialsNames);
   return (
     <>
-      <CanvasBaseWithRedux section="Simulator" savedPortParameters={savedPortParameters}>
+      <CanvasBaseWithRedux section="Simulator">
         {selectedProject && (
           <MeshedElement
             mesherOutput={mesherOutput}

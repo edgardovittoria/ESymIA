@@ -1,9 +1,10 @@
-import { FactoryShapes } from "cad-library";
+import { FactoryShapes, meshFrom, useFaunaQuery } from "cad-library";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	findSelectedPort,
 	selectedProjectSelector,
-	selectPort, 
+	selectPort,
+	setBoundingBoxDimension,
 	updatePortPosition
 } from "../../../../store/projectSlice";
 import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
@@ -19,7 +20,7 @@ import { PortPosition } from "./portManagement/components/PortPosition";
 import { RLCParamsComponent } from "./portManagement/components/RLCParamsComponent";
 import { ModalSelectPortType } from "./portManagement/ModalSelectPortType";
 import { InputSignal } from "./inputSignal/InputSignal";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { InputSignalManagement } from "./inputSignal/InputSignalManagement";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { Models } from "../../sharedElements/Models";
@@ -29,6 +30,9 @@ import { ImportExportPhysicsSetup } from "./ImportExportPhysicsSetup";
 import { BiHide, BiShow } from "react-icons/bi";
 import { ThreeEvent } from "@react-three/fiber";
 import StatusBar from "../../sharedElements/StatusBar";
+import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
+import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
+import EdgesGenerator from "./EdgesGenerator";
 
 interface PhysicsProps {
 	selectedTabLeftPanel: string;
@@ -44,46 +48,81 @@ export const Physics: React.FC<PhysicsProps> = ({
 	setSavedPortParameters,
 }) => {
 	const selectedProject = useSelector(selectedProjectSelector);
+	const { execQuery } = useFaunaQuery()
 	let selectedPort = findSelectedPort(selectedProject);
 	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
 	const dispatch = useDispatch();
 	const [surfaceAdvices, setSurfaceAdvices] = useState(true)
 	const [pointerEvent, setPointerEvent] = useState<ThreeEvent<MouseEvent> | undefined>(undefined)
 	const [inputPortPositioned, setInputPortPositioned] = useState(false)
+	const mesh = useRef<THREE.Mesh[]>([]);
+
+	const setMesh = (meshToSet: THREE.Mesh, index: number) => {
+		if (meshToSet) {
+			mesh.current[index] = meshToSet;
+		}
+	}
 
 	useEffect(() => {
-        if (pointerEvent) {
-            if (!inputPortPositioned) {
-                dispatch(
-                    updatePortPosition({
-                        type: "first",
-                        position: [pointerEvent.point.x, pointerEvent.point.y, pointerEvent.point.z],
-                    })
-                );
-                setInputPortPositioned(true)
-            } else {
-                dispatch(
-                    updatePortPosition({
-                        type: "last",
-                        position: [pointerEvent.point.x, pointerEvent.point.y, pointerEvent.point.z],
-                    })
-                );
-                setInputPortPositioned(false)
+		if (pointerEvent) {
+			if (!inputPortPositioned) {
+				dispatch(
+					updatePortPosition({
+						type: "first",
+						position: [pointerEvent.point.x, pointerEvent.point.y, pointerEvent.point.z],
+					})
+				);
+				setInputPortPositioned(true)
+			} else {
+				dispatch(
+					updatePortPosition({
+						type: "last",
+						position: [pointerEvent.point.x, pointerEvent.point.y, pointerEvent.point.z],
+					})
+				);
+				setInputPortPositioned(false)
+			}
+		}
+	}, [pointerEvent])
+
+	useEffect(() => {
+		if (selectedProject && savedPortParameters === true) {
+			execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject));
+		}
+	}, [
+		savedPortParameters,
+		selectedProject?.signal,
+		selectedProject?.simulation,
+		selectedProject?.meshData,
+		selectedProject?.modelS3
+	]);
+
+	useEffect(() => {
+        if (mesh.current && mesh.current.length !== 0) {
+            let group = new THREE.Group()
+            if (selectedProject && selectedProject.model.components) {
+                selectedProject.model.components.forEach(c => {
+                    group.add(meshFrom(c))
+                })
             }
+            let boundingbox = new THREE.Box3().setFromObject(group)
+            dispatch(setBoundingBoxDimension(boundingbox.getSize(boundingbox.max).x))
         }
-    }, [pointerEvent])
+    }, [selectedProject, selectedProject?.model, mesh.current])
 	
+
 
 	return (
 		<>
 			<CanvasBaseWithRedux
 				section="Physics"
-				savedPortParameters={savedPortParameters}
-				surfaceAdvices={surfaceAdvices}
 				setPointerEvent={setPointerEvent}
-				inputPortPositioned={inputPortPositioned}
-				setInputPortPositioned={setInputPortPositioned}
+				setMesh={setMesh}
 			>
+				<EdgesGenerator meshRef={mesh}
+					surfaceAdvices={surfaceAdvices as boolean}
+					inputPortPositioned={inputPortPositioned as boolean}
+					setInputPortPositioned={setInputPortPositioned as Function} />
 				{selectedProject?.ports.map((port, index) => {
 					if (port.category === "port" || port.category === "lumped") {
 						return (
@@ -169,7 +208,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 					</>
 				)}
 			</CanvasBaseWithRedux>
-			<StatusBar/>
+			<StatusBar />
 			<LeftPanel
 				tabs={["Modeler", "Physics"]}
 				selectedTab={selectedTabLeftPanel}

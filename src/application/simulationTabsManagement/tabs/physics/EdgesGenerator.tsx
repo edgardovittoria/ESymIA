@@ -8,17 +8,16 @@ import {
     findSelectedPort,
     selectedProjectSelector,
     updatePortPosition
-} from "../../../store/projectSlice";
+} from "../../../../store/projectSlice";
 
 export interface EdgesGeneratorProps {
-    section: string,
     meshRef: React.MutableRefObject<THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>[]>,
     surfaceAdvices: boolean,
     inputPortPositioned: boolean,
     setInputPortPositioned: Function
 }
 
-const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfaceAdvices, inputPortPositioned, setInputPortPositioned}) => {
+const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, surfaceAdvices, inputPortPositioned, setInputPortPositioned}) => {
 
     const selectedProject = useSelector(selectedProjectSelector);
     const dispatch = useDispatch()
@@ -33,7 +32,6 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfac
     let size = useSelector(boundingBoxDimensionSelector)
     const instancedMeshRef = useRef<InstancedMesh[]>([]);
     useEffect(() => {
-        if (section === "Physics") {
             let tempObject = new Object3D();
             group.children.forEach((c, index) => {
                 if (meshRef.current && selectedPort && meshRef.current.length !== 0 && surfaceAdvices) {
@@ -61,8 +59,8 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({section, meshRef, surfac
                     instancedMeshRef.current[index].instanceMatrix.needsUpdate = true;
                 }
             })
-        }
-    }, [selectedPort, selectedProject, section, surfaceAdvices])
+            // bounds.refresh().fit()
+    }, [selectedPort, selectedProject, surfaceAdvices])
 
     return (
         <>

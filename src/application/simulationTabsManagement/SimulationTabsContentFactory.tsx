@@ -40,7 +40,6 @@ export const SimulationTabsContentFactory: React.FC<
         <Simulator
           selectedTabLeftPanel={selectedTabLeftPanel}
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
-          savedPortParameters={savedPortParameters}
         />
       );
     case "Results":
