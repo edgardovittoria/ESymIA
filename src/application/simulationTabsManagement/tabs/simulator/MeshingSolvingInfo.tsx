@@ -1,6 +1,6 @@
 import {ComponentEntity, exportToSTL, Material} from "cad-library";
 import React, {useEffect, useState} from "react";
-import {AiOutlineThunderbolt} from "react-icons/ai";
+import {AiOutlineCheckCircle, AiOutlineThunderbolt} from "react-icons/ai";
 import {useDispatch, useSelector} from "react-redux";
 import {setSolverOutput} from "../../../../store/solverSlice";
 import {
@@ -112,25 +112,31 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     }
 
     const WS_URL = 'ws://127.0.0.1:8080';
-    const [solverStatus, setSolverStatus] = useState<"Computing P" | "Computing Lpx" | "Computing Lpy" | "Computing Lpz" | "Doing Iterations">("Computing P")
+    const [computingP, setComputingP] = useState(false)
+    const [computingLpx, setComputingLpx] = useState(false)
+    const [computingLpy, setComputingLpy] = useState(false)
+    const [computingLpz, setComputingLpz] = useState(false)
+    const [doingIterations, setDoingIterations] = useState(false)
     const [iterations, setIterations] = useState(0)
 
     useWebSocket(WS_URL, {
         onOpen: () => {
             console.log('WebSocket connection established.');
         },
+        shouldReconnect: (event) => true,
         onMessage: (event) => {
             if (event.data === "P Computing Completed") {
-                setSolverStatus("Computing Lpx")
+                setComputingP(true)
             }
             if (event.data === "LPx Computing Completed") {
-                setSolverStatus("Computing Lpy")
+                setComputingLpx(true)
             }
             if (event.data === "LPy Computing Completed") {
-                setSolverStatus("Computing Lpz")
+                setComputingLpy(true)
             }
             if (event.data === "LPz Computing Completed") {
-                setSolverStatus("Doing Iterations")
+                setComputingLpz(true)
+                setDoingIterations(true)
             }
             setIterations(event.data)
         },
@@ -172,7 +178,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 dispatch(deleteSimulation());
                 dispatch(setMeshApproved(false));
             })
-            setSolverStatus("Computing P")
+            setComputingP(false)
+            setComputingLpx(false)
+            setComputingLpy(false)
+            setComputingLpz(false)
+            setDoingIterations(false)
         }
     }, [meshApproved]);
 
@@ -237,18 +247,45 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 <>
                     <div
                         className="absolute right-[42%] top-1/2 flex flex-col justify-center items-center bg-white p-8 rounded-xl">
-                        <h5 className="mb-5">{solverStatus}</h5>
-                        {/*<ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2`} />*/}
-                        {solverStatus !== "Doing Iterations" ? <progress className="progress w-56"/> :
-                            <progress className="progress w-56" value={iterations} max={frequenciesNumber}></progress>
+                        <h5 className="mb-2">Computing P</h5>
+                        <div className="flex flex-row justify-between items-center">
+                            {computingP ?
+                                <div className="flex flex-row justify-between items-center">
+                                    <progress className="progress w-56 mr-4" value={1} max={1}/>
+                                    <AiOutlineCheckCircle size="20px" className="text-green-500"/>
+                                </div> : <progress className="progress w-56"/>
+                            }
+                        </div>
+                        <h5 className="mb-2">Computing Lpx</h5>
+                        {computingLpx ?
+                            <div className="flex flex-row justify-between items-center">
+                                <progress className="progress w-56 mr-4" value={1} max={1}/>
+                                <AiOutlineCheckCircle size="20px" className="text-green-500"/>
+                            </div> : <progress className="progress w-56"/>
                         }
-
+                        <h5 className="mb-2">Computing Lpy</h5>
+                        {computingLpy ?
+                            <div className="flex flex-row justify-between items-center">
+                                <progress className="progress w-56 mr-4" value={1} max={1}/>
+                                <AiOutlineCheckCircle size="20px" className="text-green-500"/>
+                            </div> : <progress className="progress w-56"/>
+                        }
+                        <h5 className="mb-2">Computing Lpz</h5>
+                        {computingLpz ?
+                            <div className="flex flex-row justify-between items-center">
+                                <progress className="progress w-56 mr-4" value={1} max={1}/>
+                                <AiOutlineCheckCircle size="20px" className="text-green-500"/>
+                            </div> : <progress className="progress w-56"/>
+                        }
+                        <h5 className="mb-2">Doing Iterations</h5>
+                        <progress className="progress w-56" value={iterations} max={frequenciesNumber}/>
                     </div>
 
                 </>
 
             )}
-            {meshGenerated === "Generating" && <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2`}/>}
+            {meshGenerated === "Generating" &&
+                <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2`}/>}
             <div
                 className={`${(meshGenerated === "Generating" || selectedProject.simulation?.status === "Queued") && 'opacity-40'} flex-col absolute right-[2%] top-[160px] w-[22%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor`}>
                 <div className="flex">
