@@ -18,17 +18,12 @@ import {
     TempLumped
 } from '../model/esymiaModels';
 
-export type OrbitTarget = {
-    position: [number, number, number];
-};
-
 
 export type ProjectState = {
     projects: Folder,
     sharedElements: Folder,
     selectedProject: string | undefined,
-    selectedFolder: string | undefined,
-    orbitTarget: OrbitTarget | undefined
+    selectedFolder: string | undefined
 }
 
 export const ProjectSlice = createSlice({
@@ -51,8 +46,7 @@ export const ProjectSlice = createSlice({
             parent: "root"
         },
         selectedProject: undefined,
-        selectedFolder: undefined,
-        orbitTarget: undefined
+        selectedFolder: undefined
     } as ProjectState,
     reducers: {
         addProject(state: ProjectState, action: PayloadAction<Project>) {
@@ -253,9 +247,6 @@ export const ProjectSlice = createSlice({
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.meshApproved = action.payload
         },
-        setOrbitTarget(state: ProjectState, action: PayloadAction<OrbitTarget | undefined>) {
-            state.orbitTarget = action.payload
-        },
         setBoundingBoxDimension(state: ProjectState, action:PayloadAction<number>){
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (selectedProject) {
@@ -315,7 +306,6 @@ export const {
     setMeshApproved,
     setFolderOfElementsSharedWithUser,
     unsetMesh,
-    setOrbitTarget,
     setModel,
     setModelS3,
     setModelUnit,
@@ -331,7 +321,7 @@ const selectTabEffects = (state: ProjectState, tab: string) => {
         state.selectedProject = tab
     }
 }
-export const orbitTargetSelector = (state: { projects: ProjectState }) => state.projects.orbitTarget
+
 export const projectsSelector = (state: { projects: ProjectState }) => takeAllProjectsIn(state.projects.projects)
 export const folderByIDSelector = (state: { projects: ProjectState }, id: string) => {
     return recursiveFindFolders(state.projects.projects, [] as Folder[]).filter(f => f.faunaDocumentId === id)[0]

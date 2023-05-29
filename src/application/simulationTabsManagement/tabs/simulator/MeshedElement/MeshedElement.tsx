@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { TransformControls } from "@react-three/drei";
 import { Material } from "cad-library";
 import { MesherOutput } from "../MesherInputOutput";
 import { MyInstancedMesh } from "./components/MyInstancedMesh";
 import { Project } from "../../../../../model/esymiaModels";
-import { OrbitTarget, setOrbitTarget } from "../../../../../store/projectSlice";
-import { useDispatch } from "react-redux";
 
 interface PanelContentProps {
 	selectedMaterials: string[];
@@ -23,7 +20,6 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 
 	const [mesherMatrices, setMesherMatrices] = useState<boolean[][][][]>([]);
 	const [modelMaterials, setModelMaterials] = useState<Material[]>([]);
-	const dispatch = useDispatch()
 
 
 	useEffect(() => {
@@ -55,20 +51,9 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 	const yPos = (mesherOutput) && (mesherOutput.cell_size.cell_size_y*1000*mesherOutput.n_cells.n_cells_y)/2
 	const zPos = (mesherOutput) && (mesherOutput.cell_size.cell_size_z*1000*mesherOutput.n_cells.n_cells_z)/2
 
-	useEffect(() => {
-		if(meshGenerated === 'Generated'){
-		  dispatch(
-			setOrbitTarget({
-			  position: [0,0,0]
-			} as OrbitTarget)
-		  );
-		}
-	  }, [meshGenerated])
-
 
 	if (meshGenerated === "Generated") {
 		return (
-			<TransformControls >
 				<group position={[-(xPos as number), -(yPos as number), -(zPos as number)]} >
 					{mesherOutput &&
 						mesherMatrices.map((matrix, index) => {
@@ -84,7 +69,6 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 							);
 						})}
 				</group>
-			</TransformControls>
 		);
 	} else {
 		return <></>;

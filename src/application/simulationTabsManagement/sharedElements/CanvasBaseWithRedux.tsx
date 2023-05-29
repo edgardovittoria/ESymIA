@@ -174,7 +174,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
 }
     ;
 
-const CommonObjectsActions: FC<{selectedProject: Project}> = ({ selectedProject, children }) => {
+export const CommonObjectsActions: FC<{selectedProject: Project}> = ({ selectedProject, children }) => {
     const bounds = useBounds()
     useEffect(() => {
         bounds.refresh().fit()

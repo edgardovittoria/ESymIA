@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {selectedProjectSelector, setMeshGenerated} from "../../../../store/projectSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectedProjectSelector, setMeshGenerated } from "../../../../store/projectSlice";
 import { SimulatorLeftPanelTab } from "./SimulatorLeftPanelTab";
 import { MeshingSolvingInfo } from "./MeshingSolvingInfo";
-import { CanvasBaseWithRedux } from "../../sharedElements/CanvasBaseWithRedux";
+import { CanvasBaseWithRedux, CommonObjectsActions } from "../../sharedElements/CanvasBaseWithRedux";
 import { MeshedElement } from "./MeshedElement/MeshedElement";
 import { ComponentEntity, Material } from "cad-library";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
@@ -13,7 +13,8 @@ import { MesherOutput } from "./MesherInputOutput";
 import { s3 } from "../../../../aws/s3Config";
 import { Project } from "../../../../model/esymiaModels";
 import StatusBar from "../../sharedElements/StatusBar";
-import {getNumberOfCells} from "./MeshedElement/components/MyInstancedMesh";
+import { getNumberOfCells } from "./MeshedElement/components/MyInstancedMesh";
+import { Bounds } from "@react-three/drei";
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;
@@ -56,10 +57,10 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
   useEffect(() => {
     setVoxelsPainted(0)
-    if(mesherOutput){
+    if (mesherOutput) {
       let numberOfCells = getNumberOfCells(mesherOutput)
       let sum = 0
-      numberOfCells.forEach(n => sum = sum+n)
+      numberOfCells.forEach(n => sum = sum + n)
       setVoxelsPainted(sum)
       setTotalVoxels(mesherOutput.n_cells.n_cells_x * mesherOutput.n_cells.n_cells_y * mesherOutput.n_cells.n_cells_z)
     }
@@ -84,14 +85,18 @@ export const Simulator: React.FC<SimulatorProps> = ({
     <>
       <CanvasBaseWithRedux section="Simulator">
         {selectedProject && (
-          <MeshedElement
-            mesherOutput={mesherOutput}
-            selectedProject={selectedProject}
-            selectedMaterials={selectedMaterials}
-          />
+          <Bounds fit clip observe margin={1.2}>
+            <CommonObjectsActions selectedProject={selectedProject}>
+              <MeshedElement
+                mesherOutput={mesherOutput}
+                selectedProject={selectedProject}
+                selectedMaterials={selectedMaterials}
+              />
+            </CommonObjectsActions>
+          </Bounds>
         )}
       </CanvasBaseWithRedux>
-      <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels}/>
+      <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
       <LeftPanel
         tabs={["Modeler", "Simulator"]}
         selectedTab={selectedTabLeftPanel}
@@ -124,8 +129,8 @@ export function getMaterialListFrom(components: ComponentEntity[]) {
   let materialList: Material[] = [];
   components?.forEach((c) => {
     if (
-        c.material?.name &&
-        materialList.filter((m) => m.name === c.material?.name).length === 0
+      c.material?.name &&
+      materialList.filter((m) => m.name === c.material?.name).length === 0
     ) {
       materialList.push(c.material);
     }
