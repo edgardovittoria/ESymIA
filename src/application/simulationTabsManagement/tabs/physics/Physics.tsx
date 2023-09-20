@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from "react";
 import { FactoryShapes, meshFrom, useFaunaQuery } from "cad-library";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -20,7 +21,6 @@ import { PortPosition } from "./portManagement/components/PortPosition";
 import { RLCParamsComponent } from "./portManagement/components/RLCParamsComponent";
 import { ModalSelectPortType } from "./portManagement/ModalSelectPortType";
 import { InputSignal } from "./inputSignal/InputSignal";
-import { useEffect, useRef, useState } from "react";
 import { InputSignalManagement } from "./inputSignal/InputSignalManagement";
 import { LeftPanel } from "../../sharedElements/LeftPanel";
 import { Models } from "../../sharedElements/Models";
@@ -86,8 +86,8 @@ export const Physics: React.FC<PhysicsProps> = ({
 	}, [pointerEvent])
 
 	useEffect(() => {
-		if (selectedProject && savedPortParameters === true) {
-			execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject));
+		if (selectedProject && savedPortParameters) {
+			execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject)).then(() => {})
 		}
 	}, [
 		savedPortParameters,

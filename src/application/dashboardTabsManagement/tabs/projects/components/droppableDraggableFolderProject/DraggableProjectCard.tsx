@@ -58,7 +58,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
     return (
         <>
             <div
-                className="w-[20%] p-[15px] flex flex-col justify-between h-[250px] border-2 border-green-200 mr-6 mt-4 rounded-lg hover:cursor-pointer hover:border-secondaryColor"
+                className="w-[15%] p-[15px] flex flex-col justify-between h-[180px] border-2 border-green-200 mr-6 mt-4 rounded-lg hover:cursor-pointer hover:border-secondaryColor shadow-xl"
                 key={project.name} ref={drag}
                 onClick={() => {
                     if(!project.model.components && project.modelS3){
@@ -67,19 +67,19 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     dispatch(addProjectTab(project))
                 }}
                 style={{opacity: isDragging ? 0.5 : 1}} onContextMenu={handleContextMenu}>
-                <h5 className="text-center" role="Handle" ref={dragPreview}>
-                    {(project.name.length > 11) ? project.name.substr(0, 11) + '...' : project.name}
+                <h5 className="text-center text-base" role="Handle" ref={dragPreview}>
+                    {(project.name.length > 15) ? project.name.substring(0, 15) + '...' : project.name}
                 </h5>
                 <div>
-                    <img className="w-[100%] scale-[2]" alt="project_screenshot"
-                         src={(project.screenshot) ? project.screenshot : "/noResultsIconForProject.png"}
+                    <img className="w-[100%] scale-125" alt="project_screenshot"
+                         src="/noResultsIconForProject.png"
                     />
                 </div>
 
-                <div>
+                {/*<div>
                     <hr className="mb-3"/>
-                    {(project.description.length > 20) ? project.description.substr(0, 20) + '...' : project.description}
-                </div>
+                    {(project.description.length > 20) ? project.description.substring(0, 20) + '...' : project.description}
+                </div>*/}
                 {project.owner.email === user.email &&
                     <Menu id={project.name}>
                         <Submenu label={

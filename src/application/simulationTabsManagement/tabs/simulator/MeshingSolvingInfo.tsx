@@ -1,14 +1,16 @@
-import {ComponentEntity, exportToSTL, Material} from "cad-library";
+import {ComponentEntity, exportToSTL, Material, useFaunaQuery} from "cad-library";
 import React, {useEffect, useState} from "react";
 import {AiOutlineCheckCircle, AiOutlineThunderbolt} from "react-icons/ai";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {setSolverOutput} from "../../../../store/solverSlice";
 import {
-    updateSimulation,
-    setQuantum,
+    deleteSimulation,
     setMesh,
+    setMeshApproved,
     setMeshGenerated,
-    setMeshApproved, unsetMesh, deleteSimulation,
+    setQuantum,
+    unsetMesh,
+    updateSimulation,
 } from "../../../../store/projectSlice";
 import axios from "axios";
 import {MesherOutput} from "./MesherInputOutput";
@@ -17,8 +19,9 @@ import {selectMenuItem} from "../../../../store/tabsAndMenuItemsSlice";
 import {ImSpinner} from "react-icons/im";
 import {Project, Simulation, SolverOutput} from "../../../../model/esymiaModels";
 import {getMaterialListFrom} from "./Simulator";
-import {exportToJsonFileThis} from "../../sharedElements/utilityFunctions";
 import useWebSocket from "react-use-websocket";
+import {updateProjectInFauna} from "../../../../faunadb/projectsFolderAPIs";
+import {convertInFaunaProjectThis} from "../../../../faunadb/apiAuxiliaryFunctions";
 
 
 interface MeshingSolvingInfoProps {
@@ -34,6 +37,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                                                       }) => {
 
     const dispatch = useDispatch();
+    const { execQuery } = useFaunaQuery()
     let quantumDimensions = selectedProject.meshData.quantum;
     let meshApproved = selectedProject.meshData.meshApproved;
     let meshGenerated = selectedProject.meshData.meshGenerated;
@@ -42,6 +46,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     const [convergenceThreshold, setConvergenceThreshold] = useState(0.0001)
     const [frequenciesNumber, setFrequenciesNumber] = useState(0)
 
+    useEffect(() => {
+        if(typeof selectedProject.meshData.mesh === 'string'){
+            execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject)).then(() => {})
+        }
+    }, [selectedProject.meshData.mesh]);
 
     const solverInputFrom = (project: Project, solverIterations: [number, number], convergenceThreshold: number) => {
         let frequencyArray: number[] = [];
@@ -56,7 +65,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 signalsValuesArray.push(sv.signal)
             );
 
-        let dataToSendToSolver = {
+        return {
             mesherOutput: mesherOutput,
             solverInput: {
                 ports: project.ports.filter(p => p.category === 'port'),
@@ -73,7 +82,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 convergenceThreshold: convergenceThreshold
             },
         }
-        return dataToSendToSolver
     }
 
     function generateSTLListFromComponents(
@@ -119,7 +127,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     const [doingIterations, setDoingIterations] = useState(false)
     const [iterations, setIterations] = useState(0)
 
-    useWebSocket(WS_URL, {
+    /*useWebSocket(WS_URL, {
         onOpen: () => {
             console.log('WebSocket connection established.');
         },
@@ -143,7 +151,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         onClose: () => {
             console.log('WebSocket connection closed.')
         }
-    });
+    });*/
 
     useEffect(() => {
         if (meshApproved && !selectedProject.simulation) {
@@ -163,7 +171,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             dispatch(updateSimulation(simulation));
 
             //https://teemaserver.cloud/solving
-            axios.post("http://127.0.0.1:8001/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
+            axios.post("http://127.0.0.1:8002/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
                 dispatch(setSolverOutput(res.data));
                 let simulationUpdated: Simulation = {
                     ...simulation,
@@ -224,11 +232,17 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     ),
                 quantum: quantumDimensions,
             };
-            //ec2 meshing: http://ec2-13-40-215-115.eu-west-2.compute.amazonaws.com/meshing
+            //local meshing: http://127.0.0.1:8003/meshing
             //lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
-            axios.post('https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/', objToSendToMesher).then((res) => {
-                saveMeshToS3((res.data)).then(() => {
-                    //dispatch(setMeshGenerated("Generated"))
+            axios.post('http://127.0.0.1:8003/meshing', objToSendToMesher).then((res) => {
+                if(selectedProject.meshData.mesh){
+                    deleteFileS3(selectedProject.meshData.mesh).then(() => {})
+                }
+                saveMeshToS3((res.data)).then((res) => {
+                    console.log(res)
+                    setTimeout(() => {
+                        dispatch(setMeshGenerated("Generated"))
+                    }, 10000)
                 });
             }).catch((err) => {
                 if (err) {
@@ -394,7 +408,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                     onClick={() => {
                                         dispatch(setMeshGenerated("Generating"));
                                         deleteFileS3(selectedProject.meshData.mesh as string).then(() => {
-                                            //dispatch(unsetMesh())
+                                            dispatch(unsetMesh())
                                         })
                                     }}
                                 >

@@ -178,7 +178,7 @@ const chartsDataOptionsFactory = (
         matrices_Z_RER.push([])
         matrix_Z[i].forEach(m => {
           m.forEach(v => {
-            (matrices_Z_RER[i] as Array<number>).push(v[0]*1000)
+            (matrices_Z_RER[i] as Array<number>).push(v[0]*1e3)
           })
         })
       }
@@ -240,7 +240,7 @@ const chartsDataOptionsFactory = (
         matrix_Z[i].forEach(m => {
           m.forEach((v,index) => {
             (matrices_Z_IM[i] as Array<number>).push(
-                (v[1] / (2 * Math.PI * labelsH[index])) * 1000000000
+                (v[1] / (2 * Math.PI * labelsH[index])) * 1e9
             )
           })
         })

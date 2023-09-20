@@ -21,7 +21,6 @@ export const LeftPanel: React.FC<DashBoardProps> = (
     }
 
     const [selectedIndex, setSelectedIndex] = useState(0)
-    const selectedProject = useSelector(selectedProjectSelector)
 
     useEffect(() => {
         setSelectedIndex(0)

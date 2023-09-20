@@ -104,7 +104,7 @@ const MyFiles: React.FC<MyFilesProps> = (
                                     })}
                                 </div>
                                 {projects.length > 0 && <h5 className="w-[100%] mt-4">Projects</h5>}
-                                <div className={`flex flex-wrap mt-2 overflow-scroll max-h-[380px]`}>
+                                <div className={`flex flex-wrap mt-2 overflow-scroll max-h-[380px] `}>
                                     {projects
                                         .filter((p) => p.owner.userName === user.userName)
                                         .map((project) => {

@@ -99,7 +99,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                             labelColor="white"
                                         />
                                     </GizmoHelper>
-                                    <Screenshot selectedProject={selectedProject} />
+                                    {/*<Screenshot selectedProject={selectedProject} />*/}
                                 </Provider>
                             </Canvas>
                         </div>

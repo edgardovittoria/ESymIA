@@ -6,7 +6,7 @@ import { selectedProjectSelector } from "../../../store/projectSlice"
 
 export const FocusView: FC = ({ children }) => {
     return (
-        <Bounds fit clip observe margin={1.2}>
+        <Bounds fit clip observe margin={1.8}>
             <FocusViewCommonActions>
                 {children}
             </FocusViewCommonActions>
@@ -18,12 +18,12 @@ const FocusViewCommonActions: FC = ({ children }) => {
     const selectedProject = useSelector(selectedProjectSelector)
     const bounds = useBounds()
     useEffect(() => {
-        bounds.refresh().fit()
+        //bounds.refresh().fit()
     }, [selectedProject])
 
     return (
         <group
-            onPointerMissed={(e) => e.button === 0 && bounds.refresh().fit()}
+            //onPointerMissed={(e) => e.button === 0 && bounds.refresh().fit()}
         >
             {children}
         </group>

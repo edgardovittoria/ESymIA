@@ -37,7 +37,6 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
             mesherMatrices.forEach((matrix, index) => {
                 if (mesherOutput && meshRef.current[index] && matrix.length === mesherOutput.n_cells.n_cells_x) {
                     let y = 0;
-                    console.log(matrix.length,mesherOutput.n_cells.n_cells_x)
                     for (let i = 0; i < mesherOutput.n_cells.n_cells_x; i++) {
                         for (let j = 0; j < mesherOutput.n_cells.n_cells_y; j++) {
                             for (let k = 0; k < mesherOutput.n_cells.n_cells_z; k++) {
@@ -73,6 +72,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
             });
         }
     }, [meshGenerated, materialsList, mesherMatrices, mesherOutput]);
+
 
     return (
         <>

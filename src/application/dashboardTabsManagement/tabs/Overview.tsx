@@ -58,13 +58,13 @@ export const Overview: React.FC<OverviewProps> = (
                                     <div className="box">
                                         <div className="flex justify-between">
                                             <div className={`w-7/8 text-[20px] mb-[10px]`}>
-                                                {(project.name.length > 15) ? project.name.substr(0, 15) + '...' : project.name}
+                                                {(project.name.length > 15) ? project.name.substring(0, 15) + '...' : project.name}
                                             </div>
                                             {/*<div className="w-1/8" onMouseOver={() => setCardMenuHovered(!cardMenuHovered)}>
                                                 <ProjectManagementIcons project={project}/>
                                             </div>*/}
                                         </div>
-                                        <h6 className="mb-2 text-gray-500">{project.description.substr(0, 50)}</h6>
+                                        <h6 className="mb-2 text-gray-500">{project.description.substring(0, 50)}</h6>
                                     </div>
                                 </div>
                             )

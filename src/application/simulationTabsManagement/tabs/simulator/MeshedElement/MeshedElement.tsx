@@ -3,6 +3,7 @@ import { Material } from "cad-library";
 import { MesherOutput } from "../MesherInputOutput";
 import { MyInstancedMesh } from "./components/MyInstancedMesh";
 import { Project } from "../../../../../model/esymiaModels";
+import {FocusView} from "../../../sharedElements/FocusView";
 
 interface PanelContentProps {
 	selectedMaterials: string[];
@@ -35,14 +36,10 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 					if (entries) selectedEntries = [...selectedEntries, ...entries.filter(e => e[0] === sm)]
 					materials = [...materials, ...materialsList.filter(m => m.name === sm)]
 				})
-
-
 				selectedEntries.forEach(e => matrices.push(e[1]))
 				materials.forEach(m => finalMaterialList.push(m))
-
 				setModelMaterials(finalMaterialList)
 				setMesherMatrices(matrices)
-
 			}
 		}
 	}, [mesherOutput, meshGenerated, selectedMaterials]);
@@ -54,6 +51,7 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 
 	if (meshGenerated === "Generated") {
 		return (
+			<FocusView>
 				<group position={[-(xPos as number), -(yPos as number), -(zPos as number)]} >
 					{mesherOutput &&
 						mesherMatrices.map((matrix, index) => {
@@ -69,6 +67,7 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 							);
 						})}
 				</group>
+			</FocusView>
 		);
 	} else {
 		return <></>;
