@@ -49,10 +49,10 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 	const zPos = (mesherOutput) && (mesherOutput.cell_size.cell_size_z * 1000 * mesherOutput.n_cells.n_cells_z) / 2
 
 
-	if (meshGenerated === "Generated") {
+	if (meshGenerated === "Generated" && mesherOutput) {
 		console.log(mesherOutput)
 		return (
-			<Bounds fit clip observe margin={mesherOutput && (mesherOutput.cell_size.cell_size_x*9000)}>
+			<Bounds fit clip observe margin={mesherOutput.cell_size.cell_size_x*9000}>
 				<group position={[-(xPos as number), -(yPos as number), -(zPos as number)]} > */
 					{mesherOutput &&
 						mesherMatrices.map((matrix, index) => {
