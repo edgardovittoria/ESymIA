@@ -3,7 +3,7 @@ import { Material } from "cad-library";
 import { MesherOutput } from "../MesherInputOutput";
 import { MyInstancedMesh } from "./components/MyInstancedMesh";
 import { Project } from "../../../../../model/esymiaModels";
-import {FocusView} from "../../../sharedElements/FocusView";
+import { Bounds } from "@react-three/drei";
 
 interface PanelContentProps {
 	selectedMaterials: string[];
@@ -17,14 +17,14 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 	mesherOutput,
 }) => {
 	let meshGenerated = selectedProject.meshData.meshGenerated;
-    let materialsList = selectedProject.model?.components.map(c => c.material as Material) as Material[]
+	let materialsList = selectedProject.model?.components.map(c => c.material as Material) as Material[]
 
 	const [mesherMatrices, setMesherMatrices] = useState<boolean[][][][]>([]);
 	const [modelMaterials, setModelMaterials] = useState<Material[]>([]);
 
 
 	useEffect(() => {
-		if(meshGenerated === "Generated"){
+		if (meshGenerated === "Generated") {
 			let matrices: boolean[][][][] = []
 			let entries = (mesherOutput) && Object.entries(mesherOutput.mesher_matrices)
 			let selectedEntries: [string, any][] = []
@@ -44,15 +44,16 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 		}
 	}, [mesherOutput, meshGenerated, selectedMaterials]);
 
-	const xPos = (mesherOutput) && (mesherOutput.cell_size.cell_size_x*1000*mesherOutput.n_cells.n_cells_x)/2
-	const yPos = (mesherOutput) && (mesherOutput.cell_size.cell_size_y*1000*mesherOutput.n_cells.n_cells_y)/2
-	const zPos = (mesherOutput) && (mesherOutput.cell_size.cell_size_z*1000*mesherOutput.n_cells.n_cells_z)/2
+	const xPos = (mesherOutput) && (mesherOutput.cell_size.cell_size_x * 1000 * mesherOutput.n_cells.n_cells_x) / 2
+	const yPos = (mesherOutput) && (mesherOutput.cell_size.cell_size_y * 1000 * mesherOutput.n_cells.n_cells_y) / 2
+	const zPos = (mesherOutput) && (mesherOutput.cell_size.cell_size_z * 1000 * mesherOutput.n_cells.n_cells_z) / 2
 
 
 	if (meshGenerated === "Generated") {
+		console.log(mesherOutput)
 		return (
-			<FocusView>
-				<group position={[-(xPos as number), -(yPos as number), -(zPos as number)]} >
+			<Bounds fit clip observe margin={mesherOutput && (mesherOutput.cell_size.cell_size_x*9000)}>
+				<group position={[-(xPos as number), -(yPos as number), -(zPos as number)]} > */
 					{mesherOutput &&
 						mesherMatrices.map((matrix, index) => {
 							return (
@@ -67,9 +68,9 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
 							);
 						})}
 				</group>
-			</FocusView>
+			</Bounds>
 		);
 	} else {
-		return <></>;
-	}
+	return <></>;
+}
 };
