@@ -37,7 +37,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                                                       }) => {
 
     const dispatch = useDispatch();
-    const { execQuery } = useFaunaQuery()
+    const {execQuery} = useFaunaQuery()
     let quantumDimensions = selectedProject.meshData.quantum;
     let meshApproved = selectedProject.meshData.meshApproved;
     let meshGenerated = selectedProject.meshData.meshGenerated;
@@ -47,8 +47,9 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     const [frequenciesNumber, setFrequenciesNumber] = useState(0)
 
     useEffect(() => {
-        if(typeof selectedProject.meshData.mesh === 'string'){
-            execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject)).then(() => {})
+        if (typeof selectedProject.meshData.mesh === 'string') {
+            execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject)).then(() => {
+            })
         }
     }, [selectedProject.meshData.mesh]);
 
@@ -235,14 +236,22 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             //local meshing: http://127.0.0.1:8003/meshing
             //lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
             axios.post('http://127.0.0.1:8003/meshing', objToSendToMesher).then((res) => {
-                if(selectedProject.meshData.mesh){
-                    deleteFileS3(selectedProject.meshData.mesh).then(() => {})
+                let grids: any[] = []
+                for (let value of Object.values(res.data.mesher_matrices)) {
+                    grids.push(value);
+                }
+                let grids_external = create_Grids_externals(grids)
+                let data = {...res.data.mesher_matrices}
+                Object.keys(res.data.mesher_matrices).forEach((k, index) => {
+                    data[k] = grids_external[index]
+                })
+                res.data.externalGrids = data
+                if (selectedProject.meshData.mesh) {
+                    deleteFileS3(selectedProject.meshData.mesh).then(() => {
+                    })
                 }
                 saveMeshToS3((res.data)).then((res) => {
-                    console.log(res)
-                    setTimeout(() => {
-                        dispatch(setMeshGenerated("Generated"))
-                    }, 10000)
+                    dispatch(setMeshGenerated("Generated"))
                 });
             }).catch((err) => {
                 if (err) {
@@ -523,3 +532,78 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         </>
     );
 };
+
+export interface Brick {
+    x: number,
+    y: number,
+    z: number
+}
+
+function create_Grids_externals(grids: any) {
+    let boxes: { nx: number, ny: number, nz: number }[] = []
+    let num_grids = grids.length;
+    let OUTPUTgrids: (Brick[])[] = []
+
+    for (let k = 0; k < num_grids; k++) {
+        boxes.push({
+            nx: grids[k].length,
+            ny: grids[k][0].length,
+            nz: grids[k][0][0].length
+        })
+
+        OUTPUTgrids.push([])
+    }
+
+    boxes.forEach((box, k) => {
+        console.log(box)
+        for (let cont2 = 0; cont2 < box.ny; cont2++) {
+            for (let cont3 = 0; cont3 < box.nz; cont3++) {
+                if (grids[k][0][cont2][cont3]) {
+                    OUTPUTgrids[k].push({x: 0, y: cont2, z: cont3} as Brick)
+                }
+            }
+        }
+        for (let cont2 = 0; cont2 < box.ny; cont2++) {
+            for (let cont3 = 0; cont3 < box.nz; cont3++) {
+                if (grids[k][box.nx - 1][cont2][cont3]) {
+                    OUTPUTgrids[k].push({x: box.nx - 1, y: cont2, z: cont3} as Brick)
+                }
+            }
+        }
+
+        for (let cont = 1; cont < box.nx - 1; cont++) {
+            for (let cont3 = 0; cont3 < box.nz; cont3++) {
+                if (grids[k][cont][0][cont3]) {
+                    OUTPUTgrids[k].push({x: cont, y: 0, z: cont3} as Brick)
+                }
+            }
+        }
+
+        for (let cont = 1; cont < box.nx - 1; cont++) {
+            for (let cont3 = 0; cont3 < box.nz; cont3++) {
+                if (grids[k][cont][box.ny - 1][cont3]) {
+                    OUTPUTgrids[k].push({x: cont, y: box.ny - 1, z: cont3} as Brick)
+                }
+            }
+        }
+
+        for (let cont = 1; cont < box.nx - 1; cont++) {
+            for (let cont2 = 1; cont2 < box.ny - 1; cont2++) {
+                if (grids[k][cont][cont2][0]) {
+                    OUTPUTgrids[k].push({x: cont, y: cont2, z: 0} as Brick)
+                }
+            }
+        }
+
+        for (let cont = 1; cont < box.nx - 1; cont++) {
+            for (let cont2 = 1; cont2 < box.ny - 1; cont2++) {
+                if (grids[k][cont][cont2][box.nz - 1]) {
+                    OUTPUTgrids[k].push({x: cont, y: cont2, z: box.nz - 1} as Brick)
+                }
+            }
+        }
+    })
+
+
+    return OUTPUTgrids;
+}

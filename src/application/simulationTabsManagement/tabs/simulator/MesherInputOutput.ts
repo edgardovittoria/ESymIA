@@ -1,3 +1,5 @@
+import {Brick} from "./MeshingSolvingInfo";
+
 export type MesherOutput = {
     n_materials: number,
     materials: Map<number, string>,
@@ -5,7 +7,10 @@ export type MesherOutput = {
     cell_size: CellSize,
     n_cells: NCells
     mesher_matrices: Map<string, boolean[][][]>
+    externalGrids: Map<string, Brick[]>
 }
+
+
 
 type Origin = {
     origin_x: number,

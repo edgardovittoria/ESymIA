@@ -36,6 +36,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
     useEffect(() => {
         if (selectedProject?.meshData.mesh) {
+            setMesherOutput(undefined)
             s3.getObject(
                 {
                     Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
@@ -57,10 +58,10 @@ export const Simulator: React.FC<SimulatorProps> = ({
     useEffect(() => {
         setVoxelsPainted(0)
         if (mesherOutput) {
-            let numberOfCells = getNumberOfCells(mesherOutput)
-            let sum = 0
-            numberOfCells.forEach(n => sum = sum + n)
-            setVoxelsPainted(sum)
+            let numberOfCells = Object.values(mesherOutput.externalGrids).reduce((prev, current) => {
+                return prev + current.length
+            }, 0)
+            setVoxelsPainted(numberOfCells)
             setTotalVoxels(mesherOutput.n_cells.n_cells_x * mesherOutput.n_cells.n_cells_y * mesherOutput.n_cells.n_cells_z)
         }
     }, [mesherOutput])
@@ -71,6 +72,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
         allMaterials = getMaterialListFrom(
             selectedProject?.model.components as ComponentEntity[]
         );
+
         materialsNames = [allMaterials[0].name];
         allMaterials.forEach((m) => {
             if (materialsNames.filter((mat) => mat !== m.name).length > 0)

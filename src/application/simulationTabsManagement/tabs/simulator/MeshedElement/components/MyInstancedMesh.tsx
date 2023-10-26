@@ -1,23 +1,20 @@
 import React, {useEffect, useRef} from "react";
-import {InstancedMesh, Object3D} from "three";
+import {FrontSide, InstancedMesh, Object3D} from "three";
 import {Material} from "cad-library";
 import {MesherOutput} from "../../MesherInputOutput";
 import {Project} from "../../../../../../model/esymiaModels";
 import {useSelector} from "react-redux";
 import {meshGeneratedSelector} from "../../../../../../store/projectSlice";
+import {Brick} from "../../MeshingSolvingInfo";
 
 
 interface InstancedMeshProps {
-    selectedProject: Project;
-    mesherMatrices: boolean[][][][];
     index: number;
     materialsList: Material[];
-    mesherOutput?: MesherOutput;
+    mesherOutput: MesherOutput;
 }
 
 export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
-                                                                  selectedProject,
-                                                                  mesherMatrices,
                                                                   index,
                                                                   materialsList,
                                                                   mesherOutput,
@@ -28,50 +25,48 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
     const edgeRef = useRef<InstancedMesh[]>([])
 
 
-
     let numberOfCells = getNumberOfCells(mesherOutput);
 
     useEffect(() => {
-        if(meshGenerated === "Generated"){
+        if (meshGenerated === "Generated") {
             let tempObject = new Object3D();
-            mesherMatrices.forEach((matrix, index) => {
-                if (mesherOutput && meshRef.current[index] && matrix.length === mesherOutput.n_cells.n_cells_x) {
+            Object.values(mesherOutput?.externalGrids).forEach((matrix:Brick[], index) => {
+                console.log(matrix)
+                if (mesherOutput && meshRef.current[index]) {
                     let y = 0;
-                    for (let i = 0; i < mesherOutput.n_cells.n_cells_x; i++) {
-                        for (let j = 0; j < mesherOutput.n_cells.n_cells_y; j++) {
-                            for (let k = 0; k < mesherOutput.n_cells.n_cells_z; k++) {
-                                if (matrix[i][j][k]) {
-                                    const id = y++;
-                                    tempObject.position.set(
-                                        i !== 0
-                                            ? ((i - 1) * mesherOutput.cell_size.cell_size_x +
-                                                mesherOutput.cell_size.cell_size_x) *
-                                            1020
-                                            : mesherOutput.origin.origin_x,
-                                        j !== 0
-                                            ? ((j - 1) * mesherOutput.cell_size.cell_size_y +
-                                                mesherOutput.cell_size.cell_size_y) *
-                                            1020
-                                            : mesherOutput.origin.origin_y,
-                                        k !== 0
-                                            ? ((k - 1) * mesherOutput.cell_size.cell_size_z +
-                                                mesherOutput.cell_size.cell_size_z) *
-                                            1020
-                                            : mesherOutput.origin.origin_z
-                                    );
-                                    tempObject.updateMatrix();
-                                    meshRef.current[index].setMatrixAt(id, tempObject.matrix);
-                                    edgeRef.current[index].setMatrixAt(id, tempObject.matrix);
-                                }
-                            }
-                        }
-                    }
+                    matrix.forEach(m => {
+
+                        const id = y++;
+                        tempObject.position.set(
+                            m.x !== 0
+                                ? ((m.x - 1) * mesherOutput.cell_size.cell_size_x +
+                                    mesherOutput.cell_size.cell_size_x) *
+                                1020
+                                : mesherOutput.origin.origin_x,
+                            m.y !== 0
+                                ? ((m.y - 1) * mesherOutput.cell_size.cell_size_y +
+                                    mesherOutput.cell_size.cell_size_y) *
+                                1020
+                                : mesherOutput.origin.origin_y,
+                            m.z !== 0
+                                ? ((m.z - 1) * mesherOutput.cell_size.cell_size_z +
+                                    mesherOutput.cell_size.cell_size_z) *
+                                1020
+                                : mesherOutput.origin.origin_z
+                        );
+                        tempObject.updateMatrix();
+                        meshRef.current[index].setMatrixAt(id, tempObject.matrix);
+                        edgeRef.current[index].setMatrixAt(id, tempObject.matrix);
+
+
+                    })
+
                     meshRef.current[index].instanceMatrix.needsUpdate = true;
                     edgeRef.current[index].instanceMatrix.needsUpdate = true;
                 }
             });
         }
-    }, [meshGenerated, materialsList, mesherMatrices, mesherOutput]);
+    }, [meshGenerated, materialsList, mesherOutput]);
 
 
     return (
@@ -83,20 +78,21 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                     }
                 }}
                 key={index}
-                args={[null as any, null as any, numberOfCells[index]]}>
+                args={[null as any, null as any, Object.values(mesherOutput.externalGrids)[index].length]}>
                 <boxGeometry
                     args={
                         [
 
-                                (mesherOutput?.cell_size.cell_size_x as number) * 1000,
-                                (mesherOutput?.cell_size.cell_size_y as number) * 1000,
-                                (mesherOutput?.cell_size.cell_size_z as number) * 1000,
+                            (mesherOutput?.cell_size.cell_size_x as number) * 1000,
+                            (mesherOutput?.cell_size.cell_size_y as number) * 1000,
+                            (mesherOutput?.cell_size.cell_size_z as number) * 1000,
 
                         ]
                     }
                 />
                 <meshPhongMaterial
                     color={materialsList[index] && materialsList[index].color}
+                    side={FrontSide}
                 />
             </instancedMesh>
             <instancedMesh
@@ -106,14 +102,14 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                     }
                 }}
                 key={index + 1}
-                args={[null as any, null as any, numberOfCells[index]]}>
+                args={[null as any, null as any, Object.values(mesherOutput.externalGrids)[index].length]}>
                 <boxBufferGeometry
                     args={
                         [
 
-                                (mesherOutput?.cell_size.cell_size_x as number) * 1000,
-                                (mesherOutput?.cell_size.cell_size_y as number) * 1000,
-                                (mesherOutput?.cell_size.cell_size_z as number) * 1000,
+                            (mesherOutput?.cell_size.cell_size_x as number) * 1000,
+                            (mesherOutput?.cell_size.cell_size_y as number) * 1000,
+                            (mesherOutput?.cell_size.cell_size_z as number) * 1000,
 
                         ]
                     }
@@ -127,8 +123,8 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
 };
 
 export function getNumberOfCells(output: MesherOutput | undefined) {
-    let numberOfCells: number[] = [];
-    let matrices: boolean[][][][] = [];
+    let numberOfCells
+    /*let matrices: (Brick[])[] = [];
     if (output) {
         Object.values(output.mesher_matrices).forEach((matrix) => {
             matrices.push(matrix);
@@ -146,6 +142,6 @@ export function getNumberOfCells(output: MesherOutput | undefined) {
             });
             numberOfCells.push(cells);
         });
-    }
-    return numberOfCells;
+    }*/
+    //return numberOfCells;
 }
