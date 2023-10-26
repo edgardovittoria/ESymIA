@@ -540,13 +540,19 @@ export interface Brick {
 }
 
 function create_Grids_externals(grids: any[]) {
-    let num_grids = grids.length;
     let OUTPUTgrids: (Brick[])[] = []
 
-    const brickIsOnASurface = (brickMaterialIndex: number, brickPosition: { x: number, y: number, z: number }, totalMatrix: boolean[][][][]): boolean => {
-        let Nx = totalMatrix[0].length
-        let Ny = totalMatrix[0][0].length
-        let Nz = totalMatrix[0][0][0].length
+    const isOnASurfaceTheBrickInThisPosition = (brickPosition: { x: number, y: number, z: number }, totalMatrix: boolean[][][][]): boolean => {
+
+        const brickTouchesTheMainBoundingBox = (): boolean => {
+            let Nx = totalMatrix[0].length
+            let Ny = totalMatrix[0][0].length
+            let Nz = totalMatrix[0][0][0].length
+            if (brickPosition.x == 0 || brickPosition.x == Nx - 1 || brickPosition.y == 0 || brickPosition.y == Ny - 1 || brickPosition.z == 0 || brickPosition.z == Nz - 1) {
+                return true
+            }
+            return false
+        }
         const brickHasAdjacentBricksInThisPosition = (position: { x: number, y: number, z: number }): boolean => {
             for (let material = 0; material < totalMatrix.length; material++) {
                 if (totalMatrix[material][position.x][position.y][position.z]) { return true }
@@ -555,9 +561,8 @@ function create_Grids_externals(grids: any[]) {
         }
 
         //condizione in cui il brick si trova già su una delle superfici estreme del modello, nel qual caso non servono altri controlli.
-        if (brickPosition.x == 0 || brickPosition.x == Nx - 1 || brickPosition.y == 0 || brickPosition.y == Ny - 1 || brickPosition.z == 0 || brickPosition.z == Nz - 1) {
-            return true
-        }
+        if(brickTouchesTheMainBoundingBox()) return true
+        
         //condizioni che verificano se le singole facce del brick sono libere. Ne basta almeno una libera.
         if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x - 1, y: brickPosition.y, z: brickPosition.z })) return true
         if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x + 1, y: brickPosition.y, z: brickPosition.z })) return true
@@ -565,17 +570,18 @@ function create_Grids_externals(grids: any[]) {
         if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x, y: brickPosition.y + 1, z: brickPosition.z })) return true
         if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x, y: brickPosition.y, z: brickPosition.z - 1 })) return true
         if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x, y: brickPosition.y, z: brickPosition.z + 1 })) return true
-        
+
         // Se non ci sono facce libere il brick è intermente coperto da altri.
         return false
     }
 
-    for (let material = 0; material < num_grids; material++) {
+    for (let material = 0; material < grids.length; material++) {
         OUTPUTgrids.push([])
         for (let cont1 = 0; cont1 < grids[0].length; cont1++) {
             for (let cont2 = 0; cont2 < grids[0][0].length; cont2++) {
                 for (let cont3 = 0; cont3 < grids[0][0][0].length; cont3++) {
-                    if (grids[material][cont1][cont2][cont3] && brickIsOnASurface(material, { x: cont1, y: cont2, z: cont3 }, grids)) {
+                    // se il brick esiste e si affaccia su una superficie, lo aggiungiamo alla griglia
+                    if (grids[material][cont1][cont2][cont3] && isOnASurfaceTheBrickInThisPosition({ x: cont1, y: cont2, z: cont3 }, grids)) {
                         OUTPUTgrids[material].push({ x: cont1, y: cont2, z: cont3 } as Brick)
                     }
                 }
