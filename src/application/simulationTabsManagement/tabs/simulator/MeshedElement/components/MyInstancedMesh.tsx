@@ -31,7 +31,6 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
         if (meshGenerated === "Generated") {
             let tempObject = new Object3D();
             Object.values(mesherOutput?.externalGrids).forEach((matrix:Brick[], index) => {
-                console.log(matrix)
                 if (mesherOutput && meshRef.current[index]) {
                     let y = 0;
                     matrix.forEach(m => {
