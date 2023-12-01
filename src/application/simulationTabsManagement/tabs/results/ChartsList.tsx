@@ -88,13 +88,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
             chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
         )
     )
-  }, [chartsOrderedIDs, selectedProject])
-
-  useEffect(() => {
-    setChartsDataToVisualize(chartsOrderedIDs.map((id) =>
-        chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
-    ))
-  }, [selectedLabel, selectedProject])
+  }, [chartsOrderedIDs, selectedProject, selectedLabel])
 
 
   const optionsWithScaleMode = (options: any, scaleMode: string) => {

@@ -7,7 +7,7 @@ import {
   selectPort, setMeshApproved,
 } from "../../../../store/projectSlice";
 import { ChartVisualizationMode } from "./ChartVisualizationMode";
-import {ChartsList, pairs} from "./ChartsList";
+import {ChartsList} from "./ChartsList";
 import { ResultsLeftPanelTab } from "./ResultsLeftPanelTab";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
@@ -80,7 +80,6 @@ export const Results: React.FC<ResultsProps> = ({
       </div>
       <div className="w-[78%]">
         {selectedProject && selectedProject.simulation ? (
-          chartVisualizationMode === "full" ? (
             <>
               {selectedTabLeftPanel === "Results" && (
                 <ChartVisualizationMode
@@ -93,7 +92,7 @@ export const Results: React.FC<ResultsProps> = ({
                   setSelectedLabel={setSelectedLabel}
                 />
               )}
-              <div className="overflow-scroll grid grid-cols-1 gap-4 max-h-[800px]">
+              <div className={chartVisualizationMode === "full" ? "overflow-scroll grid grid-cols-1 gap-4 max-h-[800px]": "grid grid-cols-2 gap-4 overflow-scroll max-h-[800px]"}>
                 <ChartsList
                   scaleMode={chartsScaleMode}
                   graphToVisualize={graphToVisualize}
@@ -101,28 +100,6 @@ export const Results: React.FC<ResultsProps> = ({
                 />
               </div>
             </>
-          ) : (
-            <>
-              {selectedTabLeftPanel === "Results" && (
-                <ChartVisualizationMode
-                  chartVisualizationMode={chartVisualizationMode}
-                  setChartVisualizationMode={setChartVisualizationMode}
-                  chartsScaleMode={chartsScaleMode}
-                  setChartsScaleMode={setChartsScaleMode}
-                  setGraphToVisualize={setGraphToVisualize}
-                  selectedLabel={selectedLabel}
-                  setSelectedLabel={setSelectedLabel}
-                />
-              )}
-              <div className="grid grid-cols-2 gap-4 overflow-scroll max-h-[800px]">
-                <ChartsList
-                  scaleMode={chartsScaleMode}
-                  graphToVisualize={graphToVisualize}
-                  selectedLabel={selectedLabel}
-                />
-              </div>
-            </>
-          )
         ) : (
           <div className="w-full text-center mt-80">
             Launch a simulation and come back here to visulize the results.
