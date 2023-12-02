@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -29,7 +29,7 @@ ChartJS.register(
 interface ChartsListProps {
   scaleMode: string;
   graphToVisualize: "All Graph" | "Z" | "S" | "Y";
-  selectedLabel: { label:string, id:number }[]
+  selectedLabel: { label: string, id: number }[]
 }
 
 interface Dataset {
@@ -64,29 +64,29 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     "S_dB",
   ])
   const [chartsDataOptionsList, setChartsDataOptionsList] = useState(chartsOrderedIDs.map((id) =>
-      chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+    chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
   ))
   const [chartsDataToVisualize, setChartsDataToVisualize] = useState(chartsDataOptionsList)
   useEffect(() => {
-    if(graphToVisualize === "All Graph"){
+    if (graphToVisualize === "All Graph") {
       setChartsOrderedIDs(["R", "L", "Z_Module", "Z_Phase", "G", "C", "Y_Module", "Y_Phase", "S_Module", "S_Phase", "S_dB",])
     }
-    if(graphToVisualize === "Z"){
+    if (graphToVisualize === "Z") {
       setChartsOrderedIDs(["R", "L", "Z_Module", "Z_Phase"])
     }
-    if(graphToVisualize === "Y"){
+    if (graphToVisualize === "Y") {
       setChartsOrderedIDs(["G", "C", "Y_Module", "Y_Phase"])
     }
-    if(graphToVisualize === "S"){
+    if (graphToVisualize === "S") {
       setChartsOrderedIDs(["S_Module", "S_Phase", "S_dB"])
     }
   }, [graphToVisualize, selectedProject])
 
   useEffect(() => {
     setChartsDataToVisualize(
-        chartsOrderedIDs.map((id) =>
-            chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
-        )
+      chartsOrderedIDs.map((id) =>
+        chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+      )
     )
   }, [chartsOrderedIDs, selectedProject, selectedLabel])
 
@@ -122,13 +122,13 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   return (
     <>
       {chartsDataToVisualize.map((chartData, index) => {
-        return(
-            <div className="box w-[100%]" key={index}>
-              <Line
-                  options={optionsWithScaleMode(chartData.options, scaleMode)}
-                  data={chartData.data}
-              />
-            </div>
+        return (
+          <div className="box w-[100%]" key={index}>
+            <Line
+              options={optionsWithScaleMode(chartData.options, scaleMode)}
+              data={chartData.data}
+            />
+          </div>
         )
       })}
     </>
@@ -138,12 +138,12 @@ export const ChartsList: React.FC<ChartsListProps> = ({
 const chartsDataOptionsFactory = (
   simulation: Simulation,
   project: Project | undefined,
-  label: string, 
+  label: string,
   matrix_Z: any[][][][],
   matrix_Y: any[][][][],
   matrix_S: any[][][][],
   ports: Port[],
-  selectedLabel: { label:string, id:number }[]
+  selectedLabel: { label: string, id: number }[]
 ) => {
   const colorArray = [
     "red",
@@ -155,718 +155,114 @@ const chartsDataOptionsFactory = (
     "pink",
   ];
   let result: { data: { datasets: Dataset[]; labels: number[] }; options: {} } =
-    {
-      data: { datasets: [], labels: [] },
-      options: {},
+  {
+    data: { datasets: [], labels: [] },
+    options: {},
+  };
+
+  const computeGraphResults = (unit: string, ports:Port[], matrix: any[][][][], getGraphFormulaResult: (index: number, v:any[], innerLabels:number[]) => number) => {
+    const labels = pairs(ports.map(p => p.name))
+    let innerLabels = (project && project.signal) ? project.signal.signalValues.map(sv => sv.freq) : [];
+    let matrices: number[][] = [];
+    for (let i = 0; i < ports.length * ports.length; i++) {
+      matrices.push([])
+      matrix[i].forEach(m => {
+        m.forEach((v, index) => {
+          (matrices[i] as Array<number>).push(getGraphFormulaResult(index,v, innerLabels))
+        })
+      })
+    }
+    const datasets = matrices.reduce((dats, m, index) => {
+      if (selectedLabel.filter(l => l.label === "All Ports").length > 0) {
+        dats.push({
+          label: `${labels[index][0]} - ${labels[index][1]}`,
+          data: m,
+          borderColor: colorArray[index],
+          backgroundColor: "white",
+        });
+      } else {
+        selectedLabel.forEach((l) => {
+          if (index === l.id) {
+            dats.push({
+              label: l.label,
+              data: m,
+              borderColor: colorArray[index],
+              backgroundColor: "white",
+            });
+          }
+        })
+      }
+      return dats
+    },[] as Dataset[]);
+
+    let options = {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top" as const
+        },
+        title: {
+          display: true,
+          text: `${simulation.name} - ${unit}`,
+        },
+      },
+      layout: {
+        padding: {
+          right: 20,
+        },
+      },
     };
-  let portNumber: number = ports.length
-  const labels = pairs(ports.map(p => p.name))
+    result.data = {
+      labels: innerLabels,
+      datasets: datasets,
+    };
+    result.options = options;
+    return result
+  }
   switch (label) {
     case "R":
-      // let matrix_Z_ModuleR: any = eval(simulation.results.matrix_Z);
-      let labelsR: number[] = [];
-      project?.signal?.signalValues.forEach((sv) => labelsR.push(sv.freq));
-      const datasetsR: Dataset[] = [];
-      let matrices_Z_RER: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_Z_RER.push([])
-        matrix_Z[i].forEach(m => {
-          m.forEach(v => {
-            (matrices_Z_RER[i] as Array<number>).push(v[0]*1e3)
-          })
-        })
-      }
-      matrices_Z_RER.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsR.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsR.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      let optionsR = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - R(mOhm)` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataR = {
-        labels: labelsR,
-        datasets: datasetsR,
-      };
-      result.data = dataR;
-      result.options = optionsR;
+      result = computeGraphResults('R(mOhm)', ports, matrix_Z, (index,v,innerLabels) => v[0] * 1e3)
       break;
     case "L":
-      // let matrix_ZH: any = eval(simulation.results.matrix_Z);
-      let labelsH: number[] = [];
-      project?.signal?.signalValues.forEach((sv) => labelsH.push(sv.freq));
-      const datasetsH: Dataset[] = [];
-      let matrices_Z_IM: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_Z_IM.push([])
-        matrix_Z[i].forEach(m => {
-          m.forEach((v,index) => {
-            (matrices_Z_IM[i] as Array<number>).push(
-                (v[1] / (2 * Math.PI * labelsH[index])) * 1e9
-            )
-          })
-        })
-      }
-      matrices_Z_IM.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsH.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsH.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-      const optionsH = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - L(nH)` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataH = {
-        labels: labelsH,
-        datasets: datasetsH,
-      };
-      result.data = dataH;
-      result.options = optionsH;
+      result = computeGraphResults('L(nH)', ports, matrix_Z, (index,v, innerLabels) => (v[1] / (2 * Math.PI * innerLabels[index])) * 1e9)
       break;
     case "Z_Module":
-      // let matrix_Z_Module: any = eval(simulation.results.matrix_Z);
-      let labelsZModule: number[] = [];
-      project?.signal?.signalValues.forEach((sv) =>
-        labelsZModule.push(sv.freq)
-      );
-      const datasetsZModule: Dataset[] = [];
-      let matrices_Z_Module_RE: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_Z_Module_RE.push([])
-        matrix_Z[i].forEach(m => {
-          m.forEach((v) => {
-            (matrices_Z_Module_RE[i] as Array<number>).push(
-                Math.sqrt(v[0] * v[0] + v[1] * v[1])
-            )
-          })
-        })
-      }
-      matrices_Z_Module_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsZModule.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsZModule.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      const optionsZModule = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - Z Module` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataZModule = {
-        labels: labelsZModule,
-        datasets: datasetsZModule,
-      };
-      result.data = dataZModule;
-      result.options = optionsZModule;
+      result = computeGraphResults('Z Module', ports, matrix_Z, (index,v, innerLabels) => Math.sqrt(v[0] * v[0] + v[1] * v[1]))
       break;
     case "Z_Phase":
-      // let matrix_Z_Phase: any = eval(simulation.results.matrix_Z);
-      let labelsZPhase: number[] = [];
-      project?.signal?.signalValues.forEach((sv) => labelsZPhase.push(sv.freq));
-      const datasetsZPhase: Dataset[] = [];
-      let matrices_Z_Phase_RE: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_Z_Phase_RE.push([])
-        matrix_Z[i].forEach(m => {
-          m.forEach((v) => {
-            (matrices_Z_Phase_RE[i] as Array<number>).push(
-                Math.atan2(v[1], v[0])
-            )
-          })
-        })
-      }
-      matrices_Z_Phase_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsZPhase.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsZPhase.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      const optionsZPhase = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - Z Phase` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataZPhase = {
-        labels: labelsZPhase,
-        datasets: datasetsZPhase,
-      };
-      result.data = dataZPhase;
-      result.options = optionsZPhase;
+      result = computeGraphResults('Z Phase', ports, matrix_Z, (index,v,innerLabels) => Math.atan2(v[1], v[0]))
       break;
     case "G":
-      // let matrix_YG: any = eval(simulation.results.matrix_Y);
-      let labelsG: number[] = [];
-      project?.signal?.signalValues.forEach((sv) => labelsG.push(sv.freq));
-      const datasetsG: Dataset[] = [];
-      let matrices_YG_RE: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_YG_RE.push([])
-        matrix_Y[i].forEach(m => {
-          m.forEach((v) => {
-            (matrices_YG_RE[i] as Array<number>).push(
-                v[0]
-            )
-          })
-        })
-      }
-      matrices_YG_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsG.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsG.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      const optionsG = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - G(S)` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataG = {
-        labels: labelsG,
-        datasets: datasetsG,
-      };
-      result.data = dataG;
-      result.options = optionsG;
+      result = computeGraphResults('G(S)', ports, matrix_Y, (index,v,innerLabels) => v[0])
       break;
     case "C":
-      // let matrix_YC: any = eval(simulation.results.matrix_Y);
-      let labelsC: number[] = [];
-      project?.signal?.signalValues.forEach((sv) => labelsC.push(sv.freq));
-      const datasetsC: Dataset[] = [];
-      let matrices_YC_RE: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_YC_RE.push([])
-        matrix_Y[i].forEach(m => {
-          m.forEach((v, index) => {
-            (matrices_YC_RE[i] as Array<number>).push(
-                v[1] / (2 * Math.PI * labelsC[index])
-            )
-          })
-        })
-      }
-      matrices_YC_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsC.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsC.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      const optionsC = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - C(F)` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataC = {
-        labels: labelsC,
-        datasets: datasetsC,
-      };
-      result.data = dataC;
-      result.options = optionsC;
+      result = computeGraphResults('C(F)', ports, matrix_Y, (index,v,innerLabels) => v[1] / (2 * Math.PI * innerLabels[index]))
       break;
     case "Y_Module":
-      // let matrix_Y_Module: any = eval(simulation.results.matrix_Y);
-      let labelsYModule: number[] = [];
-      project?.signal?.signalValues.forEach((sv) =>
-        labelsYModule.push(sv.freq)
-      );
-      const datasetsYModule: Dataset[] = [];
-      let matrices_Y_Module_RE: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_Y_Module_RE.push([])
-        matrix_Y[i].forEach(m => {
-          m.forEach((v) => {
-            (matrices_Y_Module_RE[i] as Array<number>).push(
-                Math.sqrt(v[0] * v[0] + v[1] * v[1])
-            )
-          })
-        })
-      }
-      matrices_Y_Module_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsYModule.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsYModule.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      const optionsYModule = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - Y Module` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataYModule = {
-        labels: labelsYModule,
-        datasets: datasetsYModule,
-      };
-      result.data = dataYModule;
-      result.options = optionsYModule;
+      result = computeGraphResults('Y Module', ports, matrix_Y, (index,v,innerLabels) => Math.sqrt(v[0] * v[0] + v[1] * v[1]))
       break;
     case "Y_Phase":
-      // let matrix_Y_Phase: any = eval(simulation.results.matrix_Y);
-      let labelsYPhase: number[] = [];
-      project?.signal?.signalValues.forEach((sv) => labelsYPhase.push(sv.freq));
-      const datasetsYPhase: Dataset[] = [];
-      let matrices_Y_Phase_RE: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_Y_Phase_RE.push([])
-        matrix_Y[i].forEach(m => {
-          m.forEach((v) => {
-            (matrices_Y_Phase_RE[i] as Array<number>).push(
-                Math.atan2(v[1], v[0])
-            )
-          })
-        })
-      }
-      matrices_Y_Phase_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsYPhase.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsYPhase.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      const optionsYPhase = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - Y Phase` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataYPhase = {
-        labels: labelsYPhase,
-        datasets: datasetsYPhase,
-      };
-      result.data = dataYPhase;
-      result.options = optionsYPhase;
+      result = computeGraphResults('Y Phase', ports, matrix_Y, (index,v,innerLabels) => Math.atan2(v[1], v[0]))
       break;
     case "S_Module":
-      // let matrix_S_Module: any = eval(simulation.results.matrix_S);
-      let labelsSModule: number[] = [];
-      project?.signal?.signalValues.forEach((sv) =>
-        labelsSModule.push(sv.freq)
-      );
-      const datasetsSModule: Dataset[] = [];
-      let matrices_S_Module_RE: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_S_Module_RE.push([])
-        matrix_S[i].forEach(m => {
-          m.forEach((v) => {
-            (matrices_S_Module_RE[i] as Array<number>).push(
-                Math.sqrt(v[0] * v[0] + v[1] * v[1])
-            )
-          })
-        })
-      }
-      matrices_S_Module_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsSModule.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsSModule.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      const optionsSModule = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - S Module` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataSModule = {
-        labels: labelsSModule,
-        datasets: datasetsSModule,
-      };
-      result.data = dataSModule;
-      result.options = optionsSModule;
+      result = computeGraphResults('S Module', ports, matrix_S, (index,v,innerLabels) => Math.sqrt(v[0] * v[0] + v[1] * v[1]))
       break;
     case "S_Phase":
-      // let matrix_S_Phase: any = eval(simulation.results.matrix_S);
-      let labelsSPhase: number[] = [];
-      project?.signal?.signalValues.forEach((sv) => labelsSPhase.push(sv.freq));
-      const datasetsSPhase: Dataset[] = [];
-      let matrices_S_Phase_RE: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_S_Phase_RE.push([])
-        matrix_S[i].forEach(m => {
-          m.forEach((v) => {
-            (matrices_S_Phase_RE[i] as Array<number>).push(
-                Math.atan2(v[1], v[0])
-            )
-          })
-        })
-      }
-      matrices_S_Phase_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsSPhase.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsSPhase.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      const optionsSPhase = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - S Phase` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataSPhase = {
-        labels: labelsSPhase,
-        datasets: datasetsSPhase,
-      };
-      result.data = dataSPhase;
-      result.options = optionsSPhase;
+      result = computeGraphResults('S Phase', ports, matrix_S, (index,v,innerLabels) => Math.atan2(v[1], v[0]))
       break;
     case "S_dB":
-      // let matrix_S_dB: any = eval(simulation.results.matrix_S);
-      let labelsSdB: number[] = [];
-      project?.signal?.signalValues.forEach((sv) => labelsSdB.push(sv.freq));
-      const datasetsSdB: Dataset[] = [];
-      let matrices_S_dB_RE: number[][] = [];
-      for(let i = 0; i<portNumber*portNumber; i++){
-        matrices_S_dB_RE.push([])
-        matrix_S[i].forEach(m => {
-          m.forEach((v) => {
-            (matrices_S_dB_RE[i] as Array<number>).push(
-                20 * Math.log10(Math.sqrt(v[0] * v[0] + v[1] * v[1]))
-            )
-          })
-        })
-      }
-      matrices_S_dB_RE.forEach((matrix, index) => {
-        if(selectedLabel.filter(l => l.label === "All Ports").length > 0){
-          datasetsSdB.push({
-            label:  `${labels[index][0]} - ${labels[index][1]}`,
-            data: matrix,
-            borderColor: colorArray[index],
-            backgroundColor: "white",
-          });
-        }else{
-          selectedLabel.forEach((l) => {
-            if(index === l.id){
-              datasetsSdB.push({
-                label:  l.label,
-                data: matrix,
-                borderColor: colorArray[index],
-                backgroundColor: "white",
-              });
-            }
-          })
-        }
-      });
-
-      const optionsSdB = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top" as const,
-          },
-          title: {
-            display: true,
-            text: simulation ? `${simulation.name} - S dB` : "",
-          },
-        },
-        layout: {
-          padding: {
-            right: 20,
-          },
-        },
-      };
-
-      const dataSdB = {
-        labels: labelsSdB,
-        datasets: datasetsSdB,
-      };
-      result.data = dataSdB;
-      result.options = optionsSdB;
+      result = computeGraphResults('S dB', ports, matrix_S, (index,v,innerLabels) => 20 * Math.log10(Math.sqrt(v[0] * v[0] + v[1] * v[1])))
       break;
     default:
       break;
   }
   return result;
 };
-export const pairs = (a:string[]) => {
-  return a.flatMap( (x:string) => {
-    return a.flatMap( (y:string) => {
-      return [[x,y]]
+
+export const pairs = (a: string[]) => {
+  return a.flatMap((x: string) => {
+    return a.flatMap((y: string) => {
+      return [[x, y]]
     });
   });
 }

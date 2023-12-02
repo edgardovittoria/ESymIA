@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useState } from 'react';
+import React from 'react';
 import { BsGrid3X3Gap } from "react-icons/bs";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useSelector } from "react-redux";
@@ -58,7 +58,8 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
                     <ul tabIndex={0} className="dropdown-content p-2 shadow bg-base-100 rounded-box w-52">
                         <li className="flex flex-row items-center justify-between p-2" key={"All Ports"}>
                             <span>All Ports</span>
-                            <input type="checkbox" checked={selectedLabel.filter(pc => pc.label === "All Ports").length > 0} className="checkbox checkbox-xs"
+                            <input type="checkbox" className="checkbox checkbox-xs"
+                                checked={selectedLabel.filter(pc => pc.label === "All Ports").length > 0}
                                 value={"All Ports"}
                                 onChange={(e) => {
                                     if (e.currentTarget.checked) {
@@ -90,19 +91,6 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
                         })}
                     </ul>
                 </div>
-                {/*<select className="select select-success w-full max-w-xs h-[35px] min-h-[35px]"
-                        multiple={true}
-                        onChange={(e) => {
-                            setSelectedLabel([e.currentTarget.value])
-                        }}
-                >
-                    <option selected>All Ports</option>
-                    {labels.map((l) => {
-                        return(
-                            <option>{`${l[0]} - ${l[1]}`}</option>
-                        )
-                    })}
-                </select>*/}
             </div>
             <div className="flex">
                 <div
