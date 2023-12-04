@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { FactoryShapes, meshFrom, useFaunaQuery } from "cad-library";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -49,8 +49,6 @@ export const Physics: React.FC<PhysicsProps> = ({
 }) => {
 	const selectedProject = useSelector(selectedProjectSelector);
 	const { execQuery } = useFaunaQuery()
-	let selectedPort = findSelectedPort(selectedProject);
-	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
 	const dispatch = useDispatch();
 	const [surfaceAdvices, setSurfaceAdvices] = useState(true)
 	const [pointerEvent, setPointerEvent] = useState<ThreeEvent<MouseEvent> | undefined>(undefined)
@@ -87,7 +85,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 
 	useEffect(() => {
 		if (selectedProject && savedPortParameters) {
-			execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject)).then(() => {})
+			execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject)).then(() => { })
 		}
 	}, [
 		savedPortParameters,
@@ -98,146 +96,156 @@ export const Physics: React.FC<PhysicsProps> = ({
 	]);
 
 	useEffect(() => {
-        if (mesh.current && mesh.current.length !== 0) {
-            let group = new THREE.Group()
-            if (selectedProject && selectedProject.model.components) {
-                selectedProject.model.components.forEach(c => {
-                    group.add(meshFrom(c))
-                })
-            }
-            let boundingbox = new THREE.Box3().setFromObject(group)
-            dispatch(setBoundingBoxDimension(boundingbox.getSize(boundingbox.max).x))
-        }
-    }, [selectedProject, selectedProject?.model, mesh.current])
-	
+		if (mesh.current && mesh.current.length !== 0) {
+			let group = new THREE.Group()
+			if (selectedProject && selectedProject.model.components) {
+				selectedProject.model.components.forEach(c => {
+					group.add(meshFrom(c))
+				})
+			}
+			let boundingbox = new THREE.Box3().setFromObject(group)
+			dispatch(setBoundingBoxDimension(boundingbox.getSize(boundingbox.max).x))
+		}
+	}, [selectedProject, selectedProject?.model, mesh.current])
+
 
 
 	return (
 		<>
-			<CanvasBaseWithRedux
-				section="Physics"
-				setPointerEvent={setPointerEvent}
-				setMesh={setMesh}
-			>
-				<EdgesGenerator meshRef={mesh}
-					surfaceAdvices={surfaceAdvices as boolean}
-					inputPortPositioned={inputPortPositioned as boolean}
-					setInputPortPositioned={setInputPortPositioned as Function} />
-				{selectedProject?.ports.map((port, index) => {
-					if (port.category === "port" || port.category === "lumped") {
-						return (
-							<group key={index}>
-								<mesh
-									name={port.inputElement.name}
-									position={port.inputElement.transformationParams.position}
-									scale={port.inputElement.transformationParams.scale}
-									rotation={port.inputElement.transformationParams.rotation}
-									onClick={() => dispatch(selectPort(port.name))}>
-									<FactoryShapes entity={port.inputElement} color="#00ff00" />
-								</mesh>
-
-								<mesh
-									name={port.outputElement.name}
-									position={port.outputElement.transformationParams.position}
-									scale={port.outputElement.transformationParams.scale}
-									rotation={port.outputElement.transformationParams.rotation}
-									onClick={() => dispatch(selectPort(port.name))}>
-									<FactoryShapes entity={port.outputElement} />
-								</mesh>
-								<Line
-									points={[
-										port.inputElement.transformationParams.position,
-										port.outputElement.transformationParams.position,
-									]}
-									color={
-										port.category === "port"
-											? new THREE.Color("red").getHex()
-											: new THREE.Color("violet").getHex()
-									}
-									lineWidth={1}
-									alphaWrite={undefined}
-								/>
-							</group>
-						);
-					} else {
-						return (
-							<group
-								key={port.name}
-								name={port.name}
-								onClick={() => dispatch(selectPort(port.name))}
-								position={(port as Probe).groupPosition}>
-								{(port as Probe).elements.map((element, index) => {
-									return (
-										<mesh
-											key={index}
-											position={element.transformationParams.position}
-											scale={element.transformationParams.scale}
-											rotation={element.transformationParams.rotation}>
-											<FactoryShapes entity={element} color="orange" />
-										</mesh>
-									);
-								})}
-							</group>
-						);
-					}
-				})}
-				{selectedProject?.simulation?.status !== "Completed" && (
-					<>
-						{selectedPort &&
-							(selectedPort.category === "port" ||
-								selectedPort.category === "lumped") && (
-								<PortControls
-									selectedPort={selectedPort}
-									updatePortPosition={(obj: {
-										type: "first" | "last";
-										position: [number, number, number];
-									}) => dispatch(updatePortPosition(obj))}
-									setSavedPortParameters={setSavedPortParameters}
-								/>
-							)}
-						{selectedPort && selectedPort.category === "probe" && (
-							<ProbeControls
-								selectedProbe={selectedPort as Probe}
-								updateProbePosition={(obj: {
-									type: "first" | "last";
-									position: [number, number, number];
-								}) => dispatch(updatePortPosition(obj))}
-								setSavedPortParameters={setSavedPortParameters}
-							/>
-						)}
-					</>
-				)}
+			<CanvasBaseWithRedux section="Physics" setPointerEvent={setPointerEvent} setMesh={setMesh}>
+				<EdgesGenerator meshRef={mesh} surfaceAdvices={surfaceAdvices as boolean} inputPortPositioned={inputPortPositioned as boolean} setInputPortPositioned={setInputPortPositioned as Function} />
+				<PhysicsPortsDrawer />
+				<PhysicsPortsControlsDrawer setSavedPortParameters={setSavedPortParameters}/>
 			</CanvasBaseWithRedux>
-			<StatusBar />
-			<LeftPanel
-				tabs={["Modeler", "Physics"]}
-				selectedTab={selectedTabLeftPanel}
-				setSelectedTab={setSelectedTabLeftPanel}>
-				{selectedTabLeftPanel === "Physics" ? (
-					<PhysicsLeftPanelTab />
-				) : (
-					<Models>
-						<ModelOutliner />
-					</Models>
-				)}
-			</LeftPanel>
-			{selectedProject?.model?.components && (
-				<SelectPorts selectedProject={selectedProject} />
-			)}
 			<ImportExportPhysicsSetup />
-			<div className="tooltip absolute left-[33%] top-[160px]" data-tip={surfaceAdvices ? "Hide Surface Advices" : "Show Surface Advices"}>
-				<button
-					className={`bg-white rounded p-2`}
-					onClick={() => setSurfaceAdvices(!surfaceAdvices)}>
-					{surfaceAdvices ? <BiShow className="h-5 w-5 text-green-300 hover:text-secondaryColor" />
-						: <BiHide className="h-5 w-5 text-green-300 hover:text-secondaryColor" />
-					}
+			<SurfaceAdvicesButton surfaceAdvices={surfaceAdvices} setSurfaceAdvices={setSurfaceAdvices}/>
+			<PhysicsLeftPanel selectedTabLeftPanel={selectedTabLeftPanel} setSelectedTabLeftPanel={setSelectedTabLeftPanel}/>
+			{selectedProject?.model?.components && <SelectPorts selectedProject={selectedProject} />}
+			<PhysicsRightPanel savedPortParameters={savedPortParameters} setSavedPortParameters={setSavedPortParameters}/>
+			<StatusBar />
+		</>
+	);
+};
 
-				</button>
-			</div>
 
-			{/* <RightPanelSimulation> */}
+const PhysicsPortsDrawer: FC = () => {
+	const selectedProject = useSelector(selectedProjectSelector);
+	const dispatch = useDispatch()
+	return <>
+	{selectedProject?.ports.map((port, index) => {
+		if (port.category === "port" || port.category === "lumped") {
+			return (
+				<group key={index}>
+					<mesh
+						name={port.inputElement.name}
+						position={port.inputElement.transformationParams.position}
+						scale={port.inputElement.transformationParams.scale}
+						rotation={port.inputElement.transformationParams.rotation}
+						onClick={() => dispatch(selectPort(port.name))}>
+						<FactoryShapes entity={port.inputElement} color="#00ff00" />
+					</mesh>
+
+					<mesh
+						name={port.outputElement.name}
+						position={port.outputElement.transformationParams.position}
+						scale={port.outputElement.transformationParams.scale}
+						rotation={port.outputElement.transformationParams.rotation}
+						onClick={() => dispatch(selectPort(port.name))}>
+						<FactoryShapes entity={port.outputElement} />
+					</mesh>
+					<Line
+						points={[
+							port.inputElement.transformationParams.position,
+							port.outputElement.transformationParams.position,
+						]}
+						color={
+							port.category === "port"
+								? new THREE.Color("red").getHex()
+								: new THREE.Color("violet").getHex()
+						}
+						lineWidth={1}
+						alphaWrite={undefined}
+					/>
+				</group>
+			);
+		} else {
+			return (
+				<group
+					key={port.name}
+					name={port.name}
+					onClick={() => dispatch(selectPort(port.name))}
+					position={(port as Probe).groupPosition}>
+					{(port as Probe).elements.map((element, index) => {
+						return (
+							<mesh
+								key={index}
+								position={element.transformationParams.position}
+								scale={element.transformationParams.scale}
+								rotation={element.transformationParams.rotation}>
+								<FactoryShapes entity={element} color="orange" />
+							</mesh>
+						);
+					})}
+				</group>
+			);
+		}
+	})}
+	</>
+}
+
+const PhysicsPortsControlsDrawer: FC<{setSavedPortParameters: Function}> = ({setSavedPortParameters}) => {
+	const selectedProject = useSelector(selectedProjectSelector);
+	let selectedPort = findSelectedPort(selectedProject);
+	const dispatch = useDispatch()
+	return <>
+	{selectedProject?.simulation?.status !== "Completed" && (
+		<>
 			{selectedPort &&
+				(selectedPort.category === "port" ||
+					selectedPort.category === "lumped") && (
+					<PortControls
+						selectedPort={selectedPort}
+						updatePortPosition={(obj: {
+							type: "first" | "last";
+							position: [number, number, number];
+						}) => dispatch(updatePortPosition(obj))}
+						setSavedPortParameters={setSavedPortParameters}
+					/>
+				)}
+			{selectedPort && selectedPort.category === "probe" && (
+				<ProbeControls
+					selectedProbe={selectedPort as Probe}
+					updateProbePosition={(obj: {
+						type: "first" | "last";
+						position: [number, number, number];
+					}) => dispatch(updatePortPosition(obj))}
+					setSavedPortParameters={setSavedPortParameters}
+				/>
+			)}
+		</>
+	)}
+	</>
+}
+
+const SurfaceAdvicesButton: FC<{surfaceAdvices:boolean, setSurfaceAdvices: Function}> = ({surfaceAdvices, setSurfaceAdvices}) => {
+	return <div className="tooltip absolute left-[33%] top-[160px]" data-tip={surfaceAdvices ? "Hide Surface Advices" : "Show Surface Advices"}>
+		<button
+			className={`bg-white rounded p-2`}
+			onClick={() => setSurfaceAdvices(!surfaceAdvices)}>
+			{surfaceAdvices ? <BiShow className="h-5 w-5 text-green-300 hover:text-secondaryColor" />
+				: <BiHide className="h-5 w-5 text-green-300 hover:text-secondaryColor" />
+			}
+
+		</button>
+	</div>
+}
+
+const PhysicsRightPanel: FC<{savedPortParameters: boolean, setSavedPortParameters: Function}> = ({savedPortParameters, setSavedPortParameters}) => {
+	const selectedProject = useSelector(selectedProjectSelector);
+	let selectedPort = findSelectedPort(selectedProject);
+	const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
+	return <>
+	{selectedPort &&
 				(selectedPort?.category === "port" ||
 					selectedPort?.category === "lumped") ? (
 				<>
@@ -288,7 +296,20 @@ export const Physics: React.FC<PhysicsProps> = ({
 					/>
 				</PortManagement>
 			)}
-			{/* </RightPanelSimulation> */}
-		</>
-	);
-};
+	</>
+}
+
+const PhysicsLeftPanel: FC<{selectedTabLeftPanel: string, setSelectedTabLeftPanel: Function}> = ({selectedTabLeftPanel, setSelectedTabLeftPanel}) => {
+	return <LeftPanel
+				tabs={["Modeler", "Physics"]}
+				selectedTab={selectedTabLeftPanel}
+				setSelectedTab={setSelectedTabLeftPanel}>
+				{selectedTabLeftPanel === "Physics" ? (
+					<PhysicsLeftPanelTab />
+				) : (
+					<Models>
+						<ModelOutliner />
+					</Models>
+				)}
+			</LeftPanel>
+}

@@ -154,6 +154,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         }
     });*/
 
+    // Solver launch and get results
     useEffect(() => {
         if (meshApproved && !selectedProject.simulation) {
             let simulation: Simulation = {
@@ -172,7 +173,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             dispatch(updateSimulation(simulation));
 
             //https://teemaserver.cloud/solving
-            axios.post("http://127.0.0.1:8002/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
+            axios.post("http://127.0.0.1:5000/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
                 dispatch(setSolverOutput(res.data));
                 let simulationUpdated: Simulation = {
                     ...simulation,
@@ -209,6 +210,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         });
     };
 
+    // Show updated quantum values whenever the mesh gets updated.
     useEffect(() => {
         if (mesherOutput) {
             dispatch(
@@ -221,6 +223,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         }
     }, [mesherOutput])
 
+    // Mesh generation and storage on S3.
     useEffect(() => {
         if (meshGenerated === "Generating") {
             let components = selectedProject?.model?.components as ComponentEntity[];
@@ -323,29 +326,54 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     <div className="mt-2">
                         <span>X,Y,Z</span>
                         <div className="flex justify-between mt-2">
-                            <div className="w-[30%]">
-                                <input
-                                    disabled={
-                                        selectedProject.simulation?.status === "Completed" ||
-                                        selectedProject.model?.components === undefined
-                                    }
-                                    min={0}
-                                    className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-                                    type="number"
-                                    step={0.000001}
-                                    value={quantumDimensions[0]}
-                                    onChange={(event) =>
-                                        dispatch(
-                                            setQuantum([
-                                                parseFloat(event.target.value),
-                                                quantumDimensions[1],
-                                                quantumDimensions[2],
-                                            ])
-                                        )
-                                    }
-                                />
-                            </div>
-                            <div className="w-[30%]">
+                            {quantumDimensions.map((quantumComponent, indexQuantumComponent) =>
+                                <div className="w-[30%]">
+                                    <input
+                                        disabled={
+                                            selectedProject.simulation?.status === "Completed" ||
+                                            selectedProject.model?.components === undefined
+                                        }
+                                        min={0.0}
+                                        className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
+                                        type="number"
+                                        step={0.000001}
+                                        value={quantumComponent}
+                                        onChange={(event) => {
+                                            if (indexQuantumComponent === 0) {
+                                                dispatch(
+                                                    setQuantum([
+                                                        parseFloat(event.target.value),
+                                                        quantumDimensions[1],
+                                                        quantumDimensions[2],
+                                                    ])
+                                                )
+                                            }
+                                            else if (indexQuantumComponent === 1){
+                                                dispatch(
+                                                    setQuantum([
+                                                        quantumDimensions[0],
+                                                        parseFloat(event.target.value),
+                                                        quantumDimensions[2],
+                                                    ])
+                                                )
+                                            }
+                                            else if (indexQuantumComponent === 2){
+                                                dispatch(
+                                                    setQuantum([
+                                                        quantumDimensions[0],
+                                                        quantumDimensions[1],
+                                                        parseFloat(event.target.value),
+                                                    ])
+                                                )
+                                            }
+                                        }
+
+                                        }
+
+                                    />
+                                </div>
+                            )}
+                            {/* <div className="w-[30%]">
                                 <input
                                     disabled={
                                         selectedProject.simulation?.status === "Completed" ||
@@ -366,14 +394,14 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                         )
                                     }
                                 />
-                            </div>
-                            <div className="w-[30%]">
+                            </div> */}
+                            {/* <div className="w-[30%]">
                                 <input
                                     disabled={
                                         selectedProject.simulation?.status === "Completed" ||
                                         selectedProject.model?.components === undefined
                                     }
-                                    min={0}
+                                    min={0.0}
                                     className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
                                     type="number"
                                     step={0.000001}
@@ -388,7 +416,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                         )
                                     }
                                 />
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -548,7 +576,7 @@ function create_Grids_externals(grids: any[]) {
             let Nx = totalMatrix[0].length
             let Ny = totalMatrix[0][0].length
             let Nz = totalMatrix[0][0][0].length
-            if (brickPosition.x == 0 || brickPosition.x == Nx - 1 || brickPosition.y == 0 || brickPosition.y == Ny - 1 || brickPosition.z == 0 || brickPosition.z == Nz - 1) {
+            if (brickPosition.x === 0 || brickPosition.x === Nx - 1 || brickPosition.y === 0 || brickPosition.y === Ny - 1 || brickPosition.z === 0 || brickPosition.z === Nz - 1) {
                 return true
             }
             return false
@@ -561,8 +589,8 @@ function create_Grids_externals(grids: any[]) {
         }
 
         //condizione in cui il brick si trova già su una delle superfici estreme del modello, nel qual caso non servono altri controlli.
-        if(brickTouchesTheMainBoundingBox()) return true
-        
+        if (brickTouchesTheMainBoundingBox()) return true
+
         //condizioni che verificano se le singole facce del brick sono libere. Ne basta almeno una libera.
         if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x - 1, y: brickPosition.y, z: brickPosition.z })) return true
         if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x + 1, y: brickPosition.y, z: brickPosition.z })) return true
