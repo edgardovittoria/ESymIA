@@ -23,8 +23,8 @@ export const Overview: React.FC<OverviewProps> = (
         <>
             <div className={`box w-[48.5%] h-1/2`}>
                 <div className="flex flex-row justify-between items-start">
-                    <h5>My Recent Projects</h5>
-                    <button className="text-primaryColor bg-transparent border-none hover:underline hover:text-black"
+                    <h5 className="text-md">My Recent Projects</h5>
+                    <button className="text-primaryColor text-sm bg-transparent border-none hover:underline hover:text-black"
                             onClick={() => {
                                 setShowModal(true)
                             }}>
@@ -56,15 +56,16 @@ export const Overview: React.FC<OverviewProps> = (
                                          dispatch(addProjectTab(project))
                                      }}>
                                     <div className="box">
-                                        <div className="flex justify-between">
-                                            <div className={`w-7/8 text-[20px] mb-[10px]`}>
-                                                {(project.name.length > 15) ? project.name.substring(0, 15) + '...' : project.name}
+                                        <div className="flex justify-between items-center">
+                                            <div className="flex flex-col">
+                                                <div className={`text-[20px]`}>
+                                                    {(project.name.length > 15) ? project.name.substring(0, 15) + '...' : project.name}
+                                                </div>
+                                                <h6 className="mb-2 text-gray-500">{project.description.substring(0, 50)}</h6>
                                             </div>
-                                            {/*<div className="w-1/8" onMouseOver={() => setCardMenuHovered(!cardMenuHovered)}>
-                                                <ProjectManagementIcons project={project}/>
-                                            </div>*/}
+                                            <img className="w-[15%]" alt="project_screenshot" src="/noResultsIconForProject.png"/>
                                         </div>
-                                        <h6 className="mb-2 text-gray-500">{project.description.substring(0, 50)}</h6>
+
                                     </div>
                                 </div>
                             )

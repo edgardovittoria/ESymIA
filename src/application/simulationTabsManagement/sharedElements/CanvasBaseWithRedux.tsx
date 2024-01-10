@@ -56,7 +56,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                 <ReactReduxContext.Consumer>
                     {({ store }) => (
                         <div className="flex flex-col">
-                            <Canvas style={{ width: "1920px", height: "805px" }}>
+                            <Canvas style={{ width: "1920px", height: "86vh" }}>
                                 <Provider store={store}>
                                     <pointLight position={[100, 100, 100]} intensity={0.8} />
                                     <hemisphereLight

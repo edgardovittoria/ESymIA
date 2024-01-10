@@ -16,7 +16,7 @@ export const Modeler: React.FC<ModelerProps> = ({
 }) => {
 
   return (
-    <>
+    <div>
       <CanvasBaseWithRedux section="Modeler"/>
       <StatusBar/>
       <LeftPanel
@@ -32,6 +32,6 @@ export const Modeler: React.FC<ModelerProps> = ({
           </Models>
         )}
       </LeftPanel>
-    </>
+    </div>
   );
 };

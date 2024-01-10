@@ -15,7 +15,7 @@ const StatusBar: React.FC<StatusBarProps> = ({voxelsPainted, totalVoxels}) => {
     return (
         <>
             {selectedProject?.model.components &&
-                <div className="w-full bg-gray-300 flex justify-end">
+                <div className="w-full bg-gray-300 flex justify-end absolute bottom-0 p-1">
                     {menuItemSelected === "Simulator" &&
                         <>
                             <div className="pr-5">Number of bricks: <span className="font-bold">{voxelsPainted}</span></div>
