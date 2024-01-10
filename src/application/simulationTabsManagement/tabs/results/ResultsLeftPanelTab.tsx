@@ -20,7 +20,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
         <div>
           <>
             <div
-              className="flex mb-2 p-[5px] hover:cursor-pointer hover:bg-gray-200 bg-gray-200"
+              className="flex mb-2 p-[5px] hover:cursor-pointer border-2 border-gray-200 rounded-xl"
               key={selectedProject.simulation.name}
             >
               <div className="w-[12%] flex items-center">
@@ -33,7 +33,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                 {selectedProject.simulation.name}
               </div>
             </div>
-            <>
+            {/*<>
               {selectedProject.ports.map((port) => {
 
                 return (
@@ -54,7 +54,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                     </>
                 );
               })}
-            </>
+            </>*/}
           </>
         </div>
       ) : (

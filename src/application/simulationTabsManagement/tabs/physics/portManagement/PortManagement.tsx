@@ -1,5 +1,5 @@
 import React from 'react';
-import {AiOutlineThunderbolt} from "react-icons/ai";
+import { FaReact } from "react-icons/fa6";
 import { Port, Probe } from '../../../../../model/esymiaModels';
 
 
@@ -25,13 +25,13 @@ export const PortManagement: React.FC<PortManagementProps> = (
             {
                 selectedPort ?
                     <>
-                        <div className="flex absolute right-[2%] top-[160px] w-[22%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl">
+                        <div className="flex items-center gap-2 absolute right-[2%] top-[160px] w-[22%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl">
                             <div className="col-1 pe-0 ps-0">
-                                <AiOutlineThunderbolt color={portColor}
+                                <FaReact color={portColor}
                                                       style={{width: "25px", height: "25px"}}/>
                             </div>
-                            <div className="col-6 text-start ps-0">
-                                <h5 className="mb-0">{selectedPort.name}</h5>
+                            <div className="col-6 text-start">
+                                <h5 className="mb-0 text-md">{selectedPort.name}</h5>
                             </div>
                         </div>
                         < div className="flex-col absolute right-[2%] top-[207px] w-[22%] rounded-tl rounded-tr bg-white p-[20px] shadow-2xl max-h-[350px] overflow-y-scroll overflow-x-hidden">

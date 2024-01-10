@@ -72,7 +72,7 @@ export const Overview: React.FC<OverviewProps> = (
                     </div>
                 }
             </div>
-            <div className={`box w-[48.5%] h-1/2 bg-gradient-to-br from-primaryColor to-secondaryColor text-white`}>
+            <div className={`box w-[48.5%] h-1/2 bg-gradient-to-br from-primaryColor to-green-600 text-white`}>
                 <h5>Your Plan</h5>
                 <div className="pl-[20px]">
                     <h2 className="mt-[10px]">Upgrade to a Pro <br/> Account</h2>

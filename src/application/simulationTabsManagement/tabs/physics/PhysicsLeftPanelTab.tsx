@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {AiOutlineThunderbolt} from "react-icons/ai";
+import { FaReact } from "react-icons/fa6";
 import {IoTrashOutline} from "react-icons/io5";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -38,12 +38,12 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                             }
                             return (
                                 <li key={port.name}
-                                    className={port.isSelected ? "mt-[5px] rounded bg-gray-200 hover:bg-gray-200 hover:cursor-pointer hover:rounded" : "mt-[5px] hover:bg-gray-200 hover:cursor-pointer hover:rounded"}
+                                    className={port.isSelected ? "mt-[5px] rounded bg-gray-200 hover:bg-gray-200 hover:cursor-pointer hover:rounded px-1" : "mt-[5px] hover:bg-gray-200 hover:cursor-pointer hover:rounded"}
                                     onClick={() => dispatch(selectPort(port.name))}
                                 >
                                     <div className="flex items-center">
                                         <div className="w-[10%]">
-                                            <AiOutlineThunderbolt color={portColor}
+                                            <FaReact color={portColor}
                                                                   style={{width: "20px", height: "20px"}}/>
                                         </div>
                                         <div className="w-[75%] text-start">
