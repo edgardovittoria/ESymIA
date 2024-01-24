@@ -1,8 +1,8 @@
-import { ComponentEntity, exportToSTL, Material, useFaunaQuery } from "cad-library";
-import React, { useEffect, useState } from "react";
-import { AiOutlineCheckCircle, AiOutlineThunderbolt } from "react-icons/ai";
-import { useDispatch } from "react-redux";
-import { setSolverOutput } from "../../../../store/solverSlice";
+import {ComponentEntity, exportToSTL, Material, useFaunaQuery} from "cad-library";
+import React, {useEffect, useState} from "react";
+import {AiOutlineCheckCircle, AiOutlineThunderbolt} from "react-icons/ai";
+import {useDispatch} from "react-redux";
+import {setSolverOutput} from "../../../../store/solverSlice";
 import {
     deleteSimulation,
     setMesh,
@@ -13,15 +13,15 @@ import {
     updateSimulation,
 } from "../../../../store/projectSlice";
 import axios from "axios";
-import { MesherOutput } from "./MesherInputOutput";
-import { deleteFileS3, uploadFileS3 } from "../../../../aws/mesherAPIs";
-import { selectMenuItem } from "../../../../store/tabsAndMenuItemsSlice";
-import { ImSpinner } from "react-icons/im";
-import { Project, Simulation, SolverOutput } from "../../../../model/esymiaModels";
-import { getMaterialListFrom } from "./Simulator";
+import {MesherOutput} from "./MesherInputOutput";
+import {deleteFileS3, uploadFileS3} from "../../../../aws/mesherAPIs";
+import {selectMenuItem} from "../../../../store/tabsAndMenuItemsSlice";
+import {ImSpinner} from "react-icons/im";
+import {Project, Simulation, SolverOutput} from "../../../../model/esymiaModels";
+import {getMaterialListFrom} from "./Simulator";
 import useWebSocket from "react-use-websocket";
-import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
-import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
+import {updateProjectInFauna} from "../../../../faunadb/projectsFolderAPIs";
+import {convertInFaunaProjectThis} from "../../../../faunadb/apiAuxiliaryFunctions";
 
 
 interface MeshingSolvingInfoProps {
@@ -31,13 +31,13 @@ interface MeshingSolvingInfoProps {
 }
 
 export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
-    selectedProject,
-    mesherOutput,
-    allMaterials
-}) => {
+                                                                          selectedProject,
+                                                                          mesherOutput,
+                                                                          allMaterials
+                                                                      }) => {
 
     const dispatch = useDispatch();
-    const { execQuery } = useFaunaQuery()
+    const {execQuery} = useFaunaQuery()
     let quantumDimensions = selectedProject.meshData.quantum;
     let meshApproved = selectedProject.meshData.meshApproved;
     let meshGenerated = selectedProject.meshData.meshGenerated;
@@ -93,9 +93,9 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
 
         materialList.forEach((m) => {
             components &&
-                filteredComponents.push(
-                    components.filter((c) => c.material?.name === m.name)
-                );
+            filteredComponents.push(
+                components.filter((c) => c.material?.name === m.name)
+            );
         });
 
         let STLList: { material: string; STL: string }[] = [];
@@ -239,23 +239,22 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             //local meshing: http://127.0.0.1:8003/meshing
             //lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
             axios.post('http://127.0.0.1:8003/meshing', objToSendToMesher).then((res) => {
-                if(res.data.x){
+                if (res.data.x) {
                     dispatch(setMeshGenerated("Not Generated"))
                     alert(`the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`)
-                }else if(res.data.y){
+                } else if (res.data.y) {
                     dispatch(setMeshGenerated("Not Generated"))
                     alert(`the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`)
-                } else if(res.data.z){
+                } else if (res.data.z) {
                     dispatch(setMeshGenerated("Not Generated"))
-                    alert(`the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_x}`)
-                }
-                else{
+                    alert(`the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`)
+                } else {
                     let grids: any[] = []
                     for (let value of Object.values(res.data.mesher_matrices)) {
                         grids.push(value);
                     }
                     let grids_external = create_Grids_externals(grids)
-                    let data = { ...res.data.mesher_matrices }
+                    let data = {...res.data.mesher_matrices}
                     Object.keys(res.data.mesher_matrices).forEach((k, index) => {
                         data[k] = grids_external[index]
                     })
@@ -290,48 +289,48 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                         <div className="flex flex-row justify-between items-center">
                             {computingP ?
                                 <div className="flex flex-row justify-between items-center">
-                                    <progress className="progress w-56 mr-4" value={1} max={1} />
-                                    <AiOutlineCheckCircle size="20px" className="text-green-500" />
-                                </div> : <progress className="progress w-56" />
+                                    <progress className="progress w-56 mr-4" value={1} max={1}/>
+                                    <AiOutlineCheckCircle size="20px" className="text-green-500"/>
+                                </div> : <progress className="progress w-56"/>
                             }
                         </div>
                         <h5 className="mb-2">Computing Lpx</h5>
                         {computingLpx ?
                             <div className="flex flex-row justify-between items-center">
-                                <progress className="progress w-56 mr-4" value={1} max={1} />
-                                <AiOutlineCheckCircle size="20px" className="text-green-500" />
-                            </div> : <progress className="progress w-56" />
+                                <progress className="progress w-56 mr-4" value={1} max={1}/>
+                                <AiOutlineCheckCircle size="20px" className="text-green-500"/>
+                            </div> : <progress className="progress w-56"/>
                         }
                         <h5 className="mb-2">Computing Lpy</h5>
                         {computingLpy ?
                             <div className="flex flex-row justify-between items-center">
-                                <progress className="progress w-56 mr-4" value={1} max={1} />
-                                <AiOutlineCheckCircle size="20px" className="text-green-500" />
-                            </div> : <progress className="progress w-56" />
+                                <progress className="progress w-56 mr-4" value={1} max={1}/>
+                                <AiOutlineCheckCircle size="20px" className="text-green-500"/>
+                            </div> : <progress className="progress w-56"/>
                         }
                         <h5 className="mb-2">Computing Lpz</h5>
                         {computingLpz ?
                             <div className="flex flex-row justify-between items-center">
-                                <progress className="progress w-56 mr-4" value={1} max={1} />
-                                <AiOutlineCheckCircle size="20px" className="text-green-500" />
-                            </div> : <progress className="progress w-56" />
+                                <progress className="progress w-56 mr-4" value={1} max={1}/>
+                                <AiOutlineCheckCircle size="20px" className="text-green-500"/>
+                            </div> : <progress className="progress w-56"/>
                         }
                         <h5 className="mb-2">Doing Iterations</h5>
-                        <progress className="progress w-56" value={iterations} max={frequenciesNumber} />
+                        <progress className="progress w-56" value={iterations} max={frequenciesNumber}/>
                     </div>
 
                 </>
 
             )}
             {meshGenerated === "Generating" &&
-                <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2`} />}
+                <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2`}/>}
             <div
                 className={`${(meshGenerated === "Generating" || selectedProject.simulation?.status === "Queued") && 'opacity-40'} flex-col absolute right-[2%] top-[160px] w-[22%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor`}>
                 <div className="flex">
-                    <AiOutlineThunderbolt style={{ width: "25px", height: "25px" }} />
+                    <AiOutlineThunderbolt style={{width: "25px", height: "25px"}}/>
                     <h5 className="ml-2">Meshing and Solving Info</h5>
                 </div>
-                <hr className="mt-1" />
+                <hr className="mt-1"/>
                 <div
                     className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
                 >
@@ -360,8 +359,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                                         quantumDimensions[2],
                                                     ])
                                                 )
-                                            }
-                                            else if (indexQuantumComponent === 1){
+                                            } else if (indexQuantumComponent === 1) {
                                                 dispatch(
                                                     setQuantum([
                                                         quantumDimensions[0],
@@ -369,8 +367,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                                         quantumDimensions[2],
                                                     ])
                                                 )
-                                            }
-                                            else if (indexQuantumComponent === 2){
+                                            } else if (indexQuantumComponent === 2) {
                                                 dispatch(
                                                     setQuantum([
                                                         quantumDimensions[0],
@@ -547,15 +544,15 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     Export Solver Input
                 </button>*/}
                 {selectedProject.simulation?.status === "Completed" ? (
-                    <button
-                        className="button buttonPrimary w-[100%] mt-3"
-                        onClick={() => {
-                            dispatch(selectMenuItem("Results"));
-                        }}
-                    >
-                        Results
-                    </button>
-                ) :
+                        <button
+                            className="button buttonPrimary w-[100%] mt-3"
+                            onClick={() => {
+                                dispatch(selectMenuItem("Results"));
+                            }}
+                        >
+                            Results
+                        </button>
+                    ) :
                     <>
                         <button
                             className={`w-full mt-3 button
@@ -583,7 +580,11 @@ export interface Brick {
 function create_Grids_externals(grids: any[]) {
     let OUTPUTgrids: (Brick[])[] = []
 
-    const isOnASurfaceTheBrickInThisPosition = (brickPosition: { x: number, y: number, z: number }, totalMatrix: boolean[][][][]): boolean => {
+    const isOnASurfaceTheBrickInThisPosition = (brickPosition: {
+        x: number,
+        y: number,
+        z: number
+    }, totalMatrix: boolean[][][][]): boolean => {
 
         const brickTouchesTheMainBoundingBox = (): boolean => {
             let Nx = totalMatrix[0].length
@@ -596,7 +597,9 @@ function create_Grids_externals(grids: any[]) {
         }
         const brickHasAdjacentBricksInThisPosition = (position: { x: number, y: number, z: number }): boolean => {
             for (let material = 0; material < totalMatrix.length; material++) {
-                if (totalMatrix[material][position.x][position.y][position.z]) { return true }
+                if (totalMatrix[material][position.x][position.y][position.z]) {
+                    return true
+                }
             }
             return false
         }
@@ -605,12 +608,36 @@ function create_Grids_externals(grids: any[]) {
         if (brickTouchesTheMainBoundingBox()) return true
 
         //condizioni che verificano se le singole facce del brick sono libere. Ne basta almeno una libera.
-        if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x - 1, y: brickPosition.y, z: brickPosition.z })) return true
-        if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x + 1, y: brickPosition.y, z: brickPosition.z })) return true
-        if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x, y: brickPosition.y - 1, z: brickPosition.z })) return true
-        if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x, y: brickPosition.y + 1, z: brickPosition.z })) return true
-        if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x, y: brickPosition.y, z: brickPosition.z - 1 })) return true
-        if (!brickHasAdjacentBricksInThisPosition({ x: brickPosition.x, y: brickPosition.y, z: brickPosition.z + 1 })) return true
+        if (!brickHasAdjacentBricksInThisPosition({
+            x: brickPosition.x - 1,
+            y: brickPosition.y,
+            z: brickPosition.z
+        })) return true
+        if (!brickHasAdjacentBricksInThisPosition({
+            x: brickPosition.x + 1,
+            y: brickPosition.y,
+            z: brickPosition.z
+        })) return true
+        if (!brickHasAdjacentBricksInThisPosition({
+            x: brickPosition.x,
+            y: brickPosition.y - 1,
+            z: brickPosition.z
+        })) return true
+        if (!brickHasAdjacentBricksInThisPosition({
+            x: brickPosition.x,
+            y: brickPosition.y + 1,
+            z: brickPosition.z
+        })) return true
+        if (!brickHasAdjacentBricksInThisPosition({
+            x: brickPosition.x,
+            y: brickPosition.y,
+            z: brickPosition.z - 1
+        })) return true
+        if (!brickHasAdjacentBricksInThisPosition({
+            x: brickPosition.x,
+            y: brickPosition.y,
+            z: brickPosition.z + 1
+        })) return true
 
         // Se non ci sono facce libere il brick è intermente coperto da altri.
         return false
@@ -622,8 +649,12 @@ function create_Grids_externals(grids: any[]) {
             for (let cont2 = 0; cont2 < grids[0][0].length; cont2++) {
                 for (let cont3 = 0; cont3 < grids[0][0][0].length; cont3++) {
                     // se il brick esiste e si affaccia su una superficie, lo aggiungiamo alla griglia
-                    if (grids[material][cont1][cont2][cont3] && isOnASurfaceTheBrickInThisPosition({ x: cont1, y: cont2, z: cont3 }, grids)) {
-                        OUTPUTgrids[material].push({ x: cont1, y: cont2, z: cont3 } as Brick)
+                    if (grids[material][cont1][cont2][cont3] && isOnASurfaceTheBrickInThisPosition({
+                        x: cont1,
+                        y: cont2,
+                        z: cont3
+                    }, grids)) {
+                        OUTPUTgrids[material].push({x: cont1, y: cont2, z: cont3} as Brick)
                     }
                 }
             }
