@@ -173,7 +173,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             dispatch(updateSimulation(simulation));
 
             //https://teemaserver.cloud/solving
-            axios.post("http://127.0.0.1:5000/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
+            axios.post("http://127.0.0.1:8002/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
                 dispatch(setSolverOutput(res.data));
                 let simulationUpdated: Simulation = {
                     ...simulation,
@@ -239,23 +239,36 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             //local meshing: http://127.0.0.1:8003/meshing
             //lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
             axios.post('http://127.0.0.1:8003/meshing', objToSendToMesher).then((res) => {
-                let grids: any[] = []
-                for (let value of Object.values(res.data.mesher_matrices)) {
-                    grids.push(value);
+                if(res.data.x){
+                    dispatch(setMeshGenerated("Not Generated"))
+                    alert(`the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`)
+                }else if(res.data.y){
+                    dispatch(setMeshGenerated("Not Generated"))
+                    alert(`the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`)
+                } else if(res.data.z){
+                    dispatch(setMeshGenerated("Not Generated"))
+                    alert(`the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_x}`)
                 }
-                let grids_external = create_Grids_externals(grids)
-                let data = { ...res.data.mesher_matrices }
-                Object.keys(res.data.mesher_matrices).forEach((k, index) => {
-                    data[k] = grids_external[index]
-                })
-                res.data.externalGrids = data
-                if (selectedProject.meshData.mesh) {
-                    deleteFileS3(selectedProject.meshData.mesh).then(() => {
+                else{
+                    let grids: any[] = []
+                    for (let value of Object.values(res.data.mesher_matrices)) {
+                        grids.push(value);
+                    }
+                    let grids_external = create_Grids_externals(grids)
+                    let data = { ...res.data.mesher_matrices }
+                    Object.keys(res.data.mesher_matrices).forEach((k, index) => {
+                        data[k] = grids_external[index]
                     })
+                    res.data.externalGrids = data
+                    if (selectedProject.meshData.mesh) {
+                        deleteFileS3(selectedProject.meshData.mesh).then(() => {
+                        })
+                    }
+                    saveMeshToS3((res.data)).then((res) => {
+                        dispatch(setMeshGenerated("Generated"))
+                    });
                 }
-                saveMeshToS3((res.data)).then((res) => {
-                    dispatch(setMeshGenerated("Generated"))
-                });
+
             }).catch((err) => {
                 if (err) {
                     window.alert("Error while generating mesh, please try again")
