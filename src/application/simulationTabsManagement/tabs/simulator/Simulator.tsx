@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {selectedProjectSelector, setMeshGenerated} from "../../../../store/projectSlice";
+import {meshGeneratedSelector, selectedProjectSelector, setMeshGenerated} from "../../../../store/projectSlice";
 import {SimulatorLeftPanelTab} from "./SimulatorLeftPanelTab";
 import {MeshingSolvingInfo} from "./MeshingSolvingInfo";
 import {CanvasBaseWithRedux} from "../../sharedElements/CanvasBaseWithRedux";
@@ -33,6 +33,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
     const selectedProject = useSelector(selectedProjectSelector);
     const dispatch = useDispatch()
+    const meshGenerated = useSelector(meshGeneratedSelector)
 
     useEffect(() => {
         if (selectedProject?.meshData.mesh) {
@@ -84,15 +85,18 @@ export const Simulator: React.FC<SimulatorProps> = ({
         useState<string[]>(materialsNames);
     return (
         <>
-            <CanvasBaseWithRedux section="Simulator">
-                {selectedProject && (
-                    <MeshedElement
-                        mesherOutput={mesherOutput}
-                        selectedProject={selectedProject}
-                        selectedMaterials={selectedMaterials}
-                    />
-                )}
-            </CanvasBaseWithRedux>
+            {selectedProject && mesherOutput
+                  ? (
+                    <CanvasBaseWithRedux section="Simulator">
+                        <MeshedElement
+                            mesherOutput={mesherOutput}
+                            selectedProject={selectedProject}
+                            selectedMaterials={selectedMaterials}
+                        />
+                    </CanvasBaseWithRedux>
+                ) : <><CanvasBaseWithRedux section={"Simulator"}/></>
+            }
+
             <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels}/>
             <LeftPanel
                 tabs={["Modeler", "Simulator"]}

@@ -1,6 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
 import "./App.css";
-import "./GlobalColors.css";
 import "font-awesome/css/font-awesome.min.css";
 import "react-contexify/dist/ReactContexify.css";
 import {TabsContainer} from "./application/TabsContainer";

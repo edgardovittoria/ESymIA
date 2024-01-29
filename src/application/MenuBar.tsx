@@ -17,7 +17,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
     const menuItems = useSelector(menuItemsSelector)
     const menuItemSelected = useSelector(selectedMenuItemSelector)
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center h-[7vh]">
             <ul className={`relative flex items-center bg-white px-4 py-2 w-[96%] rounded-xl`}>
                 {(menuItems as string[]).map(item => <li key={item} className="flex flex-col justify-center items-center hover:cursor-pointer" onClick={() => dispatch(selectMenuItem(item))}>
                     {item === "Modeler" && <PiCubeFocusDuotone size={25} className={(menuItemSelected === item) ? 'text-[#4AC37E]' : 'text-gray-400'}/>}

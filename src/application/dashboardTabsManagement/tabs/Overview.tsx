@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {projectsSelector} from "../../../store/projectSlice";
 import {addProjectTab} from '../../../store/tabsAndMenuItemsSlice';
 import {setModelInfoFromS3} from "./shared/utilFunctions";
+import {AiFillUnlock} from "react-icons/ai";
 
 interface OverviewProps {
     setShowModal: Function
@@ -22,8 +23,8 @@ export const Overview: React.FC<OverviewProps> = (
     return (
         <>
             <div className={`box w-[48.5%] h-1/2`}>
-                <div className="flex flex-row justify-between items-start">
-                    <h5 className="text-md">My Recent Projects</h5>
+                <div className="flex flex-row justify-between items-start p-2">
+                    <h5 className="text-base">My Recent Projects</h5>
                     <button className="text-primaryColor text-sm bg-transparent border-none hover:underline hover:text-black"
                             onClick={() => {
                                 setShowModal(true)
@@ -73,8 +74,8 @@ export const Overview: React.FC<OverviewProps> = (
                     </div>
                 }
             </div>
-            <div className={`box w-[48.5%] h-1/2 bg-gradient-to-br from-primaryColor to-green-600 text-white`}>
-                <h5>Your Plan</h5>
+            <div className={`box w-[48.5%] relative h-1/2 bg-gradient-to-br from-primaryColor to-green-600 text-white`}>
+                <h5 className="text-base p-2">Your Plan</h5>
                 <div className="pl-[20px]">
                     <h2 className="mt-[10px]">Upgrade to a Pro <br/> Account</h2>
                     <div className="flex">
@@ -94,7 +95,13 @@ export const Overview: React.FC<OverviewProps> = (
                         </div>
                     </div>
                 </div>
-
+                <svg width="1em" height="1em">
+                    <linearGradient id="blue-gradient" x1="20%" y1="100%" x2="20%" y2="30%">
+                        <stop stopColor="#ececec" offset="0%" />
+                        <stop stopColor="#174143" offset="100%" />
+                    </linearGradient>
+                </svg>
+                <AiFillUnlock style={{ fill: "url(#blue-gradient)"}} size={280} className="absolute right-0 bottom-[-40px]"/>
 
             </div>
             <div className="mt-3 justify-between w-full h-1/2">

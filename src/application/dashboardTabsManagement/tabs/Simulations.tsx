@@ -59,7 +59,7 @@ export const Simulations: React.FC<SimulationsProps> = () => {
 
   return (
     <div className="text-center p-[20px] box w-full flex flex-col">
-      <h5 className="text-left">Simulations</h5>
+      <h5 className="text-left text-base p-2">Simulations</h5>
       {simulations.length > 0 ? (
         <div className="overflow-auto h-full w-full mt-5">
           <table className="table mt-4 w-full">

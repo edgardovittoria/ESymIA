@@ -42,17 +42,17 @@ const MyFiles: React.FC<MyFilesProps> = (
         <>
             <DndProvider backend={HTML5Backend}>
                 <div className="box w-full h-full">
-                    <div className="flex pt-2">
+                    <div className="flex p-2">
                         <div className="w-3/5">
-                            <h5>Files</h5>
+                            <h5 className="text-base">Files</h5>
                         </div>
                         <div
-                            className={`w-1/5 text-end text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline`}
+                            className={`w-1/5 text-end text-sm text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline`}
                             onClick={() => setShowModal(true)}>
                             + New Project
                         </div>
                         <div
-                            className={`w-1/5 text-center text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline`}
+                            className={`w-1/5 text-sm text-center text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline`}
                             onClick={() => setShowCreateNewFolderModal(true)}>
                             + New Folder
                         </div>
@@ -62,11 +62,11 @@ const MyFiles: React.FC<MyFilesProps> = (
                         <hr/>
                         {path.map((p, index) => {
                             return (
-                                <div className="inline-block ml-2" key={index}>
+                                <div className="inline-block p-2" key={index}>
                                     {index !== path.length - 1 ? (
                                         <div>
 										<span
-                                            className="hover:underline hover:cursor-pointer"
+                                            className="hover:underline hover:cursor-pointer text-sm"
                                             onClick={() => {
                                                 let newPath = path.filter((p, i) => i <= index);
                                                 setPath(newPath);
@@ -77,7 +77,7 @@ const MyFiles: React.FC<MyFilesProps> = (
                                             <span> &gt; </span>
                                         </div>
                                     ) : (
-                                        <span className="font-bold">{p.name}</span>
+                                        <span className="font-bold text-sm">{p.name}</span>
                                     )}
                                 </div>
                             );
@@ -90,7 +90,7 @@ const MyFiles: React.FC<MyFilesProps> = (
                         folders &&
                         (projects.length > 0 || folders.length > 0) ? (
                             <>
-                                {folders.length > 0 && <h5 className="w-[100%]">Folders</h5>}
+                                {folders.length > 0 && <h5 className="w-[100%] text-sm font-semibold uppercase p-2">Folders</h5>}
                                 <div className="flex flex-wrap overflow-scroll max-h-[100px]">
                                     {folders.map((folder) => {
                                         return (
@@ -103,7 +103,7 @@ const MyFiles: React.FC<MyFilesProps> = (
                                         );
                                     })}
                                 </div>
-                                {projects.length > 0 && <h5 className="w-[100%] mt-4">Projects</h5>}
+                                {projects.length > 0 && <h5 className="w-[100%] mt-4 text-sm font-semibold uppercase p-2">Projects</h5>}
                                 <div className={`flex flex-wrap mt-2 overflow-scroll max-h-[380px] `}>
                                     {projects
                                         .filter((p) => p.owner.userName === user.userName)

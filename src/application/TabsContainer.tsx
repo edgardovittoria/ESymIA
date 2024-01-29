@@ -35,9 +35,9 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
     return (
         <>
             <SetUserInfo/>
-            <nav className="flex w-full justify-between px-8 pt-3">
-                <div className="flex items-end h-max">
-                    <a className="text-black no-underline text-2xl mr-4 ml-4" href="/">ESimIA</a>
+            <nav className="flex w-full justify-between px-8 pt-4 h-[6vh]">
+                <div className="flex items-center h-max">
+                    <a className="text-black no-underline text-2xl bg-clip-text text-transparent font-semibold bg-gradient-to-r from-secondaryColor to-green-400 mr-4 ml-4" href="/">ESimIA</a>
                     <ul className="flex pl-0 mb-0">
                         <li className={(tabSelected === "DASHBOARD") ? `px-3 py-3 bg-white rounded-tl text-black flex justify-between items-center gap-2` : `bg-[#dadada] rounded flex items-center px-3 py-3 hover:cursor-pointer`} onClick={() => {
                             dispatch(selectTab("DASHBOARD"))

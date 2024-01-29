@@ -1,10 +1,10 @@
 import {ComponentEntity, exportToSTL, Material, useFaunaQuery} from "cad-library";
 import React, {useEffect, useState} from "react";
 import {AiOutlineCheckCircle, AiOutlineThunderbolt} from "react-icons/ai";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {setSolverOutput} from "../../../../store/solverSlice";
 import {
-    deleteSimulation,
+    deleteSimulation, meshGeneratedSelector,
     setMesh,
     setMeshApproved,
     setMeshGenerated,
@@ -40,7 +40,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     const {execQuery} = useFaunaQuery()
     let quantumDimensions = selectedProject.meshData.quantum;
     let meshApproved = selectedProject.meshData.meshApproved;
-    let meshGenerated = selectedProject.meshData.meshGenerated;
+    let meshGenerated = useSelector(meshGeneratedSelector)
 
     const [solverIterations, setSolverIterations] = useState<[number, number]>([100, 1])
     const [convergenceThreshold, setConvergenceThreshold] = useState(0.0001)
@@ -263,9 +263,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                         deleteFileS3(selectedProject.meshData.mesh).then(() => {
                         })
                     }
-                    saveMeshToS3((res.data)).then((res) => {
-                        dispatch(setMeshGenerated("Generated"))
-                    });
+                    saveMeshToS3((res.data)).then((res) => {});
                 }
 
             }).catch((err) => {

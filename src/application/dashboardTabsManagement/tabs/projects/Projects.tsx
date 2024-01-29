@@ -38,7 +38,7 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 						}
 						className={({ selected }) =>
 							classNames(
-								"w-full rounded-md py-2.5 text-sm font-medium leading-5 text-secondaryColor",
+								"w-full rounded-md py-2.5 text-base font-medium leading-5 text-secondaryColor",
 								"ring-white ring-opacity-60 ring-offset-2 ring-offset-secondaryColor focus:outline-none focus:ring-2",
 								selected
 									? "bg-white shadow"
@@ -56,7 +56,7 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
 						}
 						className={({ selected }) =>
 							classNames(
-								"w-full rounded-md py-2.5 text-sm font-medium leading-5 text-secondaryColor",
+								"w-full rounded-md py-2.5 text-base font-medium leading-5 text-secondaryColor",
 								"ring-white ring-opacity-60 ring-offset-2 ring-offset-secondaryColor focus:outline-none focus:ring-2",
 								selected
 									? "bg-white shadow"

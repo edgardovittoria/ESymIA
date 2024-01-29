@@ -42,7 +42,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 				<div className="box w-full h-full">
 					<div className="flex pt-2">
 						<div className="w-3/5">
-							<h5>Shared Elements</h5>
+							<h5 className="text-sm">Shared Elements</h5>
 						</div>
 						{/*<div
                             className={`w-1/5 text-end text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline`}
@@ -64,7 +64,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 									{index !== pathSharedElements.length - 1 ? (
 										<div>
 											<span
-												className="hover:underline hover:cursor-pointer"
+												className="hover:underline hover:cursor-pointer text-sm"
 												onClick={() => {
 													let newPath = pathSharedElements.filter(
 														(p, i) => i <= index
@@ -77,7 +77,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 											<span> &gt; </span>
 										</div>
 									) : (
-										<span className="font-bold">{p.name}</span>
+										<span className="font-bold text-sm">{p.name}</span>
 									)}
 								</div>
 							);
