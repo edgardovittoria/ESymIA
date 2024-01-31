@@ -35,7 +35,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
     return (
         <>
             <SetUserInfo/>
-            <nav className="flex w-full justify-between px-8 pt-4 h-[6vh]">
+            <nav className="flex w-full justify-between px-8 pt-6 h-[6vh]">
                 <div className="flex items-center h-max">
                     <a className="text-black no-underline text-2xl bg-clip-text text-transparent font-semibold bg-gradient-to-r from-secondaryColor to-green-400 mr-4 ml-4" href="/">ESimIA</a>
                     <ul className="flex pl-0 mb-0">

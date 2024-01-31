@@ -205,9 +205,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
 
         uploadFileS3(meshFile).then((res) => {
             if (res) {
+                dispatch(setMeshGenerated("Generated"))
                 dispatch(setMesh(res.key));
             }
         });
+        return "saved"
     };
 
     // Show updated quantum values whenever the mesh gets updated.
