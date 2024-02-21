@@ -13,14 +13,13 @@ import {
     ,
 } from "cad-library";
 import {
-    importModel, meshGeneratedSelector,
-    selectedProjectSelector,
+    importModel, meshGeneratedSelector, screenshotSelector,
+    selectedProjectSelector, selectProject,
     setModelS3,
     setModelUnit,
 } from "../../../store/projectSlice";
 import {Provider, ReactReduxContext, useDispatch, useSelector} from "react-redux";
 import {s3} from "../../../aws/s3Config";
-import {Screenshot} from "./Screenshot";
 import {uploadFileS3} from "../../../aws/mesherAPIs";
 import {setModelInfoFromS3} from "../../dashboardTabsManagement/tabs/shared/utilFunctions";
 import {FocusView} from "./FocusView";
@@ -40,7 +39,6 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                                                         }) => {
     const selectedProject = useSelector(selectedProjectSelector);
     let mesherOutput = selectedProject?.meshData.mesh;
-    let meshGenerated = useSelector(meshGeneratedSelector)
     const [showModalLoadFromDB, setShowModalLoadFromDB] = useState(false);
     const dispatch = useDispatch()
 
@@ -49,6 +47,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
         if (!selectedProject?.model.components && selectedProject?.modelS3) {
             setModelInfoFromS3(selectedProject, dispatch)
         }
+
     }, [])
 
     return (
@@ -91,6 +90,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                         )
                                     })}
                                     {children}
+                                    {/*<Screenshot selectedProject={selectedProject}/>*/}
                                     <OrbitControls makeDefault/>
                                     <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
                                         <GizmoViewport

@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {meshGeneratedSelector, selectedProjectSelector, setMeshGenerated} from "../../../../store/projectSlice";
 import {SimulatorLeftPanelTab} from "./SimulatorLeftPanelTab";
-import {MeshingSolvingInfo} from "./MeshingSolvingInfo";
+import {Brick, MeshingSolvingInfo} from "./MeshingSolvingInfo";
 import {CanvasBaseWithRedux} from "../../sharedElements/CanvasBaseWithRedux";
 import {MeshedElement} from "./MeshedElement/MeshedElement";
 import {ComponentEntity, Material} from "cad-library";
@@ -11,10 +11,8 @@ import {Models} from "../../sharedElements/Models";
 import {ModelOutliner} from "../../sharedElements/ModelOutliner";
 import {MesherOutput} from "./MesherInputOutput";
 import {s3} from "../../../../aws/s3Config";
-import {Project} from "../../../../model/esymiaModels";
+import {ExternalGridsObject, Project} from "../../../../model/esymiaModels";
 import StatusBar from "../../sharedElements/StatusBar";
-import {getNumberOfCells} from "./MeshedElement/components/MyInstancedMesh";
-import {FocusView} from "../../sharedElements/FocusView";
 
 interface SimulatorProps {
     selectedTabLeftPanel: string;
@@ -28,44 +26,47 @@ export const Simulator: React.FC<SimulatorProps> = ({
     const [mesherOutput, setMesherOutput] = useState<MesherOutput | undefined>(
         undefined
     );
+    const [externalGrids, setExternalGrids] = useState<ExternalGridsObject | undefined>(
+        undefined
+    );
     const [voxelsPainted, setVoxelsPainted] = useState(0)
     const [totalVoxels, setTotalVoxels] = useState(0)
 
     const selectedProject = useSelector(selectedProjectSelector);
     const dispatch = useDispatch()
-    const meshGenerated = useSelector(meshGeneratedSelector)
 
     useEffect(() => {
         if (selectedProject?.meshData.mesh) {
             setMesherOutput(undefined)
+            setExternalGrids(undefined)
             s3.getObject(
                 {
                     Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-                    Key: selectedProject.meshData.mesh,
+                    Key: selectedProject.meshData.externalGrids as string,
                 },
                 (err, data) => {
                     if (err) {
                         console.log(err);
                     }
-                    setMesherOutput(
-                        JSON.parse(data.Body?.toString() as string) as MesherOutput
+                    setExternalGrids(
+                        JSON.parse(data.Body?.toString() as string) as ExternalGridsObject
                     );
                     dispatch(setMeshGenerated("Generated"))
                 }
             );
         }
-    }, [selectedProject?.meshData.mesh]);
+    }, [selectedProject?.meshData.externalGrids]);
 
     useEffect(() => {
         setVoxelsPainted(0)
-        if (mesherOutput) {
-            let numberOfCells = Object.values(mesherOutput.externalGrids).reduce((prev, current) => {
+        if (externalGrids) {
+            let numberOfCells = Object.values(externalGrids.externalGrids).reduce((prev, current) => {
                 return prev + current.length
             }, 0)
             setVoxelsPainted(numberOfCells)
-            setTotalVoxels(mesherOutput.n_cells.n_cells_x * mesherOutput.n_cells.n_cells_y * mesherOutput.n_cells.n_cells_z)
+            setTotalVoxels(externalGrids.n_cells.n_cells_x * externalGrids.n_cells.n_cells_y * externalGrids.n_cells.n_cells_z)
         }
-    }, [mesherOutput])
+    }, [externalGrids])
 
     let materialsNames: string[] = [];
     let allMaterials: Material[] = [];
@@ -85,11 +86,11 @@ export const Simulator: React.FC<SimulatorProps> = ({
         useState<string[]>(materialsNames);
     return (
         <>
-            {selectedProject && mesherOutput
+            {selectedProject && externalGrids
                   ? (
                     <CanvasBaseWithRedux section="Simulator">
                         <MeshedElement
-                            mesherOutput={mesherOutput}
+                            externalGrids={externalGrids}
                             selectedProject={selectedProject}
                             selectedMaterials={selectedMaterials}
                         />

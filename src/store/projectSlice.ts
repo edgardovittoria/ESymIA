@@ -235,6 +235,10 @@ export const ProjectSlice = createSlice({
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.mesh = action.payload
         },
+        setExternalGrids(state: ProjectState, action: PayloadAction<string>) {
+            let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
+            if (project) project.meshData.externalGrids = action.payload
+        },
         unsetMesh(state: ProjectState) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
             if (project) project.meshData.mesh = undefined
@@ -306,6 +310,7 @@ export const {
     setMeshApproved,
     setFolderOfElementsSharedWithUser,
     unsetMesh,
+    setExternalGrids,
     setModel,
     setModelS3,
     setModelUnit,
@@ -337,6 +342,7 @@ export const selectedProjectSelector = (state: { projects: ProjectState }) => {
     return project
 }
 export const meshGeneratedSelector = (state: {projects: ProjectState}) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.meshData.meshGenerated
+export const screenshotSelector = (state: {projects: ProjectState}) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.screenshot
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
     let allFolders: Folder[] = []

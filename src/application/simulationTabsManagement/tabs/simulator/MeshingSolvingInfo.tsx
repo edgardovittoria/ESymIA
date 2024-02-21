@@ -4,7 +4,7 @@ import {AiOutlineCheckCircle, AiOutlineThunderbolt} from "react-icons/ai";
 import {useDispatch, useSelector} from "react-redux";
 import {setSolverOutput} from "../../../../store/solverSlice";
 import {
-    deleteSimulation, meshGeneratedSelector,
+    deleteSimulation, meshGeneratedSelector, setExternalGrids,
     setMesh,
     setMeshApproved,
     setMeshGenerated,
@@ -171,9 +171,16 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 }
             };
             dispatch(updateSimulation(simulation));
+            let file = new Blob([JSON.stringify(solverInputFrom(selectedProject, solverIterations, convergenceThreshold))]);
+            let solverInputFile = new File([file], `mesh.json`, {
+                type: "application/json",
+            });
+            uploadFileS3(solverInputFile).then(() => {
+
+            })
 
             //https://teemaserver.cloud/solving
-            axios.post("http://127.0.0.1:8002/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
+            axios.post("http://127.0.0.1:5000/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
                 dispatch(setSolverOutput(res.data));
                 let simulationUpdated: Simulation = {
                     ...simulation,
@@ -197,7 +204,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     }, [meshApproved]);
 
 
-    const saveMeshToS3 = async (mesherOutput: any) => {
+    const saveMeshAndExternalGridsToS3 = async (mesherOutput: any, externalGrid: any) => {
         let blobFile = new Blob([JSON.stringify(mesherOutput)]);
         let meshFile = new File([blobFile], `mesh.json`, {
             type: "application/json",
@@ -207,6 +214,20 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             if (res) {
                 dispatch(setMeshGenerated("Generated"))
                 dispatch(setMesh(res.key));
+                saveExternalGridsToS3(externalGrid)
+            }
+        });
+        return "saved"
+    };
+
+    const saveExternalGridsToS3 = async (externalGrids: any) => {
+        let blobFile = new Blob([JSON.stringify(externalGrids)]);
+        let meshFile = new File([blobFile], `mesh.json`, {
+            type: "application/json",
+        });
+        uploadFileS3(meshFile).then((res) => {
+            if (res) {
+                dispatch(setExternalGrids(res.key));
             }
         });
         return "saved"
@@ -260,12 +281,19 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     Object.keys(res.data.mesher_matrices).forEach((k, index) => {
                         data[k] = grids_external[index]
                     })
-                    res.data.externalGrids = data
-                    if (selectedProject.meshData.mesh) {
-                        deleteFileS3(selectedProject.meshData.mesh).then(() => {
-                        })
+                    let extGrids = {
+                        externalGrids: data,
+                        cell_size: res.data.cell_size,
+                        origin: res.data.origin,
+                        n_cells: res.data.n_cells
                     }
-                    saveMeshToS3((res.data)).then((res) => {});
+                    if (selectedProject.meshData.mesh) {
+                        deleteFileS3(selectedProject.meshData.mesh).then(() => {})
+                    }
+                    if (selectedProject.meshData.externalGrids) {
+                        deleteFileS3(selectedProject.meshData.externalGrids).then(() => {})
+                    }
+                    saveMeshAndExternalGridsToS3(res.data, extGrids).then((res) => {});
                 }
 
             }).catch((err) => {

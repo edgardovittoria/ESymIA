@@ -71,8 +71,8 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = (
                     {(project.name.length > 15) ? project.name.substring(0, 15) + '...' : project.name}
                 </h5>
                 <div>
-                    <img className="w-[100%] scale-125" alt="project_screenshot"
-                         src="/noResultsIconForProject.png"
+                    <img className="w-[100%]" alt="project_screenshot"
+                         src={(project.screenshot) ? project.screenshot : "/noResultsIconForProject.png"}
                     />
                 </div>
 

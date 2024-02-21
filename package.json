@@ -36,6 +36,7 @@
     "react-hot-toast": "^2.2.0",
     "react-icons": "^5.0.0",
     "react-redux": "^7.2.6",
+    "react-screen-capture": "^1.1.1",
     "react-scripts": "5.0.0",
     "react-use-websocket": "^3.0.0",
     "three": "^0.138.0",

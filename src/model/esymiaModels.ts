@@ -1,4 +1,5 @@
 import { CanvasState, ComponentEntity, UsersState } from "cad-library"
+import {Brick} from "../application/simulationTabsManagement/tabs/simulator/MeshingSolvingInfo";
 
 export type Folder = {
     name: string,
@@ -83,6 +84,7 @@ export type Probe = {
 
 export type MeshData = {
     mesh?: string,
+    externalGrids?: string
     meshGenerated: "Not Generated" | "Generated" | "Generating",
     meshApproved: boolean,
     quantum: [number, number, number]
@@ -107,4 +109,23 @@ export type SolverOutput = {
     matrix_Z: string,
     matrix_S: string,
     matrix_Y: string,
+}
+
+export type ExternalGridsObject = {
+    externalGrids: Brick[][],
+    cell_size: {
+        cell_size_x: number,
+        cell_size_y: number,
+        cell_size_z: number
+    },
+    origin: {
+        origin_x: number,
+        origin_y: number,
+        origin_z: number
+    },
+    n_cells:{
+        n_cells_x: number,
+        n_cells_y: number,
+        n_cells_z: number,
+    }
 }

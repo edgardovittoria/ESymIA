@@ -2,7 +2,7 @@ import React, {useEffect, useRef} from "react";
 import {FrontSide, InstancedMesh, Object3D} from "three";
 import {Material} from "cad-library";
 import {MesherOutput} from "../../MesherInputOutput";
-import {Project} from "../../../../../../model/esymiaModels";
+import {ExternalGridsObject, Project} from "../../../../../../model/esymiaModels";
 import {useSelector} from "react-redux";
 import {meshGeneratedSelector} from "../../../../../../store/projectSlice";
 import {Brick} from "../../MeshingSolvingInfo";
@@ -11,13 +11,14 @@ import {Brick} from "../../MeshingSolvingInfo";
 interface InstancedMeshProps {
     index: number;
     materialsList: Material[];
-    mesherOutput: MesherOutput;
+    externalGrids: ExternalGridsObject
+
 }
 
 export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                                                                   index,
                                                                   materialsList,
-                                                                  mesherOutput,
+                                                                  externalGrids,
                                                               }) => {
     let meshGenerated = useSelector(meshGeneratedSelector)
 
@@ -25,33 +26,31 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
     const edgeRef = useRef<InstancedMesh[]>([])
 
 
-    let numberOfCells = getNumberOfCells(mesherOutput);
-
     useEffect(() => {
+        console.log("matrix")
         if (meshGenerated === "Generated") {
             let tempObject = new Object3D();
-            Object.values(mesherOutput?.externalGrids).forEach((matrix:Brick[], index) => {
-                if (mesherOutput && meshRef.current[index]) {
+            Object.values(externalGrids.externalGrids).forEach((matrix:Brick[], index) => {
+                if (externalGrids && meshRef.current[index]) {
                     let y = 0;
                     matrix.forEach(m => {
-
                         const id = y++;
                         tempObject.position.set(
                             m.x !== 0
-                                ? ((m.x - 1) * mesherOutput.cell_size.cell_size_x +
-                                    mesherOutput.cell_size.cell_size_x) *
+                                ? ((m.x - 1) * externalGrids.cell_size.cell_size_x +
+                                    externalGrids.cell_size.cell_size_x) *
                                 1020
-                                : mesherOutput.origin.origin_x,
+                                : externalGrids.origin.origin_x,
                             m.y !== 0
-                                ? ((m.y - 1) * mesherOutput.cell_size.cell_size_y +
-                                    mesherOutput.cell_size.cell_size_y) *
+                                ? ((m.y - 1) * externalGrids.cell_size.cell_size_y +
+                                    externalGrids.cell_size.cell_size_y) *
                                 1020
-                                : mesherOutput.origin.origin_y,
+                                : externalGrids.origin.origin_y,
                             m.z !== 0
-                                ? ((m.z - 1) * mesherOutput.cell_size.cell_size_z +
-                                    mesherOutput.cell_size.cell_size_z) *
+                                ? ((m.z - 1) * externalGrids.cell_size.cell_size_z +
+                                    externalGrids.cell_size.cell_size_z) *
                                 1020
-                                : mesherOutput.origin.origin_z
+                                : externalGrids.origin.origin_z
                         );
                         tempObject.updateMatrix();
                         meshRef.current[index].setMatrixAt(id, tempObject.matrix);
@@ -65,7 +64,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                 }
             });
         }
-    }, [meshGenerated, materialsList, mesherOutput]);
+    }, [meshGenerated, materialsList, externalGrids]);
 
 
     return (
@@ -77,14 +76,14 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                     }
                 }}
                 key={index}
-                args={[null as any, null as any, Object.values(mesherOutput.externalGrids)[index].length]}>
+                args={[null as any, null as any, Object.values(externalGrids.externalGrids)[index].length]}>
                 <boxGeometry
                     args={
                         [
 
-                            (mesherOutput?.cell_size.cell_size_x as number) * 1000,
-                            (mesherOutput?.cell_size.cell_size_y as number) * 1000,
-                            (mesherOutput?.cell_size.cell_size_z as number) * 1000,
+                            (externalGrids?.cell_size.cell_size_x as number) * 1000,
+                            (externalGrids?.cell_size.cell_size_y as number) * 1000,
+                            (externalGrids?.cell_size.cell_size_z as number) * 1000,
 
                         ]
                     }
@@ -101,14 +100,14 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                     }
                 }}
                 key={index + 1}
-                args={[null as any, null as any, Object.values(mesherOutput.externalGrids)[index].length]}>
+                args={[null as any, null as any, Object.values(externalGrids.externalGrids)[index].length]}>
                 <boxBufferGeometry
                     args={
                         [
 
-                            (mesherOutput?.cell_size.cell_size_x as number) * 1000,
-                            (mesherOutput?.cell_size.cell_size_y as number) * 1000,
-                            (mesherOutput?.cell_size.cell_size_z as number) * 1000,
+                            (externalGrids?.cell_size.cell_size_x as number) * 1000,
+                            (externalGrids?.cell_size.cell_size_y as number) * 1000,
+                            (externalGrids?.cell_size.cell_size_z as number) * 1000,
 
                         ]
                     }
@@ -120,27 +119,3 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
         </>
     );
 };
-
-export function getNumberOfCells(output: MesherOutput | undefined) {
-    let numberOfCells
-    /*let matrices: (Brick[])[] = [];
-    if (output) {
-        Object.values(output.mesher_matrices).forEach((matrix) => {
-            matrices.push(matrix);
-        });
-        matrices.forEach((matrix) => {
-            let cells = 0;
-            matrix.forEach((m) => {
-                m.forEach((m) => {
-                    m.forEach((m) => {
-                        if (m) {
-                            cells += 1;
-                        }
-                    });
-                });
-            });
-            numberOfCells.push(cells);
-        });
-    }*/
-    //return numberOfCells;
-}
