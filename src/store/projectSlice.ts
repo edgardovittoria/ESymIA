@@ -61,7 +61,8 @@ export const ProjectSlice = createSlice({
         },
         removeProject(state: ProjectState, action: PayloadAction<string>) {
             let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload);
-            (project?.meshData.mesh) && deleteFileS3(project?.meshData.mesh as string).catch((err) => console.log(err))
+            (project?.meshData.mesh) && deleteFileS3(project?.meshData.mesh as string).catch((err) => console.log(err));
+            (project?.meshData.externalGrids) && deleteFileS3(project?.meshData.externalGrids as string).catch((err) => console.log(err))
             removeProjectFromStore(state, action.payload)
         },
         moveFolder(state: ProjectState, action: PayloadAction<{
