@@ -23,9 +23,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
                                                         selectedTabLeftPanel,
                                                         setSelectedTabLeftPanel,
                                                     }) => {
-    const [mesherOutput, setMesherOutput] = useState<MesherOutput | undefined>(
-        undefined
-    );
+
     const [externalGrids, setExternalGrids] = useState<ExternalGridsObject | undefined>(
         undefined
     );
@@ -37,7 +35,6 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
     useEffect(() => {
         if (selectedProject?.meshData.mesh) {
-            setMesherOutput(undefined)
             setExternalGrids(undefined)
             s3.getObject(
                 {
@@ -119,8 +116,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
             {/* <RightPanelSimulation> */}
             <MeshingSolvingInfo
                 selectedProject={selectedProject as Project}
-                mesherOutput={mesherOutput}
                 allMaterials={allMaterials}
+                externalGrids={externalGrids}
             />
             {/* </RightPanelSimulation> */}
         </>

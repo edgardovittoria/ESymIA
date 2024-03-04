@@ -17,23 +17,24 @@ import {MesherOutput} from "./MesherInputOutput";
 import {deleteFileS3, uploadFileS3} from "../../../../aws/mesherAPIs";
 import {selectMenuItem} from "../../../../store/tabsAndMenuItemsSlice";
 import {ImSpinner} from "react-icons/im";
-import {Project, Simulation, SolverOutput} from "../../../../model/esymiaModels";
+import {ExternalGridsObject, Project, Simulation, SolverOutput} from "../../../../model/esymiaModels";
 import {getMaterialListFrom} from "./Simulator";
 import useWebSocket from "react-use-websocket";
 import {updateProjectInFauna} from "../../../../faunadb/projectsFolderAPIs";
 import {convertInFaunaProjectThis} from "../../../../faunadb/apiAuxiliaryFunctions";
+import {s3} from "../../../../aws/s3Config";
 
 
 interface MeshingSolvingInfoProps {
     selectedProject: Project;
-    mesherOutput?: MesherOutput;
-    allMaterials?: Material[]
+    allMaterials?: Material[];
+    externalGrids?: ExternalGridsObject
 }
 
 export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                                                           selectedProject,
-                                                                          mesherOutput,
-                                                                          allMaterials
+                                                                          allMaterials,
+                                                                          externalGrids
                                                                       }) => {
 
     const dispatch = useDispatch();
@@ -67,7 +68,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             );
 
         return {
-            mesherOutput: mesherOutput,
+            mesherFileId: project.meshData.mesh,
             solverInput: {
                 ports: project.ports.filter(p => p.category === 'port'),
                 lumped_elements: project.ports.filter(p => p.category === 'lumped'),
@@ -180,7 +181,8 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             })
 
             //https://teemaserver.cloud/solving
-            axios.post("http://127.0.0.1:5000/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
+            console.log(solverInputFrom(selectedProject, solverIterations, convergenceThreshold))
+            axios.post("http://127.0.0.1:8002/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
                 dispatch(setSolverOutput(res.data));
                 let simulationUpdated: Simulation = {
                     ...simulation,
@@ -235,16 +237,16 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
 
     // Show updated quantum values whenever the mesh gets updated.
     useEffect(() => {
-        if (mesherOutput) {
+        if (externalGrids) {
             dispatch(
                 setQuantum([
-                    mesherOutput.cell_size.cell_size_x * 1000,
-                    mesherOutput.cell_size.cell_size_y * 1000,
-                    mesherOutput.cell_size.cell_size_z * 1000,
+                    externalGrids.cell_size.cell_size_x * 1000,
+                    externalGrids.cell_size.cell_size_y * 1000,
+                    externalGrids.cell_size.cell_size_z * 1000,
                 ])
             );
         }
-    }, [mesherOutput])
+    }, [externalGrids])
 
     // Mesh generation and storage on S3.
     useEffect(() => {
@@ -288,12 +290,18 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                         n_cells: res.data.n_cells
                     }
                     if (selectedProject.meshData.mesh) {
-                        deleteFileS3(selectedProject.meshData.mesh).then(() => {})
+                        deleteFileS3(selectedProject.meshData.mesh).then(() => {
+                        })
                     }
                     if (selectedProject.meshData.externalGrids) {
-                        deleteFileS3(selectedProject.meshData.externalGrids).then(() => {})
+                        deleteFileS3(selectedProject.meshData.externalGrids).then(() => {
+                        })
                     }
-                    saveMeshAndExternalGridsToS3(res.data, extGrids).then((res) => {});
+                    let solverInput = {
+                        ...res.data,
+                        ...solverInputFrom(selectedProject, solverIterations, convergenceThreshold)
+                    }
+                    saveMeshAndExternalGridsToS3(solverInput, extGrids).then((res) => {});
                 }
 
             }).catch((err) => {
