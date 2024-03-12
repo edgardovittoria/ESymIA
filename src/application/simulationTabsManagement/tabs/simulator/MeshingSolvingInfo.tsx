@@ -48,11 +48,10 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     const [frequenciesNumber, setFrequenciesNumber] = useState(0)
 
     useEffect(() => {
-        if (typeof selectedProject.meshData.mesh === 'string') {
-            execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject)).then(() => {
-            })
+        if (typeof selectedProject.meshData.mesh === 'string' && typeof selectedProject.meshData.externalGrids === 'string') {
+            execQuery(updateProjectInFauna, convertInFaunaProjectThis(selectedProject)).then(() => {})
         }
-    }, [selectedProject.meshData.mesh]);
+    }, [selectedProject.meshData.mesh, selectedProject.meshData.externalGrids]);
 
     const solverInputFrom = (project: Project, solverIterations: [number, number], convergenceThreshold: number) => {
         let frequencyArray: number[] = [];
@@ -214,9 +213,16 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
 
         uploadFileS3(meshFile).then((res) => {
             if (res) {
-                dispatch(setMeshGenerated("Generated"))
-                dispatch(setMesh(res.key));
                 saveExternalGridsToS3(externalGrid)
+                    .then((resExt) => {
+                        dispatch(setMeshGenerated("Generated"))
+                        dispatch(setMesh(res.key));
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        window.alert("Error while meshing, please try again")
+                        dispatch(setMeshGenerated("Not Generated"))
+                    })
             }
         });
         return "saved"
