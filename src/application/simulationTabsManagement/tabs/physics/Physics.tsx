@@ -164,7 +164,6 @@ const PhysicsPortsDrawer: FC = () => {
 								: new THREE.Color("violet").getHex()
 						}
 						lineWidth={1}
-						alphaWrite={undefined}
 					/>
 				</group>
 			);

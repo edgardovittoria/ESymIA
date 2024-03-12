@@ -25,9 +25,9 @@ export const SolverSlice = createSlice({
             state.downloadPercentage = action.payload
         }
     },
-    extraReducers: {
-        //qui inseriamo i metodi : PENDING, FULLFILLED, REJECT utili per la gestione delle richieste asincrone
-}
+//     extraReducers: {
+//         //qui inseriamo i metodi : PENDING, FULLFILLED, REJECT utili per la gestione delle richieste asincrone
+// }
 })
 
 

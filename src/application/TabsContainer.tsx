@@ -91,7 +91,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
                                 </div>
                                 <div
                                     className={`flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer`}
-                                    onClick={() => logout({returnTo: window.location.origin})}>
+                                    onClick={() => logout({logoutParams:{returnTo: window.location.origin}})}>
                                     <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px] text-primaryColor"/>
                                     <li>Logout</li>
                                 </div>
@@ -101,7 +101,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
                         :
                         <button
                             className="text-primaryColor rounded mr-[20px] border-2 border-secondaryColor font-bold py-[4px] px-[10px] hover:bg-green-200"
-                            onClick={loginWithRedirect}>
+                            onClick={() => loginWithRedirect}>
                             Login
                         </button>}
                 </div>

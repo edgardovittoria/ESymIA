@@ -27,7 +27,7 @@ export const ProbeControls: React.FC<ProbeControlsProps> = (
 
     function onChangePositionHandler(event: THREE.Event) {
         setSavedPortParameters(false)
-        if (!event.value && transformation.current) {
+        if (!event.target && transformation.current) {
             const controls: Object3DNode<any, any> = transformation.current as unknown as Object3DNode<any, any>
             let transformationParmas = {
                 type: 'probe',

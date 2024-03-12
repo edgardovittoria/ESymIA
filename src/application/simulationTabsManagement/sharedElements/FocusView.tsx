@@ -1,10 +1,10 @@
 import { Bounds, useBounds } from "@react-three/drei"
-import { FC, useEffect } from "react"
+import { FC, ReactNode, useEffect } from "react"
 import { useSelector } from "react-redux"
 import { selectedProjectSelector } from "../../../store/projectSlice"
 
 
-export const FocusView: FC = ({ children }) => {
+export const FocusView: FC<{children: ReactNode}> = ({ children }) => {
     return (
         <Bounds fit clip observe margin={1.8}>
             <FocusViewCommonActions>
@@ -14,7 +14,7 @@ export const FocusView: FC = ({ children }) => {
     )
 }
 
-const FocusViewCommonActions: FC = ({ children }) => {
+const FocusViewCommonActions: FC<{children: ReactNode}> = ({ children }) => {
     const selectedProject = useSelector(selectedProjectSelector)
     const bounds = useBounds()
     useEffect(() => {

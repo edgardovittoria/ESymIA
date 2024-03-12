@@ -1,4 +1,4 @@
-import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
+import React, {MutableRefObject, ReactNode, useEffect, useRef, useState} from 'react';
 import {BufferGeometry, InstancedBufferAttribute, InstancedMesh, Material, Object3D, Vector3} from "three";
 import {MeshSurfaceSampler} from "three/examples/jsm/math/MeshSurfaceSampler";
 import * as THREE from "three";
@@ -7,6 +7,7 @@ export interface SampledSurfaceProps {
     instance: InstancedMesh<BufferGeometry, Material | Material[]>[]
     color: THREE.Color,
     id: number | undefined,
+    children: ReactNode
 }
 
 const SampledSurface: React.FC<SampledSurfaceProps> = (

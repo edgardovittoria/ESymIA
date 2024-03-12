@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import {Canvas} from "@react-three/fiber";
 import * as THREE from "three";
 import {OrbitControls, GizmoHelper, GizmoViewport, Edges} from "@react-three/drei";
@@ -28,7 +28,8 @@ interface CanvasBaseWithReduxProps {
     section: string;
     portClickAction?: Function;
     setPointerEvent?: Function,
-    setMesh?: Function
+    setMesh?: Function,
+    children?: ReactNode
 }
 
 export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
@@ -126,10 +127,10 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                         actionParams={
                             {id: selectedProject?.faunaDocumentId, unit: "mm"} as ImportActionParamsObject
                         }>
-                        <GiCubeforce
+                        {/* <GiCubeforce
                             style={{width: "25px", height: "25px", marginRight: "5px"}}
-                        />{" "}
-                        Import From FS
+                        />{" "} */}
+                        {"Import From FS"}
                     </ImportCadProjectButton>
                     <span className="border-start border-dark"/>
                     <button

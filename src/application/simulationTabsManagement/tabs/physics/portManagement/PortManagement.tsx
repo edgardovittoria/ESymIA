@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { FaReact } from "react-icons/fa6";
 import { Port, Probe } from '../../../../../model/esymiaModels';
 
@@ -6,7 +6,8 @@ import { Port, Probe } from '../../../../../model/esymiaModels';
 interface PortManagementProps {
     selectedPort: Port | Probe | undefined,
     savedPortParameters: boolean,
-    setSavedPortParameters: Function
+    setSavedPortParameters: Function,
+    children: ReactNode
 }
 
 export const PortManagement: React.FC<PortManagementProps> = (

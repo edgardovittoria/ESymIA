@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import {Tab} from "@headlessui/react";
 import {tabTitles} from "./modelerTabTitlesAndIcons";
 import {useSelector} from "react-redux";
@@ -7,7 +7,8 @@ import {selectedProjectSelector} from "../../../store/projectSlice";
 interface DashBoardProps {
     tabs: string[],
     selectedTab: string
-    setSelectedTab: Function,    
+    setSelectedTab: Function, 
+    children: ReactNode   
 }
 
 export const LeftPanel: React.FC<DashBoardProps> = (

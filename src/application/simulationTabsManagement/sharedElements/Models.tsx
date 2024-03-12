@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import {useSelector} from "react-redux";
 import {selectedProjectSelector} from "../../../store/projectSlice";
 
 interface ModelsProps {
+    children: ReactNode
 }
 
 export const Models: React.FC<ModelsProps> = ({children}) => {

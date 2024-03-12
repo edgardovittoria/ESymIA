@@ -23,7 +23,7 @@ export const Screenshot: FC<ScreenshotProps> = ({ selectedProject }) => {
 		gl.render(scene, camera);
 		gl.toneMapping = THREE.ACESFilmicToneMapping;
 		gl.toneMappingExposure = 0.6;
-		gl.outputEncoding = THREE.sRGBEncoding;
+		// gl.outputEncoding = THREE.sRGBEncoding;
 		gl.domElement.toBlob(
 			function (blob) {
 				if (blob) {

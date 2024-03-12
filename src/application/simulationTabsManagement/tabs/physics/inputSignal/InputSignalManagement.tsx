@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 interface InputSignalManagementProps {
+    children: ReactNode
 }
 
 export const InputSignalManagement: React.FC<InputSignalManagementProps> = (
