@@ -101,7 +101,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = (
                         :
                         <button
                             className="text-primaryColor rounded mr-[20px] border-2 border-secondaryColor font-bold py-[4px] px-[10px] hover:bg-green-200"
-                            onClick={() => loginWithRedirect}>
+                            onClick={() => loginWithRedirect()}>
                             Login
                         </button>}
                 </div>

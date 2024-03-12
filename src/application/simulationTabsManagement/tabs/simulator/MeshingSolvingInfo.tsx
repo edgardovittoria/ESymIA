@@ -176,13 +176,13 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             let solverInputFile = new File([file], `mesh.json`, {
                 type: "application/json",
             });
-            uploadFileS3(solverInputFile).then(() => {
+            /*uploadFileS3(solverInputFile).then(() => {
 
-            })
+            })*/
 
             //https://teemaserver.cloud/solving
             console.log(solverInputFrom(selectedProject, solverIterations, convergenceThreshold))
-            axios.post("http://127.0.0.1:8002/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
+            axios.post("http://127.0.0.1:8000/solving", solverInputFrom(selectedProject, solverIterations, convergenceThreshold)).then((res) => {
                 dispatch(setSolverOutput(res.data));
                 let simulationUpdated: Simulation = {
                     ...simulation,

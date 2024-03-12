@@ -1,8 +1,7 @@
 import React, {useEffect, useRef} from "react";
 import {FrontSide, InstancedMesh, Object3D} from "three";
 import {Material} from "cad-library";
-import {MesherOutput} from "../../MesherInputOutput";
-import {ExternalGridsObject, Project} from "../../../../../../model/esymiaModels";
+import {ExternalGridsObject} from "../../../../../../model/esymiaModels";
 import {useSelector} from "react-redux";
 import {meshGeneratedSelector} from "../../../../../../store/projectSlice";
 import {Brick} from "../../MeshingSolvingInfo";
@@ -101,7 +100,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                 }}
                 key={index + 1}
                 args={[null as any, null as any, Object.values(externalGrids.externalGrids)[index].length]}>
-                <boxBufferGeometry
+                <boxGeometry
                     args={
                         [
 
@@ -111,7 +110,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
 
                         ]
                     }
-                ></boxBufferGeometry>
+                ></boxGeometry>
                 <meshPhongMaterial
                     color={"black"} wireframe={true}
                 />

@@ -64,7 +64,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                                         color={"#ffffff"}
                                         groundColor={new THREE.Color("#b9b9b9")}
                                         position={[-7, 25, 13]}
-                                        intensity={0.85}
+                                        intensity={3}
                                     />
                                     {/* paint models */}
                                     {(!mesherOutput || section !== "Simulator") && selectedProject && selectedProject.model.components.map((component, index) => {
